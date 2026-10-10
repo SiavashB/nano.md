@@ -1,4 +1,4 @@
-# NanoMD
+# Nano.MD
 
 A lightweight native macOS app for reading Markdown files, with source editing planned for a later milestone.
 
