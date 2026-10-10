@@ -72,11 +72,9 @@ struct MarkdownTextRenderer {
         let table = NSTextTable()
         table.numberOfColumns = content.columnAlignments.count
         table.layoutAlgorithm = .fixedLayoutAlgorithm
-        table.collapsesBorders = true
+        table.collapsesBorders = false
         table.hidesEmptyCells = false
-        table.setContentWidth(100, type: .percentageValueType)
         table.setWidth(indent, type: .absoluteValueType, for: .margin, edge: .minX)
-        table.setWidth(12, type: .absoluteValueType, for: .margin, edge: .maxY)
 
         for (rowIndex, row) in ([content.header] + content.rows).enumerated() {
             try Task.checkCancellation()
@@ -89,7 +87,6 @@ struct MarkdownTextRenderer {
                     table: table, startingRow: rowIndex, rowSpan: 1,
                     startingColumn: columnIndex, columnSpan: 1
                 )
-                cell.setContentWidth(100 / CGFloat(table.numberOfColumns), type: .percentageValueType)
                 cell.setWidth(8, type: .absoluteValueType, for: .padding)
                 cell.setWidth(0.5, type: .absoluteValueType, for: .border)
                 cell.setBorderColor(.separatorColor)
@@ -117,6 +114,15 @@ struct MarkdownTextRenderer {
                 output.append(NSAttributedString(string: "\n", attributes: base))
             }
         }
+
+        // Keep the gap after a table outside its cell layout and borders.
+        let spacing = NSMutableParagraphStyle()
+        spacing.minimumLineHeight = 12
+        spacing.maximumLineHeight = 12
+        output.append(NSAttributedString(string: "\n", attributes: [
+            .font: NSFont.systemFont(ofSize: 1),
+            .paragraphStyle: spacing
+        ]))
     }
 
     private func appendParagraph(

@@ -40,7 +40,7 @@ Rendering is implemented. Debug and locally signed Release builds passed. A focu
 
 The reader milestone is complete within its documented syntax subset. Performance profiling is deferred to final polish and is not a gate for further feature work. The initial formatting limits (1 MiB, 50,000 nodes, 64 levels) remain conservative guardrails. Full source remains available when a limit is exceeded. No automated tests or dedicated accessibility audit were added. The live check did not exercise rapid external file replacement or browser navigation; cancellation/revision checks and the link policy were reviewed in code.
 
-Pipe-table rendering was added after the original reader smoke check, with native cells, header styling, borders, column alignment, and inline formatting. Debug and locally signed Release builds passed, and build 3 was installed at `/Applications/NanoMD.app`. The installed binary matches the Release build, and macOS resolves NanoMD to that location. Table rendering has not been visually verified; no tests were added.
+Pipe-table rendering was added after the original reader smoke check, with native cells, header styling, borders, column alignment, and inline formatting. User-provided screenshots confirmed visible alignment, inline formatting, text wrapping, empty cells, and header-only tables, and exposed border gaps and tight spacing after tables. Border and spacing adjustments compile in Debug and locally signed Release; build 4 is installed at `/Applications/NanoMD.app`. The installed binary matches the Release build, and macOS resolves NanoMD to that location. The adjusted layout awaits user confirmation; selection and copying across table cells remain unverified. No tests were added.
 
 ## 3. Public release preparation
 

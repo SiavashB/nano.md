@@ -4,6 +4,7 @@ NanoMD is a lightweight native macOS Markdown app. The first product milestone i
 
 ## Start here
 
+- The public-facing product name is `nano.md`, all lowercase with a period. `NanoMD`/`nanomd` are the existing project and code names; keep those technical identifiers unless explicitly asked to rename them.
 - Read [README.md](README.md) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before changing app code. Consult [docs/ROADMAP.md](docs/ROADMAP.md) for scope and [CONTRIBUTING.md](CONTRIBUTING.md) for validation.
 - Inspect the current code, project settings, and Git diff. Architecture documents describe the intended design; do not assume planned components exist.
 - Work in the user's saved project directory and current checkout. Do not create or use a worktree unless explicitly requested. Preserve unrelated changes.
