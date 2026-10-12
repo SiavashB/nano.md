@@ -9,7 +9,7 @@ Test locally with AI assistance, merge the changes, push a version tag, and revi
 
 Both workflows use the standard `macos-26` runner and Xcode 26.6. Build products, package caches, logs, and release staging stay under `Temp/`. Only selected logs and release files are uploaded. CI compilation does not verify editing behavior, file preservation, or the downloaded app's first launch.
 
-Standard runner time is free for public repositories. Private repositories use the account's included Actions allowance and may incur charges beyond it. This repository is currently private; check its Actions budget before enabling paid overages.
+Standard runner time is free for public repositories. Private repositories use the account's included Actions allowance and may incur charges beyond it; check the account's Actions budget before enabling paid overages.
 
 ## One-time signing setup
 
