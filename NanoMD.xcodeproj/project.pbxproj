@@ -7,10 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A79D185C736A4E499BA32EE1 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = A79D185C736A4E499BA32EE2 /* LICENSE */; };
 		3F90602C50834145A5333C01 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 3F90602C50834145A5333C02 /* Markdown */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A79D185C736A4E499BA32EE2 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		BD7DE698C62A4BE3943116DD /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Signing.xcconfig; sourceTree = "<group>"; };
 		7C6A330C3050BD8100EFCD32 /* NanoMD.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NanoMD.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -51,6 +53,7 @@
 		7C6A33033050BD8100EFCD32 = {
 			isa = PBXGroup;
 			children = (
+				A79D185C736A4E499BA32EE2 /* LICENSE */,
 				BD7DE698C62A4BE3943116DD /* Signing.xcconfig */,
 				7C6A330E3050BD8100EFCD32 /* NanoMD */,
 				7C6A330D3050BD8100EFCD32 /* Products */,
@@ -133,6 +136,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A79D185C736A4E499BA32EE1 /* LICENSE in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

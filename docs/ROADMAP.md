@@ -44,7 +44,7 @@ Pipe-table rendering was added after the original reader smoke check, with nativ
 
 ## 3. Public release preparation
 
-- [ ] Choose and add the project license; retain any required dependency notices.
+- [x] Choose and add the project license; retain any required dependency notices.
 - [ ] Decide and validate the minimum supported macOS and Xcode versions.
 - [x] Share the Xcode scheme and verify a build from a fresh checkout without personal settings.
 - [x] Remove already-tracked `xcuserdata` from Git while preserving the owner's local settings; ignore rules do not untrack files.
@@ -57,7 +57,7 @@ Automated test coverage is a separate maintainer-requested task. No tests or tes
 
 The initial release process is defined in [Releasing](RELEASING.md): build-only CI on pull requests and `main`, local AI-assisted functional checks, and signed/notarized draft releases from version tags. A shared Xcode scheme is included. [The first GitHub build](https://github.com/SiavashB/nano.md/actions/runs/38302783956) passed unsigned Debug and Release on a clean macOS runner with Xcode 26.6. Local independent build and workflow validation also passed; app/source size was unchanged. Signing credentials are not configured yet, so the signed release workflow remains unverified.
 
-The first beta candidate is version 0.1.0, build 7, intended for `v0.1.0-beta.1`. Personal Xcode state is no longer tracked, and signing uses an optional ignored `Config/Local.xcconfig`. Independent unsigned arm64 Debug and Release builds, workflow/project lint, and shared-scheme parsing passed with Xcode 26.6. Compared with the previous build under the same measurement method, regular-file Release bundle bytes increased from 3,640,373 to 3,640,375 (+2 bytes for version metadata). Production Swift remains 13 files, 910 physical lines, 818 nonblank lines, and 34,586 bytes. Logs and measurements are under `Temp/FirstRelease/`. License selection, local functional checks, Developer ID signing, and notarization remain pending; no release tag has been pushed.
+The first beta candidate is version 0.1.0, build 7, intended for `v0.1.0-beta.1`. The MIT license and dependency notices are bundled byte for byte. Personal Xcode state is no longer tracked, and signing uses an optional ignored `Config/Local.xcconfig`. Independent unsigned arm64 Debug and Release builds, workflow/project lint, and shared-scheme parsing passed with Xcode 26.6. Under the same measurement method, regular-file Release bundle bytes increased from 3,640,373 to 3,641,448 (+1,075 bytes for the license and version metadata). Production Swift remains 13 files, 910 physical lines, 818 nonblank lines, and 34,586 bytes. Logs and measurements are under `Temp/FirstRelease/`. Local functional checks, Developer ID signing, and notarization remain pending; no release tag has been pushed.
 
 ## 4. Source editing
 

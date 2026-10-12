@@ -13,7 +13,7 @@ Standard runner time is free for public repositories. Private repositories use t
 
 ## One-time signing setup
 
-1. Sign in to [Apple Developer](https://developer.apple.com/account/) and confirm an active Developer Program membership and its Team ID. Use the team that will own the release certificate; do not assume the local development team is the distribution team.
+1. Sign in to [Apple Developer](https://developer.apple.com/account/) and confirm an active Developer Program membership and its Team ID. Having an Apple account alone is insufficient; complete [enrollment and membership payment](https://developer.apple.com/programs/enroll/) if activation is pending. Use the team that will own the release certificate; do not assume the local development team is the distribution team.
 2. In Xcode's Settings → Accounts, select that account and team, then **Manage Certificates**. Create a **Developer ID Application** certificate with the + button. Certificate creation requires the Account Holder role. If that option is unavailable, follow [Apple's certificate setup](https://developer.apple.com/help/account/certificates/create-developer-id-certificates/) or ask the team's Account Holder to provide an export.
 3. Control-click the certificate and choose **Export Certificate**. Save it as `Temp/FirstRelease/DeveloperID.p12` with a nonempty password. The export must include the private key. See [Apple's export instructions](https://help.apple.com/xcode/mac/current/en.lproj/dev154b28f09.html).
 4. At [account.apple.com](https://account.apple.com/), open **Sign-In and Security → App-Specific Passwords**, and create a password named `nano.md releases`. This requires two-factor authentication. See [Apple's password instructions](https://support.apple.com/en-us/102654).
@@ -46,7 +46,7 @@ Missing credentials stop the release workflow with the missing secret's name. A 
 
 The first candidate is version **0.1.0**, build **7**, with the intended tag **`v0.1.0-beta.1`**. It targets Apple Silicon and macOS 26.5 or later, using Xcode 26.6. Broader hardware and older macOS support have not been verified. Preparing this version does not create a release tag or certify runtime behavior.
 
-Before tagging, choose and add the project license and complete these local checks with disposable files under `Temp/`. If using an AI assistant for UI checks, explicitly authorize visual testing in that chat.
+The project uses the MIT license, bundled alongside the dependency notices. Before tagging, complete these local checks with disposable files under `Temp/`. If using an AI assistant for UI checks, explicitly authorize visual testing in that chat.
 
 - Open `.md` and `.markdown` files in Read mode; check headings, lists, code, links, and tables, including selecting and copying across table cells.
 - Switch Read/Edit repeatedly; check selection, scroll position, undo/redo, and two independent document windows.

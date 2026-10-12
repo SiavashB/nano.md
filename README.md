@@ -62,4 +62,4 @@ This checks compilation; it does not validate signing or distribution. Swift Pac
 
 ## License
 
-An open-source release is planned. A project license has not yet been selected. Dependency licenses and notices are retained in [ThirdPartyNotices.txt](NanoMD/Resources/ThirdPartyNotices.txt), which is also included in the app bundle.
+nano.md is licensed under the [MIT License](LICENSE), which is included in the app bundle. Dependency licenses and notices are retained in [ThirdPartyNotices.txt](NanoMD/Resources/ThirdPartyNotices.txt), which is also bundled. A signed, notarized download is not yet available.

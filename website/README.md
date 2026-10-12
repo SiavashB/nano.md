@@ -53,4 +53,4 @@ NANO_MD_APP_PATH=/path/to/NanoMD.app npm --prefix website run deploy
 
 Review and commit the updated `index.html` with the app update. Never use a Debug build to advertise app size.
 
-Keep release claims aligned with the app. No public download is available yet. The repo remains private and has no project license; show “Source coming soon” until public access and a license are ready. The intended source URL is https://github.com/SiavashB/nano.md.
+Keep release claims aligned with the app. No public download is available yet. The project is MIT-licensed; show “Source coming soon” until the repository is public. The intended source URL is https://github.com/SiavashB/nano.md.
