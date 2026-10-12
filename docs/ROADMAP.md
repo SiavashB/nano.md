@@ -55,6 +55,8 @@ Pipe-table rendering was added after the original reader smoke check, with nativ
 
 Automated test coverage is a separate maintainer-requested task. No tests or test targets are introduced without an explicit request. Builds, focused manual verification, and honest reporting remain required.
 
+The initial release process is defined in [Releasing](RELEASING.md): build-only CI on pull requests and `main`, local AI-assisted functional checks, and signed/notarized draft releases from version tags. A shared Xcode scheme is included. GitHub execution and the first signed release must be verified before the corresponding preparation items are considered complete; signing credentials are not configured yet.
+
 ## 4. Source editing
 
 - [x] Add Read/Edit controls over the same document source and retain the existing reader path.
