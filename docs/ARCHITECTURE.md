@@ -1,10 +1,10 @@
 # Architecture
 
-Status: the read-only document foundation and native Markdown rendering are implemented. App functionality is the current priority; performance profiling and budgets are deferred to final polish.
+Status: the document foundation, native Markdown rendering, and first source editor are implemented. Builds are verified; runtime editing checks remain pending. App functionality is the current priority; performance profiling and budgets are deferred to final polish.
 
 ## Goals and constraints
 
-NanoMD opens local Markdown files in native macOS document windows. The first milestone displays documents without changing them. A later milestone adds source editing, undo/redo, and saving while reusing the reader.
+nano.md opens local Markdown files in native macOS document windows. Existing files start in Read; new documents start in Edit. Source editing, undo/redo, and native saving reuse the same document and existing reader.
 
 Favor small, explicit boundaries and macOS conventions. Keep document ownership in the system document lifecycle, preserve the user's source, and measure performance before adding caches or custom infrastructure. Accounts, synchronization, a document database, plugins, and an embedded browser are outside the initial scope.
 
@@ -14,13 +14,13 @@ Favor small, explicit boundaries and macOS conventions. Keep document ownership 
 | --- | --- | --- |
 | Application | SwiftUI, one macOS app target | Native scenes and commands with a small build surface. Folder boundaries are enforced through review rather than separate modules. |
 | Document lifecycle | `DocumentGroup` with a value-type `FileDocument` adapter | Reuse system document ownership. Move to a reference document only if actual editing or size requirements justify it. |
-| Read-only mode | Viewer scene, `Viewer` document role, read-only file entitlement, rejecting write adapter | Read-only behavior is enforced at multiple boundaries. Editing will require an intentional change to those boundaries. |
+| Editing lifecycle | Editing scene, `Editor` role, read/write selected-file entitlement, UTF-8 serialization | System document lifecycle owns persistence; the formatted reader remains read-only. |
 | Parsing | `swiftlang/swift-markdown` 0.8.0, behind a concrete parser boundary | Avoid maintaining a Markdown grammar. Use the maintained Swift/cmark parser instead of maintaining a grammar. The native view owns presentation. |
-| Presentation | SwiftUI shell with a read-only, selectable AppKit `NSTextView` adapter | Native continuous text selection and text layout. Block styling uses attributed text and paragraph indentation; a dedicated accessibility audit is deferred. |
+| Presentation | SwiftUI Read/Edit control, persistent plain-text editor, conditional read-only native reader | Native editing and continuous selection without a browser or hidden preview work. A dedicated accessibility audit is deferred. |
 | State | Document-owned source, document-scoped reader state, derived render output | One authoritative source with no application-wide document store. |
 | Persistence | Markdown files only | No database, rendered-content sidecars, or custom file format. |
 
-SwiftUI provides a dedicated viewer scene initializer and documents how it relates to the document role. Use the API available in the installed stable SDK; the Xcode 26.6 SDK includes `DocumentGroup(viewing:viewer:)`. See [Apple's viewer initializer documentation](https://developer.apple.com/documentation/swiftui/documentgroup/init(viewing:viewer:)-6dq9n).
+The editing `DocumentGroup(newDocument:editor:)` supplies a binding to the value-type document and restores standard document commands. No custom New, Save, Close, or Undo command groups are added. The completed viewer milestone's write restrictions have intentionally been superseded.
 
 Swift Markdown provides a syntax tree backed by `cmark-gfm`; it is a parser, not a complete macOS presentation layer. The project pins release 0.8.0; `Package.resolved` also records swift-cmark 0.9.0. Parser types stay inside `Markdown/`. See the [Swift Markdown repository](https://github.com/swiftlang/swift-markdown).
 
@@ -32,7 +32,6 @@ Current source layout inside the existing `NanoMD/` synchronized Xcode folder:
 NanoMD/
   App/
     NanoMDApp.swift
-    ReaderCommands.swift
   Documents/
     NanoMDDocument.swift
     MarkdownContentType.swift
@@ -40,6 +39,10 @@ NanoMD/
     MarkdownContent.swift
     MarkdownParser.swift
   Features/
+    Document/
+      DocumentView.swift
+    Editor/
+      MarkdownEditorView.swift
     Reader/
       ReaderView.swift
       ReaderModel.swift
@@ -60,18 +63,22 @@ Dependency direction:
 ```text
 App ──────────> Documents ──────────> SwiftUI document APIs + Foundation
  │
- └────────────> Reader ─────────────> Markdown ─────────────> parser package
+ └────────────> DocumentView ────────> Editor ──────────────> SwiftUI + AppKit
+                  │
+                  └────────────────> Reader ─────────────> Markdown ─────────────> parser package
                   │
                   └────────────────> SwiftUI + AppKit
 ```
 
-`App` supplies the document's source to `Reader`. The reader does not need to own or import a file adapter. `Markdown` has no knowledge of views, windows, file URLs, or persistence. The parser package's types do not escape into document or UI interfaces.
+`App` supplies a document binding to `DocumentView`, which gives the editor that binding and mounts `Reader` with the current immutable source only in Read mode. The reader does not need to own or import a file adapter. `Markdown` has no knowledge of views, windows, file URLs, or persistence. The parser package's types do not escape into document or UI interfaces.
 
 | Boundary | Owns | Must not own |
 | --- | --- | --- |
 | `App` | Scenes, commands, dependency construction | Parsing, file encoding, render state |
 | `Documents` | Source text, required encoding metadata, content types, file read/write contract | Fonts, attributed text, reader selection |
 | `Markdown` | Parsing and immutable semantic output for supported syntax | AppKit objects, file/network access, global state |
+| `DocumentView` | Per-window Read/Edit mode and composition | Parsing, encoding, file I/O |
+| `Editor` | Native text, selection, scroll position, input, document binding synchronization, native undo | Parsing, custom file I/O, rendered-text saving |
 | `Reader` | Loading state, presentation, selection, native text adapter, link policy | Source mutation or document I/O |
 
 Use a small semantic render model for supported blocks and inline content, not a second general-purpose Markdown syntax library. Parser nodes remain temporary implementation details. Keep styling in the reader so changing appearance does not require reparsing.
@@ -82,14 +89,7 @@ The document's decoded source is authoritative. Preserve whitespace, Unicode, li
 
 Register `.md` and `.markdown` with a Markdown content type in both the document adapter and `Info.plist`. Import an established type for an existing format; do not export a new proprietary Markdown format or claim all plain-text documents.
 
-For the read-only milestone:
-
-- Use a viewing `DocumentGroup`, set the bundle document role to `Viewer`, and reduce user-selected file access to read-only.
-- Give the reader a source value rather than a mutable document binding.
-- Declare no writable content types and make the required `FileDocument.fileWrapper` implementation throw a write-permission error.
-- Provide no editor, new-document action, save command, or custom autosave path.
-
-`ReaderCommands` replaces the framework's creation and save command groups, retaining File > Open and a Close action routed through the native responder chain. The Close command follows the focused document scene. This is necessary because the viewer scene alone still exposes document-writing commands in the Xcode 26.6 runtime.
+The writable adapter builds a `FileWrapper` directly from `source.utf8`, prepending the loaded BOM when present. New documents are empty UTF-8 without a BOM. Encoding does not normalize Unicode, whitespace, line endings, or trailing newlines. No parser output or native attributes reach serialization. The first existing CRLF, CR, or LF is the editor's insertion convention; no line ending defaults to LF. Existing and pasted text are not globally normalized.
 
 The system reads the document through the adapter. A renderer must not reopen the same document URL to obtain content. File identity and display metadata may be passed separately when needed. Rely on the system lifecycle for external changes initially; verify reload behavior and document any limitation before adding a file watcher. Apple's [DocumentGroup documentation](https://developer.apple.com/documentation/swiftui/documentgroup) describes document ownership and URL access constraints.
 
@@ -127,13 +127,21 @@ The literal-source reader disables automatic link and data detection. Formatted 
 
 Later local assets require explicit user-granted access to the needed resources; access to a Markdown file does not imply access to its containing directory. Remote loading requires a deliberate product policy. Keep document content and full paths out of logs.
 
-## Path to editing
+## Source editing and undo ownership
 
-Add source editing as another presentation of the same document. The editor mutates the document source through its binding; the preview consumes snapshots through the existing parser boundary. Selection, scroll position, loading state, and preview output remain outside persisted document content.
+`DocumentView` owns only presentation mode. Its `MarkdownEditorView` remains mounted while hidden in Read mode, preserving native selection, scroll position, text storage, and undo targets. Before hiding, it ends typing coalescing and releases first responder. Switching modes does not write the binding or register undo. The reader is removed in Edit, canceling its source-keyed task; entering Read mounts a fresh reader for the current source, including unsaved edits. Existing parser cancellation/revision protection, tables, fallback, limits, and link/resource policy are unchanged.
 
-The editing milestone intentionally changes the scene to an editing document group, enables writable types and file access, and implements serialization. Preserve encoding/BOM policy, line endings, and unchanged source bytes on a no-op round trip. Never serialize the render model or format Markdown implicitly.
+`MarkdownEditorView` uses a plain-text monospaced `NSTextView`. Native editing, selection, and input methods stay in AppKit. Smart quotes/dashes, substitutions, correction/completion, smart spacing, rich text/graphics, and automatic link/data detection are disabled. Paste uses plain text, and native newline insertion uses the document's line-ending convention.
 
-Integrate native undo/redo and verify that edits register correctly with the document lifecycle. Settle autosave, external-change conflicts, failure recovery, and crash recovery before claiming reliable editing. Debounce preview work if typing measurements require it. Do not add editing protocols or dormant mutation APIs to the reader milestone.
+The editor delegate supplies SwiftUI's document-scoped environment undo manager. NSTextView registers native incremental typing actions; the coordinator briefly disables registration while publishing source through the FileDocument binding, avoiding a second whole-document undo path. Native undo/redo notifications publish the changed source by the same route. The native objects stay alive in Read, and each window receives its own binding, coordinator, and undo manager. Window teardown removes actions retaining native editor targets. No standalone undo manager or global document state is introduced. Apple's [text-view undo delegate](https://developer.apple.com/documentation/appkit/nstextviewdelegate/undomanager(for:)) provides this integration point; [FileDocument undo semantics](https://developer.apple.com/documentation/swiftui/updating-your-document-based-app) explain the need to avoid duplicate binding actions.
+
+Every system read creates a transient `loadIdentity`, retained during ordinary edits and saves and never serialized. Accepted reloads/reverts replace it, so even an identical-byte revert invalidates stale undo. Ordinary SwiftUI updates do not replace native text; reloads compare exact UTF-8 representations before assigning the string. Delegate feedback is suppressed during replacement. Applying an accepted reload waits until marked text ends; old editor callbacks cannot publish over a document with a new load identity. Only the editor changes source during ordinary editing.
+
+## Native persistence and remaining verification
+
+The editing scene delegates saves, autosaves, save errors, reverts, external-change acceptance, and recovery to SwiftUI/macOS document infrastructure. The app never accesses document URLs directly, adds watchers, or clears source after a write failure. Unsaved text remains authoritative when entering Read. Conflict arbitration stays with the system rather than an app-specific merge/recovery mechanism; the coordinator applies only replacements already delivered by the document lifecycle. Runtime verification of unsaved external conflicts is still required before claiming reliable conflict handling.
+
+Compilation and code review support the implementation, not runtime guarantees. Save/reopen, dirty state/autosave, undo/redo across modes and windows, failed saves, byte preservation, selection/scroll retention, input-method composition with reloads, external conflicts, and crash recovery remain unverified. No tests or visual checks were introduced. Syntax highlighting, formatting controls, split preview, rendered editing, additional dependencies, caches, services, and performance profiling are deferred.
 
 ## Quality and evolution
 
