@@ -1,4 +1,4 @@
-# nano.md
+# Nano.MD
 
 A lightweight native macOS app for reading and editing Markdown files.
 
