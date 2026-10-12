@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1254 1254">
+  <g fill="none" stroke="#86D89F" stroke-width="67" stroke-linecap="round" stroke-linejoin="round">
+    <g id="hash-left">
+      <path d="M445 449 L348 820 M569 449 L473 820 M338 575 L604 575 M310 704 L577 704" />
+    </g>
+    <g id="hash-right" transform="translate(369 0)">
+      <path d="M445 449 L348 820 M569 449 L473 820 M338 575 L604 575 M310 704 L577 704" />
+    </g>
+  </g>
+</svg>
