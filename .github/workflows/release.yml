@@ -1,0 +1,145 @@
+name: Draft release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      RELEASE_TAG: ${{ github.ref_name }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate release tag
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v([0-9]+\.[0-9]+(\.[0-9]+)?)(-(alpha|beta|rc)\.[0-9]+)?$ ]]; then
+            echo 'Use a version tag such as v0.1.0 or v0.1.0-beta.1.' >&2
+            exit 1
+          fi
+          git merge-base --is-ancestor HEAD origin/main
+          mkdir -p Temp/Logs Temp/Release
+          xcodebuild -version
+      - name: Install Developer ID certificate
+        env:
+          CERTIFICATE_P12_BASE64: ${{ secrets.CERTIFICATE_P12_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          for name in CERTIFICATE_P12_BASE64 CERTIFICATE_PASSWORD APPLE_TEAM_ID APPLE_ID APPLE_APP_PASSWORD; do
+            if [[ -z "${!name}" ]]; then
+              echo "Missing GitHub Actions secret: $name. See docs/RELEASING.md." >&2
+              exit 1
+            fi
+          done
+          signing_dir="$PWD/Temp/ReleaseSigning"
+          mkdir -p "$signing_dir"
+          chmod 700 "$signing_dir"
+          keychain="$signing_dir/signing.keychain-db"
+          keychain_password=$(openssl rand -base64 32)
+          printf '%s' "$CERTIFICATE_P12_BASE64" | base64 --decode > "$signing_dir/certificate.p12"
+          security create-keychain -p "$keychain_password" "$keychain"
+          security set-keychain-settings -lut 3600 "$keychain"
+          security unlock-keychain -p "$keychain_password" "$keychain"
+          security import "$signing_dir/certificate.p12" -P "$CERTIFICATE_PASSWORD" \
+            -k "$keychain" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$keychain_password" "$keychain" > /dev/null
+          security list-keychains -d user -s "$keychain" "$HOME/Library/Keychains/login.keychain-db"
+          identity=$(security find-identity -v -p codesigning "$keychain" | awk '/Developer ID Application/ {print $2; exit}')
+          if [[ -z "$identity" ]]; then
+            echo 'The certificate must contain a valid Developer ID Application signing identity.' >&2
+            exit 1
+          fi
+          echo "SIGNING_IDENTITY=$identity" >> "$GITHUB_ENV"
+          rm "$signing_dir/certificate.p12"
+      - name: Build signed Release
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcodebuild -project NanoMD.xcodeproj -scheme NanoMD \
+            -configuration Release -destination 'platform=macOS,arch=arm64' \
+            -derivedDataPath "$PWD/Temp/DerivedData" \
+            -clonedSourcePackagesDirPath "$PWD/Temp/SourcePackages" \
+            -packageCachePath "$PWD/Temp/PackageCache" \
+            -onlyUsePackageVersionsFromResolvedFile \
+            ARCHS=arm64 CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            OTHER_CODE_SIGN_FLAGS="--timestamp --keychain $PWD/Temp/ReleaseSigning/signing.keychain-db" \
+            build 2>&1 | tee Temp/Logs/Release.log
+          app="$PWD/Temp/DerivedData/Build/Products/Release/NanoMD.app"
+          version=$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$app/Contents/Info.plist")
+          expected=${RELEASE_TAG#v}
+          if [[ "$version" != "${expected%%-*}" ]]; then
+            echo "App version $version does not match tag $RELEASE_TAG. Update MARKETING_VERSION before tagging." >&2
+            exit 1
+          fi
+          codesign --verify --deep --strict --verbose=2 "$app"
+          ditto -c -k --keepParent "$app" Temp/NotarizationUpload.zip
+      - name: Notarize and package
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          xcrun notarytool submit Temp/NotarizationUpload.zip \
+            --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" \
+            --wait --timeout 20m --output-format json > Temp/Logs/notarization.json
+          jq -e '.status == "Accepted"' Temp/Logs/notarization.json
+          app="$PWD/Temp/DerivedData/Build/Products/Release/NanoMD.app"
+          xcrun stapler staple "$app"
+          xcrun stapler validate "$app"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          spctl --assess --type execute --verbose=2 "$app"
+          archive="nano.md-$RELEASE_TAG-arm64.zip"
+          ditto -c -k --sequesterRsrc --keepParent "$app" "Temp/Release/$archive"
+          (cd Temp/Release && shasum -a 256 "$archive" > SHA256SUMS.txt)
+          minimum=$(/usr/libexec/PlistBuddy -c 'Print LSMinimumSystemVersion' "$app/Contents/Info.plist")
+          build=$(/usr/libexec/PlistBuddy -c 'Print CFBundleVersion' "$app/Contents/Info.plist")
+          {
+            printf 'nano.md %s (build %s)\n\n' "$RELEASE_TAG" "$build"
+            printf 'Requires macOS %s or later on Apple Silicon.\n\n' "$minimum"
+            printf 'Unzip and move NanoMD.app to Applications. The app is Developer ID signed and notarized.\n\n'
+            printf 'Validation: build, signing, and notarization checks. Functional testing is handled locally; there is no automated test suite.\n\n'
+            printf 'ZIP size: %s bytes.\n' "$(stat -f%z "Temp/Release/$archive")"
+            printf 'Commit: %s\n' "$(git rev-parse HEAD)"
+          } > Temp/Release/notes.md
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          options=()
+          if [[ "$RELEASE_TAG" == *-* ]]; then options+=(--prerelease); fi
+          gh release create "$RELEASE_TAG" Temp/Release/*.zip Temp/Release/SHA256SUMS.txt \
+            --verify-tag --draft --title "nano.md $RELEASE_TAG" \
+            --notes-file Temp/Release/notes.md --generate-notes "${options[@]}"
+      - name: Remove signing material
+        if: always()
+        run: |
+          keychain="$PWD/Temp/ReleaseSigning/signing.keychain-db"
+          if [[ -f "$keychain" ]]; then security delete-keychain "$keychain"; fi
+          rm -f Temp/ReleaseSigning/certificate.p12
+      - name: Retain release logs
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-logs
+          path: Temp/Logs/
+          retention-days: 7
+          if-no-files-found: ignore

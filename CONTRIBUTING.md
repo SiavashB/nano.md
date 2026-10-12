@@ -48,4 +48,4 @@ For documentation changes, verify local links, commands, current project facts, 
 
 Describe the problem, resulting behavior, and any meaningful tradeoff. Include the build/configuration used, focused manual checks, and known limitations. Screenshots help for visible changes. Keep claims proportional to the evidence; do not claim compatibility, performance, security, or coverage that was not checked.
 
-Publication prerequisites, including license selection and CI, are tracked in the [roadmap](docs/ROADMAP.md).
+The Build workflow compiles Debug and Release for pull requests and `main`; it does not run automated tests. Functional testing is performed locally with AI assistance before release. Follow [Releasing](docs/RELEASING.md) to create a version-tagged draft. Publication prerequisites, including license selection and distribution verification, remain tracked in the [roadmap](docs/ROADMAP.md).
