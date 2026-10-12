@@ -46,16 +46,16 @@ Pipe-table rendering was added after the original reader smoke check, with nativ
 
 - [ ] Choose and add the project license; retain any required dependency notices.
 - [ ] Decide and validate the minimum supported macOS and Xcode versions.
-- [ ] Share the Xcode scheme and verify a build from a fresh checkout without personal settings.
+- [x] Share the Xcode scheme and verify a build from a fresh checkout without personal settings.
 - [ ] Remove already-tracked `xcuserdata` from Git while preserving the owner's local settings; ignore rules do not untrack files.
 - [ ] Make contributor builds independent of the original developer's signing team.
-- [ ] Add build CI using a runner with the required Xcode version; do not publish a passing badge before CI is working.
+- [x] Add build CI using a runner with the required Xcode version; do not publish a passing badge before CI is working.
 - [ ] Add screenshots of the implemented app, accurate feature/limitation notes, and release instructions.
 - [ ] Verify signing, sandbox behavior, and notarization if distributing an app binary.
 
 Automated test coverage is a separate maintainer-requested task. No tests or test targets are introduced without an explicit request. Builds, focused manual verification, and honest reporting remain required.
 
-The initial release process is defined in [Releasing](RELEASING.md): build-only CI on pull requests and `main`, local AI-assisted functional checks, and signed/notarized draft releases from version tags. A shared Xcode scheme is included. GitHub execution and the first signed release must be verified before the corresponding preparation items are considered complete; signing credentials are not configured yet.
+The initial release process is defined in [Releasing](RELEASING.md): build-only CI on pull requests and `main`, local AI-assisted functional checks, and signed/notarized draft releases from version tags. A shared Xcode scheme is included. [The first GitHub build](https://github.com/SiavashB/nano.md/actions/runs/38302783956) passed unsigned Debug and Release on a clean macOS runner with Xcode 26.6. Local independent build and workflow validation also passed; app/source size was unchanged. Signing credentials are not configured yet, so the signed release workflow remains unverified.
 
 ## 4. Source editing
 
