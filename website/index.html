@@ -3,24 +3,72 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f7f7f2" />
-    <meta name="description" content="nano.md is a focused, native Markdown reader for Mac. Open the files you already own and enjoy a quieter place to read." />
+    <meta name="theme-color" content="#202724" />
+    <meta name="description" content="Free, minimal Markdown reader and editor for macOS. Read and edit SKILL.md, AGENTS.md, README files, and local notes. Native Mac app. Download coming soon." />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
     <link rel="canonical" href="https://nano.thirdeyeds.com/" />
-    <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64" />
-    <link rel="apple-touch-icon" href="/nano-md-icon.png" />
-    <title>nano.md — A quieter way to read Markdown on Mac</title>
+    <link rel="icon" href="./favicon.png" type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href="./nano-md-icon.png" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@700&amp;display=swap" />
+    <title>nano.md — Minimal Markdown Reader &amp; Editor for Mac</title>
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="nano.md — A quieter way to read Markdown on Mac" />
-    <meta property="og:description" content="A focused, native Markdown reader for the files you already own. Public download coming soon." />
+    <meta property="og:site_name" content="nano.md" />
+    <meta property="og:title" content="nano.md — Minimal Markdown Reader &amp; Editor for Mac" />
+    <meta property="og:description" content="Read and edit SKILL.md, AGENTS.md, and other local Markdown files in a free, minimal native Mac app. Download coming soon." />
     <meta property="og:url" content="https://nano.thirdeyeds.com/" />
+    <meta property="og:image" content="https://nano.thirdeyeds.com/nano-md-icon.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1254" />
+    <meta property="og:image:height" content="1254" />
+    <meta property="og:image:alt" content="nano.md app icon: two mint green hash marks on charcoal" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="nano.md — Minimal Markdown Reader &amp; Editor for Mac" />
+    <meta name="twitter:description" content="Read and edit SKILL.md, AGENTS.md, and other local Markdown files in a free, minimal native Mac app. Download coming soon." />
+    <meta name="twitter:image" content="https://nano.thirdeyeds.com/nano-md-icon.png" />
+    <meta name="twitter:image:alt" content="nano.md app icon: two mint green hash marks on charcoal" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://thirdeyeds.com/#organization",
+            "name": "Third Eye Digital Studio",
+            "url": "https://thirdeyeds.com/"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://nano.thirdeyeds.com/#app",
+            "name": "nano.md",
+            "url": "https://nano.thirdeyeds.com/",
+            "description": "A free, minimal native Markdown reader and editor for macOS. Read and edit SKILL.md, AGENTS.md, README files, and local notes. Public download coming soon.",
+            "applicationCategory": "DeveloperApplication",
+            "operatingSystem": "macOS",
+            "isAccessibleForFree": true,
+            "image": "https://nano.thirdeyeds.com/nano-md-icon.png",
+            "publisher": { "@id": "https://thirdeyeds.com/#organization" }
+          },
+          {
+            "@type": "WebPage",
+            "@id": "https://nano.thirdeyeds.com/#webpage",
+            "url": "https://nano.thirdeyeds.com/",
+            "name": "nano.md — Minimal Markdown Reader & Editor for Mac",
+            "inLanguage": "en",
+            "mainEntity": { "@id": "https://nano.thirdeyeds.com/#app" }
+          }
+        ]
+      }
+    </script>
     <style>
       :root {
-        color-scheme: light;
-        --paper: #f7f7f2;
-        --ink: #1c2923;
-        --muted: #56645b;
-        --line: #d6dbd3;
-        --accent: #b5d97a;
+        color-scheme: dark;
+        --paper: #202724;
+        --ink: #edf3ee;
+        --muted: #b0c0b5;
+        --line: #43564a;
+        --accent: #86d89f;
+        --panel: #18201c;
+        --mono: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
       }
 
       * { box-sizing: border-box; }
@@ -29,22 +77,38 @@
         margin: 0;
         background: var(--paper);
         color: var(--ink);
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-family: var(--mono);
         -webkit-font-smoothing: antialiased;
       }
       a { color: inherit; }
-      a:focus-visible { outline: 3px solid #739b42; outline-offset: 4px; }
+      a:hover { color: var(--accent); }
+      a:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+      ::selection { background: var(--accent); color: var(--paper); }
       .shell { width: min(100% - 48px, 1120px); margin-inline: auto; }
       .topbar {
         min-height: 88px;
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
         gap: 20px;
+        padding-block: 12px;
         border-bottom: 1px solid var(--line);
       }
-      .brand { display: inline-flex; align-items: center; text-decoration: none; }
-      .brand img { display: block; width: 240px; height: 80px; object-fit: contain; }
+      .brand { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); font-size: 28px; font-weight: 700; letter-spacing: -.055em; text-decoration: none; }
+      .brand-mark { display: block; width: 54px; height: 34px; color: var(--accent); }
+      .topbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; }
+      .studio-credit {
+        margin: 0;
+        padding: 11px 16px;
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--accent);
+        border-radius: 4px;
+        background: var(--panel);
+      }
+      .studio-credit span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 12px; }
+      .studio-credit a { color: var(--accent); font-family: "Manrope", sans-serif; font-size: 16px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+      .studio-credit a:hover { color: var(--ink); }
       .hero-icon { display: block; width: 88px; height: 88px; margin-bottom: 28px; }
       .toplink {
         font-size: 13px;
@@ -64,107 +128,117 @@
         align-items: center;
         gap: 10px;
         margin: 0 0 28px;
-        color: var(--muted);
+        color: var(--accent);
         font-size: 12px;
         font-weight: 800;
-        letter-spacing: .16em;
-        text-transform: uppercase;
+        letter-spacing: .03em;
       }
-      .eyebrow::before { content: ""; width: 27px; height: 1px; background: currentColor; }
+      .eyebrow::before { content: ">"; }
       h1 {
         max-width: 760px;
         margin: 0;
-        font-size: clamp(54px, 7vw, 96px);
-        line-height: .98;
+        font-size: clamp(30px, 3.4vw, 44px);
+        line-height: 1.15;
         font-weight: 750;
-        letter-spacing: -.078em;
+        letter-spacing: -.055em;
       }
+      .headline-line { display: block; }
+      .headline-accent { color: var(--accent); }
       .hero-copy {
         max-width: 540px;
         margin: 30px 0 0;
         color: var(--muted);
-        font-size: clamp(17px, 2vw, 20px);
+        font-size: clamp(15px, 1.6vw, 17px);
         line-height: 1.65;
       }
       .hero-links { display: flex; flex-wrap: wrap; align-items: center; gap: 22px; margin-top: 38px; }
+      .app-facts { display: flex; flex-wrap: wrap; gap: 24px 36px; margin: 30px 0 0; }
+      .app-facts dt { color: var(--muted); font-size: 12px; }
+      .app-facts dd { margin: 5px 0 0; color: var(--accent); font-size: 20px; font-weight: 750; }
+      .build-note { margin: 16px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
       .button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         min-height: 52px;
         padding: 0 23px;
-        border: 1px solid var(--ink);
-        border-radius: 8px;
-        background: var(--ink);
-        color: #fff;
+        border: 1px solid var(--accent);
+        border-radius: 4px;
+        background: var(--accent);
+        color: var(--paper);
         font-size: 14px;
         font-weight: 700;
         text-decoration: none;
-        transition: transform .18s ease, background .18s ease;
+        transition: background .18s ease;
       }
-      .button:hover { background: #33463b; transform: translateY(-2px); }
+      .button:hover { background: #a4e3b6; color: var(--paper); }
       .quiet-link { font-size: 14px; font-weight: 700; text-underline-offset: 5px; }
       .sample {
         position: relative;
-        padding: 18px;
-        border-radius: 21px;
-        background: #e7ebe1;
-        box-shadow: 0 28px 80px rgb(24 43 31 / .08);
+        min-width: 0;
       }
       .window {
         overflow: hidden;
         min-height: 450px;
-        border: 1px solid #d5dbd2;
-        border-radius: 13px;
-        background: #fff;
-        box-shadow: 0 14px 30px rgb(24 43 31 / .08);
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: var(--panel);
+        box-shadow: 12px 12px 0 rgb(12 19 15 / .25);
       }
       .window-bar {
         display: flex;
         align-items: center;
-        gap: 7px;
-        height: 47px;
-        padding: 0 17px;
-        border-bottom: 1px solid #e8ebe5;
-        color: #68746c;
-        font-size: 11px;
+        gap: 16px;
+        min-height: 44px;
+        padding: 12px 17px;
+        background: var(--accent);
+        color: var(--paper);
+        font-size: 12px;
       }
-      .window-bar i { width: 9px; height: 9px; border-radius: 50%; background: #cbd2c8; }
-      .window-bar span { flex: 1; padding-right: 27px; text-align: center; }
-      .document { max-width: 420px; margin: 0 auto; padding: 43px 37px 50px; }
-      .document small { color: #718071; font-size: 11px; font-weight: 750; letter-spacing: .16em; text-transform: uppercase; }
-      .document h2 { margin: 18px 0 15px; font-size: 30px; line-height: 1.15; letter-spacing: -.055em; }
-      .document p, .document li { color: #4e5b51; font-size: 14px; line-height: 1.75; }
+      .window-bar span { flex: 1; text-align: right; }
+      .document { max-width: 420px; margin: 0 auto; padding: 35px 30px 40px; }
+      .document small { color: var(--accent); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+      .document h2 { margin: 18px 0 15px; font-size: 24px; line-height: 1.25; letter-spacing: -.035em; }
+      .document p, .document li { color: var(--muted); font-size: 13px; line-height: 1.8; }
       .document ul { padding-left: 20px; }
       .document li { margin-bottom: 4px; }
-      .document code { padding: 3px 6px; border-radius: 4px; background: #eef1e9; color: #344638; font-size: .9em; }
+      .document li::marker { color: var(--accent); }
+      .document code { padding: 3px 6px; border-radius: 2px; background: #26332b; color: var(--accent); font-family: var(--mono); font-size: .9em; }
+      .document pre { margin: 18px 0; padding: 14px; border: 1px solid var(--line); border-radius: 2px; background: #111914; overflow-x: auto; }
+      .document pre code { padding: 0; background: none; font-size: 12px; line-height: 1.7; }
+      .window-status { display: flex; justify-content: space-between; gap: 12px; padding: 10px 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+      .window-status::after { content: "▌"; color: var(--accent); }
       .sample-label { margin: 15px 3px 1px; color: var(--muted); font-size: 11px; text-align: right; }
       .features { border-top: 1px solid var(--line); padding-block: 77px 88px; }
-      .section-kicker { margin: 0 0 18px; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
-      .features h2, .release h2 { max-width: 700px; margin: 0; font-size: clamp(34px, 4.3vw, 58px); line-height: 1.1; letter-spacing: -.065em; }
+      .section-kicker { margin: 0 0 18px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+      .section-kicker::before { content: "# "; }
+      .features h2, .release h2 { max-width: 700px; margin: 0; font-size: clamp(28px, 3.3vw, 42px); line-height: 1.2; letter-spacing: -.045em; }
       .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; margin-top: 62px; }
-      .feature { border-top: 1px solid var(--ink); padding-top: 21px; }
-      .feature-number { color: #82908a; font-size: 12px; font-weight: 700; }
+      .feature { border-top: 1px solid var(--line); padding-top: 21px; }
+      .feature-number { color: var(--accent); font-size: 12px; font-weight: 700; }
+      .feature-number::before { content: "["; }
+      .feature-number::after { content: "]"; }
       .feature h3 { margin: 27px 0 9px; font-size: 20px; letter-spacing: -.035em; }
-      .feature p { max-width: 320px; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
+      .feature p { max-width: 320px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.75; }
       .release {
         display: grid;
         grid-template-columns: 1fr minmax(260px, .7fr);
         gap: 48px;
         align-items: end;
         padding: clamp(40px, 6vw, 78px);
-        border-radius: 18px;
-        background: var(--ink);
-        color: white;
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--accent);
+        border-radius: 4px;
+        background: var(--panel);
+        color: var(--ink);
       }
       .release .section-kicker { color: var(--accent); }
-      .release p { max-width: 520px; margin: 20px 0 0; color: #d1ddd3; font-size: 16px; line-height: 1.7; }
-      .status { padding: 22px 25px; border: 1px solid #5a6c5e; border-radius: 9px; }
+      .release p { max-width: 520px; margin: 20px 0 0; color: var(--muted); font-size: 14px; line-height: 1.75; }
+      .status { padding: 22px 25px; border: 1px solid var(--line); border-radius: 2px; }
       .status strong { display: flex; align-items: center; gap: 10px; font-size: 15px; }
-      .status strong::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
-      .status span { display: block; margin-top: 10px; color: #d1ddd3; font-size: 14px; line-height: 1.5; }
+      .status strong::before { content: ""; width: 8px; height: 12px; background: var(--accent); }
+      .status > span { display: block; margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.6; }
       footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 18px; padding-block: 44px 56px; color: var(--muted); font-size: 13px; }
-      footer a { text-underline-offset: 4px; }
       @media (max-width: 800px) {
         .hero { grid-template-columns: 1fr; }
         .sample { width: min(100%, 580px); }
@@ -175,9 +249,9 @@
       @media (max-width: 520px) {
         .shell { width: min(100% - 36px, 1120px); }
         .topbar { min-height: 74px; }
-        .brand img { width: 190px; height: auto; }
+        .topbar-actions { width: 100%; gap: 16px; }
+        .brand { font-size: 25px; }
         .hero { padding-block: 65px 72px; }
-        .sample { padding: 10px; border-radius: 16px; }
         .window { min-height: 390px; }
         .document { padding: 30px 24px 36px; }
         .features { padding-block: 62px; }
@@ -186,85 +260,110 @@
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
         .button { transition: none; }
-        .button:hover { transform: none; }
       }
     </style>
   </head>
   <body>
     <header class="topbar shell">
-      <a class="brand" href="#top" aria-label="nano.md home"><img src="/nano-md-logo.png" width="2172" height="724" alt="nano.md" /></a>
-      <a class="toplink" href="#release">Release status ↗</a>
+      <a class="brand" href="#top" aria-label="nano.md home">
+        <svg class="brand-mark" viewBox="260 400 760 470" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-width="67" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M445 449 L348 820 M569 449 L473 820 M338 575 L604 575 M310 704 L577 704" />
+            <path transform="translate(369 0)" d="M445 449 L348 820 M569 449 L473 820 M338 575 L604 575 M310 704 L577 704" />
+          </g>
+        </svg>
+        <span>nano.md</span>
+      </a>
+      <div class="topbar-actions">
+        <p class="studio-credit">
+          <span>Made by</span>
+          <a href="https://thirdeyeds.com/">Third Eye Digital Studio</a>
+        </p>
+        <a class="toplink" href="#release">Download &amp; source ↗</a>
+      </div>
     </header>
 
     <main id="top">
       <section class="hero shell" aria-labelledby="hero-title">
         <div>
-          <img class="hero-icon" src="/nano-md-icon.png" width="1254" height="1254" alt="" />
-          <p class="eyebrow">A native Markdown reader for Mac</p>
-          <h1 id="hero-title">A quieter place for your Markdown.</h1>
-          <p class="hero-copy">Open the files you already own. Read with clear formatting, select what matters, and leave the original Markdown exactly as it was.</p>
+          <img class="hero-icon" src="./nano-md-icon.png" width="1254" height="1254" alt="" />
+          <p class="eyebrow">nano.md for macOS</p>
+          <h1 id="hero-title">
+            <span class="headline-line">A minimal</span>
+            <span class="headline-line"><span class="headline-accent">Markdown</span> reader/editor</span>
+            <span class="headline-line">for mac</span>
+          </h1>
+          <p class="hero-copy">Read and edit SKILL.md, AGENTS.md, and the Markdown instructions you give your AI tools. Free, lightweight, and native to macOS.</p>
+          <dl class="app-facts">
+            <div><dt>Price</dt><dd>Free</dd></div>
+            <div><dt>App size</dt><dd id="app-size" data-bytes="3648821">3.6 MB</dd></div>
+            <div><dt>Platform</dt><dd>Native macOS</dd></div>
+          </dl>
+          <p class="build-note">Current build: <span id="app-version">1.0</span> (<span id="app-build">6</span>). Uncompressed app size.</p>
           <div class="hero-links">
-            <a class="button" href="#release">Download status <span aria-hidden="true">&nbsp;↗</span></a>
-            <a class="quiet-link" href="#features">Explore the app</a>
+            <a class="button" href="#release">Download coming soon</a>
+            <a class="quiet-link" href="#features">Features</a>
           </div>
         </div>
-        <div class="sample" aria-label="Illustrative Markdown document">
+        <div class="sample" aria-label="Illustrative AGENTS.md document">
           <div class="window">
-            <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>notes.md</span></div>
+            <div class="window-bar" aria-hidden="true"><strong>nano.md</strong><span>AGENTS.md</span></div>
             <div class="document">
-              <small>Somewhere to think</small>
-              <h2>Make room for the good ideas.</h2>
-              <p>Markdown is at its best when it stays simple. A few familiar marks are enough to give a thought some shape.</p>
+              <small>Agent instructions</small>
+              <h2>Working agreements</h2>
+              <p>Keep changes focused. Follow the existing project structure.</p>
               <ul>
-                <li>Write in plain text.</li>
-                <li>Keep every file yours.</li>
-                <li>Come back to it when you need it.</li>
+                <li>Read <code>docs/architecture.md</code> first.</li>
+                <li>Use the existing dependencies.</li>
+                <li>Review the diff before committing.</li>
               </ul>
-              <p>Start with <code>one idea at a time</code>.</p>
+              <p>Before finishing, run:</p>
+              <pre><code>npm run check</code></pre>
             </div>
+            <div class="window-status" aria-hidden="true"><span>[ AGENTS.md ]</span><span>UTF-8</span></div>
           </div>
-          <p class="sample-label">Illustrative document, not an app screenshot</p>
+          <p class="sample-label">Example AGENTS.md document</p>
         </div>
       </section>
 
       <section class="features shell" id="features" aria-labelledby="features-title">
-        <p class="section-kicker">Why nano.md</p>
-        <h2 id="features-title">Everything you need to read. Nothing you need to manage.</h2>
+        <p class="section-kicker">Features</p>
+        <h2 id="features-title">For the files behind your AI workflow.</h2>
         <div class="feature-grid">
           <div class="feature">
             <span class="feature-number">01</span>
-            <h3>Made for Mac</h3>
-            <p>Open <code>.md</code> and <code>.markdown</code> files in a focused, native app.</p>
+            <h3>Skills &amp; agent files</h3>
+            <p>Open <code>SKILL.md</code> and <code>AGENTS.md</code> from Finder. Read the instructions, switch to Edit, and save changes to the same file.</p>
           </div>
           <div class="feature">
             <span class="feature-number">02</span>
-            <h3>Readable by default</h3>
-            <p>Headings, lists, tables, code, and links get the structure they deserve. Text stays selectable and easy to copy.</p>
+            <h3>Small footprint</h3>
+            <p>A small app bundle, free to use. No account or subscription.</p>
           </div>
           <div class="feature">
             <span class="feature-number">03</span>
-            <h3>Your files stay yours</h3>
-            <p>The reader opens local files without rewriting them. Your original Markdown remains the source of truth.</p>
+            <h3>Other Markdown, too</h3>
+            <p>README files, project docs, and notes. The same native app for your other <code>.md</code> and <code>.markdown</code> files.</p>
           </div>
         </div>
       </section>
 
       <section class="release shell" id="release" aria-labelledby="release-title">
         <div>
-          <p class="section-kicker">Get nano.md</p>
-          <h2 id="release-title">A public download is on its way.</h2>
-          <p>nano.md is being prepared for release. When it’s ready, this page will have the Mac download and installation details.</p>
+          <p class="section-kicker">Download &amp; source</p>
+          <h2 id="release-title">Free. Download coming soon.</h2>
+          <p>The app is still in development. A public Mac download will be available here when it’s ready.</p>
+          <p><strong>Source coming soon.</strong> We plan to publish the code on GitHub.</p>
         </div>
         <div class="status" role="status">
-          <strong>Release in progress</strong>
-          <span>No public download is available yet.</span>
+          <strong>Current build</strong>
+          <span>Requires macOS <span id="app-minimum-macos">26.5</span> or newer.</span>
         </div>
       </section>
     </main>
 
     <footer class="shell">
       <span>© <span id="year">2026</span> nano.md</span>
-      <span>Made by <a href="https://thirdeyeds.com/">Third Eye Digital Studio</a></span>
     </footer>
     <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
   </body>

@@ -15,7 +15,7 @@ struct MarkdownTextView: NSViewRepresentable {
         scrollView.borderType = .noBorder
 
         // Native text tables use the TextKit 1 layout path.
-        let textView = NSTextView(usingTextLayoutManager: false)
+        let textView = ReaderTextView(usingTextLayoutManager: false)
         textView.delegate = context.coordinator
         textView.isEditable = false
         textView.isSelectable = true
@@ -59,5 +59,15 @@ struct MarkdownTextView: NSViewRepresentable {
             // Always consume the event so AppKit cannot open a rejected URL itself.
             return true
         }
+    }
+}
+
+private final class ReaderTextView: NSTextView {
+    override func draw(_ dirtyRect: NSRect) {
+        // Table borders need final row geometry before their backgrounds are drawn.
+        if let textContainer {
+            layoutManager?.ensureLayout(for: textContainer)
+        }
+        super.draw(dirtyRect)
     }
 }

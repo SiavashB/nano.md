@@ -141,6 +141,13 @@ struct MarkdownTextRenderer {
         paragraph.firstLineHeadIndent = marker.isEmpty ? indent : max(0, indent - 24)
         paragraph.tabStops = [NSTextTab(textAlignment: .left, location: indent)]
         paragraph.defaultTabInterval = 32
+        if isLiteralBlock {
+            let block = RoundedCodeBlock()
+            block.setContentWidth(100, type: .percentageValueType)
+            block.backgroundColor = .quaternaryLabelColor
+            block.setWidth(4, type: .absoluteValueType, for: .padding)
+            paragraph.textBlocks = [block]
+        }
 
         let base: [NSAttributedString.Key: Any] = [
             .font: font,
@@ -149,12 +156,17 @@ struct MarkdownTextRenderer {
         ]
         let prefix = marker + (quoteDepth > 0 ? "│ " : "")
         output.append(NSAttributedString(string: prefix, attributes: base))
-        appendRuns(runs, to: output, font: font, base: base)
+        appendRuns(runs, to: output, font: font, base: base, usesInlineCodeBackground: !isLiteralBlock)
         if runs.last?.text.hasSuffix("\n") != true || runs.last?.destination != nil {
             output.append(NSAttributedString(string: "\n", attributes: base))
         }
         if isLiteralBlock {
-            output.append(NSAttributedString(string: "\n", attributes: base))
+            let spacing = NSMutableParagraphStyle()
+            spacing.lineSpacing = paragraph.lineSpacing
+            output.append(NSAttributedString(string: "\n", attributes: [
+                .font: font,
+                .paragraphStyle: spacing
+            ]))
         }
     }
 
@@ -162,7 +174,8 @@ struct MarkdownTextRenderer {
         _ runs: [MarkdownRun],
         to output: NSMutableAttributedString,
         font: NSFont,
-        base: [NSAttributedString.Key: Any]
+        base: [NSAttributedString.Key: Any],
+        usesInlineCodeBackground: Bool = true
     ) {
         for (index, run) in runs.enumerated() {
             var attributes = base
@@ -175,7 +188,7 @@ struct MarkdownTextRenderer {
                 runFont = NSFontManager.shared.convert(runFont, toHaveTrait: .italicFontMask)
             }
             attributes[.font] = runFont
-            if run.style.contains(.code) {
+            if run.style.contains(.code), usesInlineCodeBackground {
                 attributes[.backgroundColor] = NSColor.quaternaryLabelColor
             }
             if let destination = run.destination {
@@ -192,5 +205,18 @@ struct MarkdownTextRenderer {
             }
             output.append(NSAttributedString(string: run.text, attributes: attributes))
         }
+    }
+}
+
+private nonisolated final class RoundedCodeBlock: NSTextBlock {
+    override func drawBackground(
+        withFrame frameRect: NSRect,
+        in controlView: NSView,
+        characterRange charRange: NSRange,
+        layoutManager: NSLayoutManager
+    ) {
+        guard let backgroundColor else { return }
+        backgroundColor.setFill()
+        NSBezierPath(roundedRect: frameRect, xRadius: 3, yRadius: 3).fill()
     }
 }

@@ -55,6 +55,7 @@ NanoMD is a lightweight native macOS Markdown app. The read-only reader and firs
 ## Validation and delivery
 
 - The landing page's maintained source is in `website/`; do not edit or deploy old copies under `Temp/WebsiteBranding/`. Follow `website/README.md` for Cloudflare deployment. Keep temporary website output in `Temp/` and do not visually test the site unless requested.
+- With each app update, refresh the website's app size and version from the updated Release bundle using `npm --prefix website run update-app-size -- /path/to/NanoMD.app` and include the resulting `website/index.html` change. Website checks and deployments refresh this automatically from the installed app by default. Do not advertise a Debug build's size or describe the uncompressed app size as download size.
 
 - Keep validation proportional to this lightweight app: build and review the changed code. Perform visual checks only when explicitly requested; opening a requested preview does not authorize visual testing.
 - Prioritize app functionality. Defer performance profiling, benchmark tooling, and optimization budgets to final polish unless the user requests them or a concrete responsiveness issue blocks the current feature.
