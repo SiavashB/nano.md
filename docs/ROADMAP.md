@@ -57,13 +57,54 @@ Automated test coverage is a separate maintainer-requested task. No tests or tes
 
 ## 4. Source editing
 
-- [ ] Add editing controls over the same document source and retain the existing preview path.
-- [ ] Enable writes intentionally across scene, document role, serialization, and entitlements.
-- [ ] Implement and verify undo/redo, dirty state, save/autosave, and failure recovery.
-- [ ] Verify no-op round trips preserve bytes, encoding policy, BOM, whitespace, and line endings.
-- [ ] Define and verify external-change conflict handling and crash recovery.
+- [x] Add Read/Edit controls over the same document source and retain the existing reader path.
+- [x] Enable writes intentionally across scene, document role, serialization, and entitlements.
+- [x] Implement persistent native source editing and one document-scoped native undo/redo path.
+- [x] Preserve UTF-8/BOM metadata and source representation in the serialization implementation.
+- [x] Delegate saving, autosaving, errors, reverts, and conflict acceptance to the system lifecycle.
+- [ ] Verify selection/scroll retention, undo/redo across modes, document isolation, and input-method composition at runtime.
+- [ ] Verify dirty state, save/reopen, autosave, and failed-save retention at runtime.
+- [ ] Verify no-edit byte preservation, BOM, whitespace, Unicode representation, and line-ending behavior at runtime.
+- [ ] Verify external-change conflicts with unsaved edits, reverts, and crash recovery at runtime.
 
-Completion: edits, undo, reopening, failed saves, and external changes preserve user work. Add richer Markdown features only as separately scoped work.
+Implementation and build verification are distinct from runtime acceptance. The first editor retains a native text view across modes, publishes literal source, and clears stale undo actions on accepted system reloads. No hidden preview parses during typing. The reader's parser, tables, fallback, limits, and resource policy remain unchanged. No dependencies, targets, processes, services, database, persistent cache, tests, or visual testing were added. Build number is 5.
+
+Completion of runtime acceptance: edits, undo, reopening, failed saves, and external changes preserve user work. These checks remain open until separately authorized and exercised. Richer Markdown features remain separately scoped.
+
+### Editing implementation validation
+
+Starting checkout: `main`, commit `9a278123033405c4325d9d1ba8db4952470ec7e5`, no pre-existing changes. Implementation is on `feature/source-editing`, in the existing project directory. Exactly one independent tester uses `gpt-6-luna` with medium reasoning and a fresh context for baseline and final verification. No applicable existing test targets exist.
+
+Baseline: freshly built locally ad-hoc signed Release, Xcode 26.6 (17F113), macOS SDK 26.5, arm64, deployment 26.5, Swift 6. Same build settings and measurement definitions are required for final comparison. Baseline app: 1,932 KiB (1,978,368 on-disk bytes); production Swift: 12 files, 696 physical lines, 627 nonblank lines, 25,893 bytes. Raw measurements, command/environment details, measurement script, and build logs are retained under `Temp/SourceEditing/`.
+
+Independent final Debug and Release builds passed (exit 0), sequentially with the baseline settings. `git diff --check` passed. There are no test targets or applicable existing tests. No Swift compiler warnings/errors occurred; Xcode emitted its standard App Intents metadata notice because that framework is not linked. Logs: `Temp/SourceEditing/final-debug.log`, `final-release.log`; command/environment report: `final-report.txt`.
+
+| Metric | Baseline | Final | Absolute change | Percentage change |
+| --- | ---: | ---: | ---: | ---: |
+| Complete Release app on disk | 1,932 KiB (1,978,368 bytes) | 2,012 KiB (2,060,288 bytes) | +80 KiB (+81,920 bytes) | +4.14% |
+| Production Swift files | 12 | 13 | +1 | +8.33% |
+| Physical Swift lines | 696 | 867 | +171 | +24.57% |
+| Nonblank Swift lines | 627 | 778 | +151 | +24.08% |
+| Swift file bytes | 25,893 | 32,944 | +7,051 | +27.23% |
+
+Measurement method: `du -sk Temp/SourceEditing/DerivedData/Build/Products/Release/NanoMD.app` measures the complete bundle's allocated KiB; on-disk bytes are KiB × 1,024. Source scripts recursively include all production `NanoMD/**/*.swift`, with file count, physical lines via `splitlines()`, nonblank lines via `line.strip()`, and actual file bytes. Temp, dependencies, generated files, build products, assets, and documentation are excluded. Both scripts use identical scope and definitions; `measure_source.py` writes the baseline JSON, and `measure_final_source.py` writes the final JSON. Both raw reports remain preserved.
+
+Build method for baseline Release and final Debug/Release (substitute the configuration):
+
+```sh
+xcodebuild -project NanoMD.xcodeproj -scheme NanoMD -configuration Release \
+  -destination 'platform=macOS' \
+  -derivedDataPath "$PWD/Temp/SourceEditing/DerivedData" \
+  -clonedSourcePackagesDirPath "$PWD/Temp/SourcePackages" \
+  -packageCachePath "$PWD/Temp/PackageCache" \
+  CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= build
+```
+
+Growth comes from the persistent native editor/coordinator, Read/Edit composition, and source serialization, partly offset by removing ReaderCommands. The final bundle contains only the executable, Info.plist, PkgInfo, signature metadata, and the existing ThirdPartyNotices resource. No dependencies or bundled build artifacts were added; the executable accounts for the bundle growth. No speculative optimization or size budget was introduced.
+
+Build 5 is installed at `/Applications/NanoMD.app` from the validated locally signed Release. Both older instances closed through normal termination; no force quit was used. A recoverable build 4 copy is retained at `Temp/SourceEditing/PreviousBuild4/NanoMD.app`. Installed and validated executable SHA-256 values match; strict signature verification passed. Only NanoMD's stale build registrations were removed, and its installed copy registered. NSWorkspace resolves its bundle identifier to `/Applications/NanoMD.app`; the Markdown default remains TextEdit. Registration and installed-binary evidence is retained in `Temp/SourceEditing/registration-after-install.json` and `installed-binary-sha256.txt`.
+
+Implementation review covered source/BOM preservation, exact representation comparisons, binding feedback suppression, native undo ownership and lifetime, document isolation, marked-text reload deferral, and save-error retention through system ownership. Runtime checks listed above remain unverified regardless of compilation and source review.
 
 ## 5. Final polish and performance
 

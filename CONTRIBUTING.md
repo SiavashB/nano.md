@@ -1,6 +1,6 @@
 # Contributing
 
-NanoMD is currently establishing its read-only reader. Start with the [architecture](docs/ARCHITECTURE.md) and [roadmap](docs/ROADMAP.md). Keep contributions focused on a concrete behavior or maintenance problem.
+nano.md now includes the reader and the first source editor. Start with the [architecture](docs/ARCHITECTURE.md) and [roadmap](docs/ROADMAP.md). Keep contributions focused on a concrete behavior or maintenance problem.
 
 ## Development
 
@@ -10,7 +10,7 @@ Open `NanoMD.xcodeproj` and select the macOS `NanoMD` scheme. The current baseli
 
 Use the unsigned Debug build command in [README.md](README.md) for local compilation. Change `-configuration Debug` to `-configuration Release` when validating dependency changes, compiler settings, or performance-sensitive code. Unsigned compilation does not validate sandbox permissions, signing, notarization, or UI behavior. For a signed local run, use your own signing configuration without committing personal team changes.
 
-For Finder and Open With checks, use the current signed Release installed at `/Applications/NanoMD.app`. Building or running in Xcode updates its build directory, not the installed app. When updating the installed copy, quit older NanoMD instances, replace the app, unregister stale build copies with Launch Services, and register the installed app. Confirm that macOS resolves the bundle identifier to the installed path.
+For Finder and Open With checks, use the current signed Release installed at `/Applications/NanoMD.app`. Building or running in Xcode updates its build directory, not the installed app. When updating the installed copy, request normal termination of older NanoMD instances and stop if unsaved work requires user action. Preserve the previous app under `Temp/`, replace it with the validated locally signed Release, unregister only stale NanoMD build copies with Launch Services, and register the installed app. Keep unrelated associations unchanged. Confirm that macOS resolves the bundle identifier to the installed path.
 
 ## Change standards
 
@@ -33,6 +33,9 @@ When manual validation is requested for document and reader changes, choose the 
 - Open two documents and confirm their source, loading state, selection, and close behavior stay independent.
 - Compare file bytes and modification times before and after opening, reading, and closing.
 - Check cancellation, rapid source replacement, error presentation, and the documented external-change behavior.
+- Check Read/Edit transitions, selection and scroll retention, undo/redo in both modes, and isolation between document windows.
+- Check new documents, save/reopen, failed saves, no-edit byte preservation, mixed line endings, BOM, canonically distinct Unicode, and input-method composition.
+- Check system reverts and external conflicts with unsaved changes; confirm accepted replacements clear stale undo history.
 - Use the keyboard, copy text across paragraphs, inspect VoiceOver reading order, and switch appearance.
 - Confirm that raw HTML and unsafe links cannot execute and that viewing a document makes no network requests.
 - Measure a Release build when claiming a performance improvement; record hardware, OS, corpus, method, and before/after results.

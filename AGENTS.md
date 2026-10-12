@@ -1,6 +1,6 @@
 # AI development rules
 
-NanoMD is a lightweight native macOS Markdown app. The first product milestone is a read-only viewer; source editing follows later. These rules apply throughout this repository.
+NanoMD is a lightweight native macOS Markdown app. The read-only reader and first source editor are implemented; editing runtime verification remains pending. These rules apply throughout this repository.
 
 ## Start here
 
@@ -14,20 +14,23 @@ NanoMD is a lightweight native macOS Markdown app. The first product milestone i
 ## Architecture
 
 - Keep one app target, organized by responsibility. Create a directory when it has real implementation to contain.
-- `App` composes scenes and dependencies. `Documents` owns file decoding and document state. `Markdown` owns parsing and semantic output. `Features/Reader` owns presentation and transient reader state.
+- `App` composes scenes and dependencies. `Documents` owns file decoding and document state. `Markdown` owns parsing and semantic output. `Features/Document` owns Read/Edit presentation, `Features/Editor` owns native editing and binding synchronization, and `Features/Reader` owns read-only presentation and transient reader state.
 - Keep `Markdown` independent of SwiftUI, AppKit, file access, and network access. Keep parser-specific types inside that boundary.
 - Treat the document's original Markdown source as the source of truth. Rendering is derived data. Never regenerate a user's file from a syntax tree, attributed string, or HTML.
 - Use concrete types and explicit initializer injection by default. Add a protocol, shared abstraction, package, or view model only when a current responsibility needs it. Avoid generic service layers, dependency containers, and empty extension points.
 - Keep state with its owner. Use local SwiftUI state for local presentation; introduce a document-scoped observable model when asynchronous loading or shared reader state requires one. Do not introduce a global document store.
 - Keep significant decisions and their tradeoffs in the architecture document. Update it when implementation changes a boundary or invariant.
 
-## Read-only milestone
+## Document editing and read-only presentation
 
-- Use the viewer document scene, declare the document role as `Viewer`, and request only read access to user-selected files.
-- Expose source values to the reader without mutable document bindings. No editor, document creation, saving, autosaving, or source transformation belongs in this milestone.
-- Reject write requests at the document boundary until editing is implemented. Disabling a control is insufficient protection.
-- Use the system document lifecycle for document I/O. Do not reread or write an open document through its URL from a view or renderer.
-- Preserve whitespace, line endings, Unicode, and the original file. Report unsupported encodings or read failures without lossy decoding or empty-document fallbacks.
+- Use an editing `DocumentGroup`, the `Editor` document role, writable Markdown types, and read/write access to user-selected files. Keep sandboxing and concurrency settings enabled.
+- Keep the value-type `NanoMDDocument` source authoritative. Serialize its exact UTF-8 representation, retaining loaded BOM metadata; new documents use UTF-8 without BOM and LF.
+- The reader remains read-only and receives an immutable snapshot. Mount it only in Read mode; do not parse a hidden preview during typing.
+- Keep the native editor alive across Read/Edit switches. Preserve selection, scroll position, and undo targets, and remove focus from hidden editing controls.
+- Let NSTextView register native typing undo with the document's undo manager. Suppress undo registration only while publishing the source binding; do not add whole-document typing actions or a separate undo stack.
+- System reloads/reverts carry a new load identity; clear stale undo actions when applying an accepted replacement. Do not replace native text on every update or disturb marked text.
+- Use the system document lifecycle for reading, saving, autosaving, failures, and external conflicts. Do not read/write an open document through its URL or add watchers or custom recovery.
+- Preserve whitespace, line endings, Unicode representation, and trailing newlines. Reject invalid UTF-8 without lossy decoding or empty-document fallbacks. Insert line breaks using the loaded convention; preserve plain pasted text.
 
 ## Swift and UI
 
@@ -61,7 +64,7 @@ NanoMD is a lightweight native macOS Markdown app. The first product milestone i
 
 ## Code Review Rules
 
-- Flag any path that can modify a document during the read-only milestone.
+- Flag source mutation in the reader, serialization of derived rendering, duplicate undo registration, stale undo targets after reloads, and hidden editors retaining keyboard focus.
 - Flag parsing in UI update paths, obsolete asynchronous results replacing newer content, or shared state leaking between documents.
 - Flag source normalization, lossy decoding, executable content, automatic network fetches, or access outside user-granted resources.
 - Flag factual claims in documentation that exceed the implemented or verified behavior. Review concrete defects; avoid preference-only comments.

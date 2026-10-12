@@ -3,11 +3,20 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 nonisolated struct NanoMDDocument: FileDocument {
-    let source: String
+    var source: String
     let hasUTF8ByteOrderMark: Bool
+    let lineEnding: String
+    // A system reload/revert replaces this identity; ordinary edits and saves do not.
+    let loadIdentity = UUID()
 
     static let readableContentTypes: [UTType] = [.markdown]
-    static let writableContentTypes: [UTType] = []
+    static let writableContentTypes: [UTType] = [.markdown]
+
+    init() {
+        source = ""
+        hasUTF8ByteOrderMark = false
+        lineEnding = "\n"
+    }
 
     init(configuration: ReadConfiguration) throws {
         guard configuration.file.isRegularFile,
@@ -23,10 +32,17 @@ nonisolated struct NanoMDDocument: FileDocument {
         }
 
         self.source = source
+        lineEnding = source.first { $0 == "\r\n" || $0 == "\r" || $0 == "\n" }
+            .map(String.init) ?? "\n"
     }
 
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        throw CocoaError(.fileWriteNoPermission)
+        var data = Data()
+        if hasUTF8ByteOrderMark {
+            data.append(contentsOf: [0xEF, 0xBB, 0xBF])
+        }
+        data.append(contentsOf: source.utf8)
+        return FileWrapper(regularFileWithContents: data)
     }
 }
 
