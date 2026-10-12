@@ -1,0 +1,16 @@
+{
+  "name": "nano-md-website",
+  "private": true,
+  "scripts": {
+    "deploy": "WRANGLER_SEND_METRICS=false WRANGLER_LOG_PATH=../Temp/WebsiteDeploy/logs/ wrangler deploy",
+    "check": "WRANGLER_SEND_METRICS=false WRANGLER_LOG_PATH=../Temp/WebsiteDeploy/logs/ wrangler deploy --dry-run --outdir ../Temp/WebsiteDeploy/output",
+    "login": "WRANGLER_SEND_METRICS=false WRANGLER_LOG_PATH=../Temp/WebsiteDeploy/logs/ wrangler login --browser=false --scopes account:read user:read workers:write workers_scripts:write workers_routes:write zone:read",
+    "whoami": "WRANGLER_SEND_METRICS=false WRANGLER_LOG_PATH=../Temp/WebsiteDeploy/logs/ wrangler whoami"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "wrangler": "4.149.0"
+  }
+}

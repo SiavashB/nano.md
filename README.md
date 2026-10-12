@@ -57,6 +57,7 @@ This checks compilation; it does not validate signing or distribution. Swift Pac
 - [Roadmap](docs/ROADMAP.md): implementation milestones and completion criteria.
 - [AI development rules](AGENTS.md): repository-wide instructions for coding agents.
 - [Contributing](CONTRIBUTING.md): change scope, validation, and review expectations.
+- [Website](website/README.md): landing page source and Cloudflare deployment commands.
 
 ## License
 

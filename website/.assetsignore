@@ -1,0 +1,6 @@
+# Only the public site files belong in the deployment.
+/**
+!/index.html
+!/nano-md-logo.png
+!/nano-md-icon.png
+!/favicon.png

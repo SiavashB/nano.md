@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "nano-md",
+  "account_id": "c235ff45bfd634ddf7ee1483bbd4cc9a",
+  "compatibility_date": "2026-10-11",
+  "keep_vars": true,
+  "workers_dev": true,
+  "assets": {
+    "directory": "."
+  },
+  "routes": [
+    {
+      "pattern": "nano.thirdeyeds.com",
+      "custom_domain": true
+    }
+  ]
+}

@@ -54,6 +54,8 @@ NanoMD is a lightweight native macOS Markdown app. The read-only reader and firs
 
 ## Validation and delivery
 
+- The landing page's maintained source is in `website/`; do not edit or deploy old copies under `Temp/WebsiteBranding/`. Follow `website/README.md` for Cloudflare deployment. Keep temporary website output in `Temp/` and do not visually test the site unless requested.
+
 - Keep validation proportional to this lightweight app: build and review the changed code. Perform visual checks only when explicitly requested; opening a requested preview does not authorize visual testing.
 - Prioritize app functionality. Defer performance profiling, benchmark tooling, and optimization budgets to final polish unless the user requests them or a concrete responsiveness issue blocks the current feature.
 - Do not write, update, or introduce tests unless the user explicitly asks. Run applicable existing tests if present; otherwise use builds and code review. Do not claim unperformed checks passed.
