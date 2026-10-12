@@ -30,6 +30,7 @@ NanoMD is a lightweight native macOS Markdown app. The read-only reader and firs
 - Let NSTextView register native typing undo with the document's undo manager. Suppress undo registration only while publishing the source binding; do not add whole-document typing actions or a separate undo stack.
 - System reloads/reverts carry a new load identity; clear stale undo actions when applying an accepted replacement. Do not replace native text on every update or disturb marked text.
 - Use the system document lifecycle for reading, saving, autosaving, failures, and external conflicts. Do not read/write an open document through its URL or add watchers or custom recovery.
+- Request native keep-changes confirmation on document close and app quit through the application-scoped `NSCloseAlwaysConfirmsChanges` policy. Keep the system lifecycle in charge of save, discard, and cancel; do not change global defaults.
 - Preserve whitespace, line endings, Unicode representation, and trailing newlines. Reject invalid UTF-8 without lossy decoding or empty-document fallbacks. Insert line breaks using the loaded convention; preserve plain pasted text.
 
 ## Swift and UI

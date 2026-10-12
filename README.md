@@ -6,7 +6,7 @@ A lightweight native macOS app for reading and editing Markdown files.
 
 ## Read and edit a document
 
-Use File > Open (Command-O) or Finder's Open With menu to open a Markdown file. Each document has its own window and initially opens in Read mode. Use the Read/Edit control to edit the literal Markdown in a native, plain-text monospaced editor, then return to Read to render the current source. New documents (Command-N) start in Edit. Standard File and Edit commands provide saving, undo, and redo through the macOS document lifecycle.
+Use File > Open (Command-O) or Finder's Open With menu to open a Markdown file. Each document has its own window and initially opens in Read mode. Use the Read/Edit control to edit the literal Markdown in a native, plain-text monospaced editor, then return to Read to render the current source. New documents (Command-N) start in Edit. Standard File and Edit commands provide saving, undo, and redo through the macOS document lifecycle. The app requests macOS’s native keep-changes confirmation when closing modified documents or quitting, including documents that have been autosaved. Explicitly saved, unchanged documents can close directly. Confirmation behavior still awaits runtime verification.
 
 The editor stays alive across mode switches to retain selection, scroll position, and native undo targets. Source is saved directly as UTF-8, retaining the loaded BOM and existing line endings; newly inserted line breaks follow the first existing line ending, or LF for a new document. Pasted plain text retains its own line endings. Smart substitutions and automatic correction are disabled. Save/reopen, undo across modes, failed saves, external conflicts, and input-method composition still need authorized runtime verification.
 
