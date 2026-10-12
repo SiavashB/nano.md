@@ -13,7 +13,22 @@ Standard runner time is free for public repositories. Private repositories use t
 
 ## One-time signing setup
 
-In the repository's GitHub Actions secrets, add:
+1. Sign in to [Apple Developer](https://developer.apple.com/account/) and confirm an active Developer Program membership and its Team ID. Use the team that will own the release certificate; do not assume the local development team is the distribution team.
+2. In Xcode's Settings → Accounts, select that account and team, then **Manage Certificates**. Create a **Developer ID Application** certificate with the + button. Certificate creation requires the Account Holder role. If that option is unavailable, follow [Apple's certificate setup](https://developer.apple.com/help/account/certificates/create-developer-id-certificates/) or ask the team's Account Holder to provide an export.
+3. Control-click the certificate and choose **Export Certificate**. Save it as `Temp/FirstRelease/DeveloperID.p12` with a nonempty password. The export must include the private key. See [Apple's export instructions](https://help.apple.com/xcode/mac/current/en.lproj/dev154b28f09.html).
+4. At [account.apple.com](https://account.apple.com/), open **Sign-In and Security → App-Specific Passwords**, and create a password named `nano.md releases`. This requires two-factor authentication. See [Apple's password instructions](https://support.apple.com/en-us/102654).
+5. From the repository root, upload the certificate without printing its contents:
+
+   ```sh
+   base64 -i Temp/FirstRelease/DeveloperID.p12 | gh secret set CERTIFICATE_P12_BASE64 --repo SiavashB/nano.md
+   gh secret set CERTIFICATE_PASSWORD --repo SiavashB/nano.md
+   gh secret set APPLE_TEAM_ID --repo SiavashB/nano.md
+   gh secret set APPLE_ID --repo SiavashB/nano.md
+   gh secret set APPLE_APP_PASSWORD --repo SiavashB/nano.md
+   gh secret list --repo SiavashB/nano.md
+   ```
+
+   Enter the four remaining values at the CLI's hidden prompts, using the meanings below. Alternatively, add them at [repository Actions secrets](https://github.com/SiavashB/nano.md/settings/secrets/actions). Confirm all five names are listed, then delete the temporary `.p12` export after storing it securely if a backup is needed.
 
 | Secret | Value |
 | --- | --- |
@@ -26,6 +41,31 @@ In the repository's GitHub Actions secrets, add:
 Use `gh secret set NAME` to enter a value securely, or GitHub's repository secrets settings. Keep any temporary certificate export under `Temp/` and remove it when finished. Never paste credentials into chat or commit them. The release runner imports the certificate into a temporary keychain and removes it after the job. No signing secrets are used by the Build workflow.
 
 Missing credentials stop the release workflow with the missing secret's name. A local ad-hoc signature cannot replace Developer ID signing for this workflow. See [GitHub's certificate setup](https://docs.github.com/en/actions/how-tos/deploy/deploy-to-third-party-platforms/sign-xcode-applications) and [Apple's Developer ID guidance](https://developer.apple.com/developer-id/).
+
+## First beta
+
+The first candidate is version **0.1.0**, build **7**, with the intended tag **`v0.1.0-beta.1`**. It targets Apple Silicon and macOS 26.5 or later, using Xcode 26.6. Broader hardware and older macOS support have not been verified. Preparing this version does not create a release tag or certify runtime behavior.
+
+Before tagging, choose and add the project license and complete these local checks with disposable files under `Temp/`. If using an AI assistant for UI checks, explicitly authorize visual testing in that chat.
+
+- Open `.md` and `.markdown` files in Read mode; check headings, lists, code, links, and tables, including selecting and copying across table cells.
+- Switch Read/Edit repeatedly; check selection, scroll position, undo/redo, and two independent document windows.
+- Create, edit, save, and reopen a document. Check close/quit confirmation, including Save, Discard, and Cancel.
+- Confirm a file opened and closed without editing retains identical bytes. Include UTF-8 BOM, Unicode, and CRLF samples; invalid UTF-8 should report an error.
+- Record outcomes and any limitations. Build success alone does not complete this checklist.
+
+After the draft is created, download both assets into `Temp/FirstRelease/Download/`, verify the checksum there, and extract the ZIP. Confirm the packaged app's signature and notarization before its first launch:
+
+```sh
+cd Temp/FirstRelease/Download
+shasum -a 256 -c SHA256SUMS.txt
+ditto -x -k nano.md-v0.1.0-beta.1-arm64.zip .
+codesign --verify --deep --strict --verbose=2 NanoMD.app
+xcrun stapler validate NanoMD.app
+spctl --assess --type execute --verbose=2 NanoMD.app
+```
+
+Launch the downloaded app through Finder and repeat opening, editing, saving/reopening, and undo. Check any first-launch failure before publishing; do not bypass Gatekeeper to count the release as verified. Review the draft's notes, mark known unsupported syntax, and publish only after the packaged app passes the intended checks. Make the repository public after its license is in place, then update and explicitly deploy the website with the verified release download and source links.
 
 ## Each release
 

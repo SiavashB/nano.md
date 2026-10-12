@@ -1,5 +1,6 @@
 .DS_Store
 /Temp/
+/Config/Local.xcconfig
 /website/node_modules/
 /website/.wrangler/
 xcuserdata/
