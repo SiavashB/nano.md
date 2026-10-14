@@ -30,7 +30,7 @@ This is an explicit, one-command deployment workflow. Git pushes do not automati
 
 The canonical URL is `https://nano.thirdeyeds.com/`. Keep it consistent across the page's canonical link, Open Graph URL, JSON-LD, and sitemap if the domain changes. `robots.txt` allows crawling and points to the sitemap. Add any future public pages to `sitemap.xml`; list canonical URLs only.
 
-The page title and descriptions cover the Markdown reader/editor and its skills and agent-file use cases. Open Graph and Twitter cards use the existing app icon. JSON-LD identifies the application and its publisher without claiming a public download, license, or reviews. Version and size appear only in the automatically refreshed visible fields so metadata cannot retain an old build's values.
+The page title and descriptions cover the Markdown reader/editor and its skills and agent-file use cases. Open Graph and Twitter cards use the existing app icon. JSON-LD identifies the application, its publisher, and beta availability without claiming reviews. Version and size appear only in the automatically refreshed visible fields so metadata cannot retain an old build's values.
 
 The sitemap can also be submitted in Google Search Console when a verified property is available. Publishing these files does not submit a Search Console request.
 
@@ -53,4 +53,4 @@ NANO_MD_APP_PATH=/path/to/NanoMD.app npm --prefix website run deploy
 
 Review and commit the updated `index.html` with the app update. Never use a Debug build to advertise app size.
 
-Keep release claims aligned with the app. No public download is available yet. The project is MIT-licensed and the source link is https://github.com/SiavashB/nano.md. Confirm the repository is publicly accessible before deploying that link. Keep the download marked as coming soon until a verified app release is published.
+Keep release claims aligned with the app. The website links to the signed, notarized [0.1.0 beta 2 release](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.2) for Apple Silicon and macOS 26.5 or later. The project is MIT-licensed and the source link is https://github.com/SiavashB/nano.md. For later releases, publish and verify the release assets before updating the versioned download link, release notes link, beta label, and ZIP size. Refresh app metadata from the exact released bundle before deploying.
