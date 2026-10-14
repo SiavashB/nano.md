@@ -2,7 +2,7 @@
 
 A lightweight native macOS app for reading and editing Markdown files.
 
-**Status:** the reader and source editor passed [focused local UI checks](docs/ROADMAP.md#focused-local-ui-validation-010-build-7) for version 0.1.0 (7). The 0.1.0 (8) beta draft passed signing, notarization, and downloaded-package checks; its first-launch UI check remains pending. nano.md opens `.md` and `.markdown` files with native formatting and continuous text selection.
+**Status:** the reader and source editor passed [focused local UI checks](docs/ROADMAP.md#focused-local-ui-validation-010-build-7) for version 0.1.0 (7). Version 0.1.0 (8) passed signing, notarization, and downloaded-package checks. The maintainer also confirmed that launching the notarized app, opening, editing, undo, saving, and reopening passed. nano.md opens `.md` and `.markdown` files with native formatting and continuous text selection.
 
 ## Read and edit a document
 
@@ -62,4 +62,4 @@ This checks compilation; it does not validate signing or distribution. Swift Pac
 
 ## License
 
-nano.md is licensed under the [MIT License](LICENSE), which is included in the app bundle. Dependency licenses and notices are retained in [ThirdPartyNotices.txt](NanoMD/Resources/ThirdPartyNotices.txt), which is also bundled. A signed, notarized download is not yet available.
+nano.md is licensed under the [MIT License](LICENSE), which is included in the app bundle. Dependency licenses and notices are retained in [ThirdPartyNotices.txt](NanoMD/Resources/ThirdPartyNotices.txt), which is also bundled. Download the signed, notarized [0.1.0 beta 2 release](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.2) for Apple Silicon and macOS 26.5 or later.
