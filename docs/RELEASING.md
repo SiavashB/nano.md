@@ -9,6 +9,8 @@ Test locally with AI assistance, merge the changes, push a version tag, and revi
 
 Both workflows use the standard `macos-26` runner and Xcode 26.6. Build products, package caches, logs, and release staging stay under `Temp/`. Only selected logs and release files are uploaded. CI compilation does not verify editing behavior, file preservation, or the downloaded app's first launch.
 
+Distribution builds use [Config/Distribution.entitlements](../Config/Distribution.entitlements) with base entitlement injection disabled. The release workflow checks the signed app for sandboxing, user-selected file read/write access, and the absence of debugger access before submission. Keep these distribution permissions aligned with the app's capabilities. Normal Xcode builds retain their generated entitlements for local debugging.
+
 Standard runner time is free for public repositories. Private repositories use the account's included Actions allowance and may incur charges beyond it; check the account's Actions budget before enabling paid overages.
 
 ## One-time signing setup
@@ -17,7 +19,7 @@ Standard runner time is free for public repositories. Private repositories use t
 2. In Xcode's Settings → Accounts, select that account and team, then **Manage Certificates**. Create a **Developer ID Application** certificate with the + button. Certificate creation requires the Account Holder role. If that option is unavailable, follow [Apple's certificate setup](https://developer.apple.com/help/account/certificates/create-developer-id-certificates/) or ask the team's Account Holder to provide an export.
 3. Control-click the certificate and choose **Export Certificate**. Save it as `Temp/FirstRelease/DeveloperID.p12` with a nonempty password. The export must include the private key. See [Apple's export instructions](https://help.apple.com/xcode/mac/current/en.lproj/dev154b28f09.html).
 4. At [account.apple.com](https://account.apple.com/), open **Sign-In and Security → App-Specific Passwords**, and create a password named `nano.md releases`. This requires two-factor authentication. See [Apple's password instructions](https://support.apple.com/en-us/102654).
-5. From the repository root, upload the certificate without printing its contents:
+5. From the repository root, run these commands exactly as written. The uppercase secret names are literal names, not placeholders for their values. Upload the certificate without printing its contents:
 
    ```sh
    base64 -i Temp/FirstRelease/DeveloperID.p12 | gh secret set CERTIFICATE_P12_BASE64 --repo SiavashB/nano.md
@@ -44,7 +46,9 @@ Missing credentials stop the release workflow with the missing secret's name. A 
 
 ## First beta
 
-The first candidate is version **0.1.0**, build **7**, with the intended tag **`v0.1.0-beta.1`**. It targets Apple Silicon and macOS 26.5 or later, using Xcode 26.6. Broader hardware and older macOS support have not been verified. Preparing this version does not create a release tag or certify runtime behavior.
+The current candidate is version **0.1.0**, build **8**, with the intended tag **`v0.1.0-beta.2`**. It targets Apple Silicon and macOS 26.5 or later, using Xcode 26.6. Broader hardware and older macOS support have not been verified. Preparing this version does not create a release tag or certify runtime behavior.
+
+Focused local UI checks passed on October 14, 2026, using the Apple Development-signed arm64 Release at `76dfc6f` on macOS 26.6.2. Reader/tables, Read/Edit, editing/undo, saving, close/quit, and file preservation passed for the exercised fixtures. The [roadmap records the scope, observed focus/reader-state limitations, and remaining runtime cases](ROADMAP.md#focused-local-ui-validation-010-build-7). This result does not verify Developer ID signing, notarization, or the downloaded package's first launch.
 
 The project uses the MIT license, bundled alongside the dependency notices. Before tagging, complete these local checks with disposable files under `Temp/`. If using an AI assistant for UI checks, explicitly authorize visual testing in that chat.
 
@@ -59,7 +63,7 @@ After the draft is created, download both assets into `Temp/FirstRelease/Downloa
 ```sh
 cd Temp/FirstRelease/Download
 shasum -a 256 -c SHA256SUMS.txt
-ditto -x -k nano.md-v0.1.0-beta.1-arm64.zip .
+ditto -x -k nano.md-v0.1.0-beta.2-arm64.zip .
 codesign --verify --deep --strict --verbose=2 NanoMD.app
 xcrun stapler validate NanoMD.app
 spctl --assess --type execute --verbose=2 NanoMD.app
@@ -70,14 +74,14 @@ Launch the downloaded app through Finder and repeat opening, editing, saving/reo
 ## Each release
 
 1. Make changes on a branch and test locally with AI assistance. Focus on the changed behavior and opening, editing, saving/reopening, and undo. Record what was actually checked in the PR; do not treat a green build as functional verification.
-2. Set `MARKETING_VERSION` consistently in Debug and Release and increment `CURRENT_PROJECT_VERSION`. For example, version `0.1.0` can use the tag `v0.1.0-beta.1`, then `v0.1.0` for the stable release. Tags also accept two-part app versions, such as `v1.0`. Refresh the website's size/version from the updated Release bundle as described in [website/README.md](../website/README.md).
+2. Set `MARKETING_VERSION` consistently in Debug and Release and increment `CURRENT_PROJECT_VERSION`. For example, version `0.1.0` can use the tag `v0.1.0-beta.2`, then `v0.1.0` for the stable release. Tags also accept two-part app versions, such as `v1.0`. Refresh the website's size/version from the updated Release bundle as described in [website/README.md](../website/README.md).
 3. Merge after the Build workflow passes. From a clean, updated `main`, create and push the intended version tag:
 
    ```sh
    git switch main
    git pull --ff-only
-   git tag -a v0.1.0-beta.1 -m "nano.md 0.1.0 beta 1"
-   git push origin v0.1.0-beta.1
+   git tag -a v0.1.0-beta.2 -m "nano.md 0.1.0 beta 2"
+   git push origin v0.1.0-beta.2
    ```
 
    Replace the example version with the app version being released. The tag's numeric version must exactly match `MARKETING_VERSION`; `alpha`, `beta`, and `rc` suffixes use a numeric iteration. Pushing the tag starts release preparation, not publication.
@@ -89,4 +93,4 @@ The workflow never publishes automatically. If a run fails before creating the d
 
 ## Current setup status
 
-Workflow definitions and a shared Xcode scheme are included in the repository. Signing secrets must be configured before the first signed release run. Build checks, signing/notarization, and local functional verification are separate results; record each only after it has actually succeeded.
+Workflow definitions and a shared Xcode scheme are included in the repository. All five signing/notarization secrets are configured. On October 14, 2026, [the first beta run](https://github.com/SiavashB/nano.md/actions/runs/38635655132) successfully imported the Developer ID certificate, built and verified the signed Release, and submitted it to Apple. Apple returned `Invalid` because the executable included `com.apple.security.get-task-allow`. The distribution workflow now sets `CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO` to exclude the debugging entitlement, while normal Xcode builds retain their existing behavior. Rejected submissions now retain Apple's detailed log in the release artifacts. Build 8 passed local Debug/Release builds and corrected Developer ID signature/entitlement checks; its notarization remains unverified. The first attempt created no draft or distributable ZIP. Build checks, signing/notarization, and local functional verification are separate results; record each only after it has actually succeeded.
