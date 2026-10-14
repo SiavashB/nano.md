@@ -81,6 +81,8 @@ jobs:
             -onlyUsePackageVersionsFromResolvedFile \
             ARCHS=arm64 CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
+            CODE_SIGN_ENTITLEMENTS="$PWD/Config/Distribution.entitlements" \
             OTHER_CODE_SIGN_FLAGS="--timestamp --keychain $PWD/Temp/ReleaseSigning/signing.keychain-db" \
             build 2>&1 | tee Temp/Logs/Release.log
           app="$PWD/Temp/DerivedData/Build/Products/Release/NanoMD.app"
@@ -91,6 +93,13 @@ jobs:
             exit 1
           fi
           codesign --verify --deep --strict --verbose=2 "$app"
+          codesign --display --entitlements - --xml "$app" > Temp/Logs/entitlements.plist
+          [[ "$(/usr/libexec/PlistBuddy -c 'Print :com.apple.security.app-sandbox' Temp/Logs/entitlements.plist)" == true ]]
+          [[ "$(/usr/libexec/PlistBuddy -c 'Print :com.apple.security.files.user-selected.read-write' Temp/Logs/entitlements.plist)" == true ]]
+          if [[ "$(/usr/libexec/PlistBuddy -c 'Print :com.apple.security.get-task-allow' Temp/Logs/entitlements.plist 2>/dev/null)" == true ]]; then
+            echo 'Distribution builds must not allow debugger attachment.' >&2
+            exit 1
+          fi
           ditto -c -k --keepParent "$app" Temp/NotarizationUpload.zip
       - name: Notarize and package
         env:
@@ -101,7 +110,12 @@ jobs:
           xcrun notarytool submit Temp/NotarizationUpload.zip \
             --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" \
             --wait --timeout 20m --output-format json > Temp/Logs/notarization.json
-          jq -e '.status == "Accepted"' Temp/Logs/notarization.json
+          if ! jq -e '.status == "Accepted"' Temp/Logs/notarization.json; then
+            submission_id=$(jq -er '.id' Temp/Logs/notarization.json)
+            xcrun notarytool log "$submission_id" Temp/Logs/notarization-details.json \
+              --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD"
+            exit 1
+          fi
           app="$PWD/Temp/DerivedData/Build/Products/Release/NanoMD.app"
           xcrun stapler staple "$app"
           xcrun stapler validate "$app"

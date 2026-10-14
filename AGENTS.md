@@ -1,6 +1,6 @@
 # AI development rules
 
-NanoMD is a lightweight native macOS Markdown app. The read-only reader and first source editor are implemented; editing runtime verification remains pending. These rules apply throughout this repository.
+NanoMD is a lightweight native macOS Markdown app. The reader and first source editor have passed focused local UI checks; remaining runtime cases are tracked in [the roadmap](docs/ROADMAP.md). These rules apply throughout this repository.
 
 ## Start here
 

@@ -40,7 +40,7 @@ Rendering is implemented. Debug and locally signed Release builds passed. A focu
 
 The reader milestone is complete within its documented syntax subset. Performance profiling is deferred to final polish and is not a gate for further feature work. The initial formatting limits (1 MiB, 50,000 nodes, 64 levels) remain conservative guardrails. Full source remains available when a limit is exceeded. No automated tests or dedicated accessibility audit were added. The live check did not exercise rapid external file replacement or browser navigation; cancellation/revision checks and the link policy were reviewed in code.
 
-Pipe-table rendering was added after the original reader smoke check, with native cells, header styling, borders, column alignment, and inline formatting. User-provided screenshots confirmed visible alignment, inline formatting, text wrapping, empty cells, and header-only tables, and exposed border gaps and tight spacing after tables. Border and spacing adjustments compile in Debug and locally signed Release; build 4 is installed at `/Applications/NanoMD.app`. The installed binary matches the Release build, and macOS resolves NanoMD to that location. The adjusted layout awaits user confirmation; selection and copying across table cells remain unverified. No tests were added.
+Pipe-table rendering was added after the original reader smoke check, with native cells, header styling, borders, column alignment, and inline formatting. User-provided screenshots confirmed visible alignment, inline formatting, text wrapping, empty cells, and header-only tables, and exposed border gaps and tight spacing after tables. Border and spacing adjustments compiled in Debug and locally signed Release; build 4 was installed at `/Applications/NanoMD.app` and its binary and registration were verified. The [build 7 UI check](#focused-local-ui-validation-010-build-7) subsequently verified table layout at two window widths and copying a selection across cells. No tests were added.
 
 ## 3. Public release preparation
 
@@ -55,9 +55,9 @@ Pipe-table rendering was added after the original reader smoke check, with nativ
 
 Automated test coverage is a separate maintainer-requested task. No tests or test targets are introduced without an explicit request. Builds, focused manual verification, and honest reporting remain required.
 
-The initial release process is defined in [Releasing](RELEASING.md): build-only CI on pull requests and `main`, local AI-assisted functional checks, and signed/notarized draft releases from version tags. A shared Xcode scheme is included. [The first GitHub build](https://github.com/SiavashB/nano.md/actions/runs/38302783956) passed unsigned Debug and Release on a clean macOS runner with Xcode 26.6. Local independent build and workflow validation also passed; app/source size was unchanged. Signing credentials are not configured yet, so the signed release workflow remains unverified.
+The initial release process is defined in [Releasing](RELEASING.md): build-only CI on pull requests and `main`, local AI-assisted functional checks, and signed/notarized draft releases from version tags. A shared Xcode scheme is included. [The first GitHub build](https://github.com/SiavashB/nano.md/actions/runs/38302783956) passed unsigned Debug and Release on a clean macOS runner with Xcode 26.6. Local independent build and workflow validation also passed; app/source size was unchanged. Signing credentials are now configured. The [first beta release run](https://github.com/SiavashB/nano.md/actions/runs/38635655132) passed certificate import and the Developer ID-signed Release build on October 14, 2026. Apple processed the notarization submission but returned `Invalid` because the executable requested the debugging entitlement `com.apple.security.get-task-allow`. Draft creation and packaged-app verification were not reached.
 
-The first beta candidate is version 0.1.0, build 7, intended for `v0.1.0-beta.1`. The MIT license and dependency notices are bundled byte for byte. Personal Xcode state is no longer tracked, and signing uses an optional ignored `Config/Local.xcconfig`. Independent unsigned arm64 Debug and Release builds, workflow/project lint, and shared-scheme parsing passed with Xcode 26.6. Under the same measurement method, regular-file Release bundle bytes increased from 3,640,373 to 3,641,448 (+1,075 bytes for the license and version metadata). Production Swift remains 13 files, 910 physical lines, 818 nonblank lines, and 34,586 bytes. Logs and measurements are under `Temp/FirstRelease/`. Local functional checks, Developer ID signing, and notarization remain pending; no release tag has been pushed.
+The first beta attempt used version 0.1.0, build 7, tagged `v0.1.0-beta.1` at `76dfc6f`. The MIT license and dependency notices are bundled byte for byte. Personal Xcode state is no longer tracked, and signing uses an optional ignored `Config/Local.xcconfig`. Independent unsigned arm64 Debug and Release builds, workflow/project lint, and shared-scheme parsing passed with Xcode 26.6. Under the same measurement method, regular-file Release bundle bytes increased from 3,640,373 to 3,641,448 (+1,075 bytes for the license and version metadata). Production Swift remains 13 files, 910 physical lines, 818 nonblank lines, and 34,586 bytes. Logs and measurements are under `Temp/FirstRelease/`. Focused local UI checks passed on October 14, 2026, as recorded below. Developer ID signing passed in CI; notarization and downloaded distribution verification remain incomplete. Independent release verification evidence is under `Temp/FirstRelease/SigningVerification/`. Build 8 is prepared for `v0.1.0-beta.2`: the distribution workflow uses explicit sandbox/file-access entitlements, disables injected debugger access, checks the signed permissions, and retains detailed rejection logs. App source and dependencies are unchanged. Independent unsigned Debug/Release and corrected Developer ID-signed Release builds passed, including actual sandbox/file-access entitlements, absence of debugger access, hardened runtime, and strict signature verification. The unsigned arm64 Release measures 3,643,352 regular-file bytes versus 3,641,448 before this change (+1,904 bytes, 0.0523%); the local Developer ID-signed bundle measures 3,653,684 bytes before notarization/stapling. Source remains 13 files and 34,586 bytes. Evidence is under `Temp/FirstRelease/NotarizationFix/`. A fresh CI notarization run remains pending.
 
 ## 4. Source editing
 
@@ -66,14 +66,18 @@ The first beta candidate is version 0.1.0, build 7, intended for `v0.1.0-beta.1`
 - [x] Implement persistent native source editing and one document-scoped native undo/redo path.
 - [x] Preserve UTF-8/BOM metadata and source representation in the serialization implementation.
 - [x] Delegate saving, autosaving, errors, reverts, and conflict acceptance to the system lifecycle.
-- [ ] Verify selection/scroll retention, undo/redo across modes, document isolation, and input-method composition at runtime.
-- [ ] Verify dirty state, save/reopen, autosave, and failed-save retention at runtime.
-- [ ] Verify no-edit byte preservation, BOM, whitespace, Unicode representation, and line-ending behavior at runtime.
+- [x] Verify editor selection/scroll retention, undo/redo after returning to the focused editor, and document isolation at runtime.
+- [x] Verify save/reopen and modified-document close/quit confirmation, including save, discard, and cancel.
+- [x] Verify no-edit byte and modification-time preservation for BOM, whitespace, Unicode, and CRLF fixtures.
+- [x] Verify inserted CRLF line breaks in an existing document and LF without BOM in a new document.
+- [ ] Verify input-method composition at runtime.
+- [ ] Verify autosave without explicit Save and failed-save retention at runtime.
+- [ ] Verify BOM retention after editing and mixed-line-ending edits at runtime.
 - [ ] Verify external-change conflicts with unsaved edits, reverts, and crash recovery at runtime.
 
-Implementation and build verification are distinct from runtime acceptance. The first editor retains a native text view across modes, publishes literal source, and clears stale undo actions on accepted system reloads. No hidden preview parses during typing. The reader's parser, tables, fallback, limits, and resource policy remain unchanged. No dependencies, targets, processes, services, database, persistent cache, tests, or visual testing were added. Build number is 5.
+Implementation and build verification are distinct from runtime acceptance. The first editor retains a native text view across modes, publishes literal source, and clears stale undo actions on accepted system reloads. No hidden preview parses during typing. The reader's parser, tables, fallback, limits, and resource policy remain unchanged. The original implementation was build 5 and added no dependencies, targets, processes, services, database, persistent cache, tests, or visual testing. Later runtime results are recorded below.
 
-Completion of runtime acceptance: edits, undo, reopening, failed saves, and external changes preserve user work. These checks remain open until separately authorized and exercised. Richer Markdown features remain separately scoped.
+Completion of runtime acceptance: edits, undo, reopening, failed saves, and external changes preserve user work. The unchecked cases above remain open; the focused build 7 check does not establish full runtime acceptance. Richer Markdown features remain separately scoped.
 
 ### Editing implementation validation
 
@@ -108,7 +112,7 @@ Growth comes from the persistent native editor/coordinator, Read/Edit compositio
 
 Build 5 was installed at `/Applications/NanoMD.app` from the validated locally signed Release; the follow-up below supersedes that installed version. Both older instances closed through normal termination; no force quit was used. A recoverable build 4 copy is retained at `Temp/SourceEditing/PreviousBuild4/NanoMD.app`. Installed and validated executable SHA-256 values match; strict signature verification passed. Only NanoMD's stale build registrations were removed, and its installed copy registered. NSWorkspace resolves its bundle identifier to `/Applications/NanoMD.app`; the Markdown default remains TextEdit. Registration and installed-binary evidence is retained in `Temp/SourceEditing/registration-after-install.json` and `installed-binary-sha256.txt`.
 
-Implementation review covered source/BOM preservation, exact representation comparisons, binding feedback suppression, native undo ownership and lifetime, document isolation, marked-text reload deferral, and save-error retention through system ownership. Runtime checks listed above remain unverified regardless of compilation and source review.
+Implementation review covered source/BOM preservation, exact representation comparisons, binding feedback suppression, native undo ownership and lifetime, document isolation, marked-text reload deferral, and save-error retention through system ownership. That review and compilation did not establish runtime behavior; subsequent build 7 results are recorded below.
 
 ### Close-confirmation follow-up (build 6)
 
@@ -116,7 +120,24 @@ The user reported quitting after edits without a warning and confirmed that the 
 
 The same independent tester passed sequential ad-hoc signed Debug and Release builds (exit 0), Xcode 26.6 (17F113), macOS SDK 26.5, arm64, Swift 6. `git diff --check` passed; no applicable tests exist. Logs, exact commands, measurements, and the report are retained under `Temp/UnsavedEditFix/`. The Release app is still 2,012 KiB (2,060,288 bytes) on disk. Using the original measurement definitions, production Swift is now 13 files, 874 physical lines, 784 nonblank lines, and 33,211 bytes: +7 lines, +6 nonblank lines, and +267 bytes from build 5; app size and file count are unchanged.
 
-Build 6 is now installed at `/Applications/NanoMD.app`; its executable matches the validated Release and strict signature verification passed. Both prior instances terminated normally. Build 5 is recoverable under `Temp/UnsavedEditFix/PreviousBuild5/NanoMD.app`. Only NanoMD registrations were refreshed; the Markdown default remains TextEdit. The dialog, cancel, explicit-save, and multi-document quit paths remain unverified at runtime; no tests or visual testing were added.
+Build 6 was installed at `/Applications/NanoMD.app`; its executable matched the validated Release and strict signature verification passed. Both prior instances terminated normally. Build 5 is recoverable under `Temp/UnsavedEditFix/PreviousBuild5/NanoMD.app`. Only NanoMD registrations were refreshed; the Markdown default remained TextEdit. No tests or visual testing were added during that change. The dialog, cancel, explicit-save, and multi-document quit paths were subsequently verified in build 7.
+
+### Focused local UI validation (0.1.0, build 7)
+
+On October 14, 2026, the Apple Development-signed arm64 Release from `main` at `76dfc6f` passed the six requested local checks on macOS 26.6.2 using Xcode 26.6:
+
+- Reader: `.md`/`.markdown`, representative formatting, table alignment/wrapping/empty cells at two window widths, and copying across cells.
+- Read/Edit: initial modes, retained editor selection/scroll, and no hidden-editor mutation in Read.
+- Editing and undo: typing, Unicode paste, deletion, undo/redo after mode switches with editor focus, and independent document histories.
+- Saving: create, save, close, and reopen with exact source bytes, including decomposed Unicode and trailing whitespace.
+- Close and quit: save, discard, and cancel on modified documents, including a two-document quit review.
+- File preservation: unchanged bytes and modification times for no-edit fixtures, invalid UTF-8 rejection, inserted CRLF line breaks, and new-document LF without BOM.
+
+The reader's selection and scroll reset on returning to Read. Switching to Edit requires a click or Tab to focus the editor. Undo/redo shortcuts were inactive with reader/window focus; the editor's history survived mode switches. These are observed limitations, not claims of retained reader state or undo availability in every focus context.
+
+The build blocker was corrected by using absolute build/cache paths; no source or configuration changes were needed. The exact bundle was launched from `Temp/UIValidation/AbsoluteBuild/Build/Products/Release/NanoMD.app`, and strict signature verification passed. The installed `/Applications` copy was not replaced or tested. Local evidence is retained in `Temp/UIValidation/REPORT.md` and its associated logs and fixtures; it is intentionally excluded from Git.
+
+This focused pass did not verify the unchecked editor cases above, browser navigation, other hardware/macOS versions, accessibility, profiling, stress cases, or the downloaded Developer ID/notarized package and its Gatekeeper first launch. No source edits or automated tests were introduced.
 
 ## 5. Final polish and performance
 
