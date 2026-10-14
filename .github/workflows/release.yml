@@ -101,6 +101,14 @@ jobs:
             exit 1
           fi
           ditto -c -k --keepParent "$app" Temp/NotarizationUpload.zip
+          (cd Temp && shasum -a 256 NotarizationUpload.zip > Logs/notarization-upload-sha256.txt)
+      - name: Retain notarization input
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: notarization-input-${{ github.run_attempt }}
+          path: Temp/NotarizationUpload.zip
+          retention-days: 7
+          if-no-files-found: error
       - name: Notarize and package
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -109,11 +117,21 @@ jobs:
         run: |
           xcrun notarytool submit Temp/NotarizationUpload.zip \
             --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" \
-            --wait --timeout 20m --output-format json > Temp/Logs/notarization.json
+            --no-wait --output-format json > Temp/Logs/notarization-submission.json
+          submission_id=$(jq -er '.id' Temp/Logs/notarization-submission.json)
+          if ! xcrun notarytool wait "$submission_id" \
+            --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" \
+            --timeout 20m --output-format json > Temp/Logs/notarization.json; then
+            xcrun notarytool info "$submission_id" \
+              --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" \
+              --output-format json > Temp/Logs/notarization.json
+          fi
           if ! jq -e '.status == "Accepted"' Temp/Logs/notarization.json; then
-            submission_id=$(jq -er '.id' Temp/Logs/notarization.json)
-            xcrun notarytool log "$submission_id" Temp/Logs/notarization-details.json \
-              --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD"
+            if jq -e '.status == "Invalid"' Temp/Logs/notarization.json; then
+              xcrun notarytool log "$submission_id" Temp/Logs/notarization-details.json \
+                --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD"
+            fi
+            echo "Notarization has not been accepted. Submission: $submission_id. See retained logs and input ZIP." >&2
             exit 1
           fi
           app="$PWD/Temp/DerivedData/Build/Products/Release/NanoMD.app"
