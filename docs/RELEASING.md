@@ -7,7 +7,7 @@ Test locally with AI assistance, merge the changes, push a version tag, and revi
 - **Build** runs unsigned Debug and Release builds on pull requests and pushes to `main`. It reports compilation failures and keeps build logs for seven days.
 - **Draft release** runs on `v*` tags. It builds the tagged commit for Apple Silicon, signs with Developer ID, notarizes and staples the app, and creates a draft release with a ZIP and SHA-256 checksum. Tags must point to a commit included in `main`. Normal pushes to `main` never create a release.
 
-Both workflows use the standard `macos-26` runner and Xcode 26.6. Build products, package caches, logs, and release staging stay under `Temp/`. Only selected logs and release files are uploaded. CI compilation does not verify editing behavior, file preservation, or the downloaded app's first launch.
+Both workflows use the standard `macos-26` runner and Xcode 26.6. Build products, package caches, logs, and release staging stay under `Temp/`. The release workflow retains the signed submission ZIP for seven days as `notarization-input-<attempt>` before waiting for Apple, along with its checksum and submission ID in the release logs. This allows packaging the exact accepted build after a timeout. CI compilation does not verify editing behavior, file preservation, or the downloaded app's first launch.
 
 Distribution builds use [Config/Distribution.entitlements](../Config/Distribution.entitlements) with base entitlement injection disabled. The release workflow checks the signed app for sandboxing, user-selected file read/write access, and the absence of debugger access before submission. Keep these distribution permissions aligned with the app's capabilities. Normal Xcode builds retain their generated entitlements for local debugging.
 
@@ -46,7 +46,7 @@ Missing credentials stop the release workflow with the missing secret's name. A 
 
 ## First beta
 
-The current candidate is version **0.1.0**, build **8**, with the intended tag **`v0.1.0-beta.2`**. It targets Apple Silicon and macOS 26.5 or later, using Xcode 26.6. Broader hardware and older macOS support have not been verified. Preparing this version does not create a release tag or certify runtime behavior.
+The current draft is version **0.1.0**, build **8**, tagged **`v0.1.0-beta.2`** at `3358691`. It targets Apple Silicon and macOS 26.5 or later, using Xcode 26.6. Its downloaded package passed signature, entitlement, notarization, stapling, checksum, and Gatekeeper checks. First-launch UI checks remain pending, and the draft is unpublished. Broader hardware and older macOS support have not been verified.
 
 Focused local UI checks passed on October 14, 2026, using the Apple Development-signed arm64 Release at `76dfc6f` on macOS 26.6.2. Reader/tables, Read/Edit, editing/undo, saving, close/quit, and file preservation passed for the exercised fixtures. The [roadmap records the scope, observed focus/reader-state limitations, and remaining runtime cases](ROADMAP.md#focused-local-ui-validation-010-build-7). This result does not verify Developer ID signing, notarization, or the downloaded package's first launch.
 
@@ -91,6 +91,16 @@ Launch the downloaded app through Finder and repeat opening, editing, saving/reo
 
 The workflow never publishes automatically. If a run fails before creating the draft, correct the configuration and rerun it when appropriate. If a partial draft already exists, inspect it and remove only that unpublished draft before retrying; the workflow does not overwrite existing releases. Source changes need a new commit and tag. Never move a published tag or replace a published binary; ship a new version.
 
+### Notarization timeouts
+
+A wait timeout does not cancel Apple's processing or mean the submission was rejected. Check the submission ID from `notarization-submission.json` with `xcrun notarytool info`. Use the same Apple account and team, entering the app-specific password only at its secure prompt.
+
+If Apple later accepts the submission, download that run attempt's `notarization-input-<attempt>` artifact and release logs into `Temp/`. Verify `NotarizationUpload.zip` against `notarization-upload-sha256.txt` before extracting it with `ditto`. Confirm the run's commit and tag, then staple and validate that exact app, run the signature and Gatekeeper checks above, and package it with a new checksum using the workflow's packaging commands. Create only a draft release. Do not rebuild and assume the earlier acceptance applies to the new binary.
+
+These recovery artifacts apply to future runs using the updated workflow. Beta.2's first attempt retained only logs, so it required a complete rerun and a new notarization submission.
+
 ## Current setup status
 
-Workflow definitions and a shared Xcode scheme are included in the repository. All five signing/notarization secrets are configured. On October 14, 2026, [the first beta run](https://github.com/SiavashB/nano.md/actions/runs/38635655132) successfully imported the Developer ID certificate, built and verified the signed Release, and submitted it to Apple. Apple returned `Invalid` because the executable included `com.apple.security.get-task-allow`. The distribution workflow now sets `CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO` to exclude the debugging entitlement, while normal Xcode builds retain their existing behavior. Rejected submissions now retain Apple's detailed log in the release artifacts. Build 8 passed local Debug/Release builds and corrected Developer ID signature/entitlement checks; its notarization remains unverified. The first attempt created no draft or distributable ZIP. Build checks, signing/notarization, and local functional verification are separate results; record each only after it has actually succeeded.
+All five signing/notarization secrets are configured and worked in CI. The first beta was rejected for the injected `com.apple.security.get-task-allow` entitlement; build 8 corrected distribution signing without changing app source or local debugging behavior.
+
+On October 14, 2026, [beta.2 attempt 2](https://github.com/SiavashB/nano.md/actions/runs/38641897124/attempts/2) completed successfully. Apple accepted submission `724df31c-f072-43a8-9e88-cb3ce00429d3`. Independent verification of the downloaded draft passed checksum, Developer ID signature and secure timestamp, hardened runtime, sandbox/file-access permissions, absence of debugger access, stapling, Gatekeeper, bundle metadata, and bundled-license comparisons. The ZIP is 2,138,600 bytes; regular nonsymlink files in the app total 3,652,073 bytes. Local evidence is retained under `Temp/FirstRelease/Beta2RetryVerification/`. The draft remains unpublished until its first-launch and focused UI checks are completed. The timeout-recovery workflow change has been reviewed separately; it was not part of this release run.
