@@ -42,6 +42,12 @@ The reader milestone is complete within its documented syntax subset. Performanc
 
 Pipe-table rendering was added after the original reader smoke check, with native cells, header styling, borders, column alignment, and inline formatting. User-provided screenshots confirmed visible alignment, inline formatting, text wrapping, empty cells, and header-only tables, and exposed border gaps and tight spacing after tables. Border and spacing adjustments compiled in Debug and locally signed Release; build 4 was installed at `/Applications/NanoMD.app` and its binary and registration were verified. The [build 7 UI check](#focused-local-ui-validation-010-build-7) subsequently verified table layout at two window widths and copying a selection across cells. No tests were added.
 
+### SKILL.md front matter (0.1.0, build 11)
+
+On October 16, 2026, opening a disposable copy of the installed `listing-floor-plan/SKILL.md` confirmed that its opening YAML rendered as a thematic break and an oversized heading. Build 11 separates a closed leading mapping block before Markdown parsing and displays all metadata literally in a compact native text panel. Edit retains the original YAML; no dependency, test target, or automated test was added.
+
+Unsigned Debug and Developer ID-signed arm64 Release builds passed with Xcode 26.6, along with strict signature verification and `git diff --check`. Focused app checks passed for the real SKILL.md's panel and body, Read/Edit source visibility, folded multiline descriptions and nested fields in a UTF-8 BOM/CRLF fixture, ordinary leading thematic breaks, and a missing closing delimiter. The real SKILL.md retained its original SHA-256 after reading and switching modes. The local signed Release bundle contains 3,674,213 regular-file bytes, and the website's size/version fields were refreshed from that bundle. Logs and disposable files are under ignored `Temp/SkillFrontMatter/`. These checks do not replace the broader outstanding editor checks or downloaded-package verification.
+
 ## 3. Public release preparation
 
 - [x] Choose and add the project license; retain any required dependency notices.
