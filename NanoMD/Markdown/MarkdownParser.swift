@@ -10,9 +10,14 @@ actor MarkdownParser {
             throw MarkdownRenderingError.tooLarge
         }
 
-        let document = Document(parsing: source, options: [.disableSmartOpts])
+        let frontMatter = MarkdownFrontMatter(source)
+        let document = Document(parsing: frontMatter?.body ?? source, options: [.disableSmartOpts])
         try validateComplexity(document)
-        let content = MarkdownContent(blocks: try document.children.map(block))
+        var blocks = try document.children.map(block)
+        if let frontMatter {
+            blocks.insert(.frontMatter(frontMatter.metadata), at: 0)
+        }
+        let content = MarkdownContent(blocks: blocks)
         try Task.checkCancellation()
         return content
     }

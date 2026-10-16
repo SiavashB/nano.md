@@ -37,6 +37,7 @@ NanoMD/
     MarkdownContentType.swift
   Markdown/
     MarkdownContent.swift
+    MarkdownFrontMatter.swift
     MarkdownParser.swift
   Features/
     Document/
@@ -110,6 +111,8 @@ AppKit view creation, attribute application, and layout remain on the main actor
 The parser handles malformed Markdown as content when possible. Unsupported presentation features retain readable content or show a clear fallback; they must not silently disappear. Failed rendering must offer access to selectable literal source without an editable control.
 
 ## Initial rendering scope
+
+Before Markdown parsing, a leading `---` block with a top-level mapping field and a closing `---` or `...` is separated as literal front matter. `MarkdownFrontMatter` recognizes the envelope without interpreting YAML values, tags, aliases, or nested structures. The reader presents every field in a compact, bordered, single-cell native text table with a Metadata label and smaller monospaced text. Metadata stays selectable in the same text view as the body and never creates Markdown links or headings. Missing closing delimiters and leading thematic breaks without mapping fields retain ordinary Markdown behavior. The remaining body retains its original source representation; only the panel's derived line separators are normalized for display. File serialization and Edit continue to use the complete, unchanged document source. No YAML dependency is added.
 
 The formatted reader supports paragraphs, headings, emphasis, strong emphasis, inline code, fenced/indented code blocks, ordered/unordered lists, blockquotes, pipe tables, thematic breaks, and explicitly activated web links. Preserve nested structure and code whitespace. Present images as descriptive text placeholders initially.
 
