@@ -195,6 +195,12 @@ The added source is the concrete appearance-mode mapping and shared picker/menu/
 
 The locally signed arm64 Release also passed compilation and strict signature verification and was installed at `/Applications/NanoMD.app`. Build 9 exited normally and is retained at `Temp/AppThemes/AppearanceModes/Install/PreviousInstalled/NanoMD.app`. Installed and built executable SHA-256 values match; macOS resolves the bundle identifier to the installed path, with stale nano.md build/backup registrations removed. The signed app measures 3,812,789 regular-file bytes; website metadata was refreshed from that installed bundle. Signed build and installation evidence is under `Temp/AppThemes/AppearanceModes/Install/`. No app launch, visual/runtime testing, release publication, merge, or deployment occurred during this follow-up.
 
+### Front-matter integration (0.1.0, build 12)
+
+Build 12 combines beta 3's SKILL.md front matter with the System/Light/Dark appearance implementation. Metadata panels use the selected palette's code-block background, one-point border, primary label, and secondary literal text, with compact monospaced typography. The existing semantic-content restyling path updates the panel alongside the document body; parsing and source serialization are unchanged.
+
+Unsigned Debug and Release builds passed with Xcode 26.6, including an arm64 Release matching the published distribution's architecture. `git diff --check` and focused integration review passed. The only build warning was skipped App Intents metadata extraction. Website source metadata was refreshed from the exact unsigned arm64 Release bundle: 3,808,153 regular-file bytes, version 0.1.0 build 12. Beta 3 download links remain in place. Logs and build output are under ignored `Temp/AppThemes/MetadataIntegration/`. No tests were introduced. Visual/runtime verification of the combined themes and metadata panel remains pending; earlier beta 3 checks do not validate this styling. The installed app and live website were not updated.
+
 ## 5. Final polish and performance
 
 - [ ] Measure parsing, layout, memory, and open-to-first-content latency using representative documents.

@@ -74,28 +74,28 @@ struct MarkdownTextRenderer {
             table: table, startingRow: 0, rowSpan: 1, startingColumn: 0, columnSpan: 1
         )
         panel.setWidth(12, type: .absoluteValueType, for: .padding)
-        panel.setWidth(0.5, type: .absoluteValueType, for: .border)
-        panel.setBorderColor(.separatorColor)
-        panel.backgroundColor = .quaternaryLabelColor
+        panel.setWidth(1, type: .absoluteValueType, for: .border)
+        panel.setBorderColor(theme.border)
+        panel.backgroundColor = theme.codeBlock
 
         let paragraph = NSMutableParagraphStyle()
         paragraph.textBlocks = [panel]
         paragraph.lineSpacing = 3
         output.append(NSAttributedString(string: String(localized: "Metadata") + "\n", attributes: [
-            .font: NSFont.systemFont(ofSize: 11, weight: .semibold),
-            .foregroundColor: NSColor.secondaryLabelColor,
+            .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .bold),
+            .foregroundColor: theme.primary,
             .paragraphStyle: paragraph
         ]))
         output.append(NSAttributedString(string: metadata + "\n", attributes: [
             .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .regular),
-            .foregroundColor: NSColor.textColor,
+            .foregroundColor: theme.secondary,
             .paragraphStyle: paragraph
         ]))
         let spacing = NSMutableParagraphStyle()
         spacing.minimumLineHeight = 16
         spacing.maximumLineHeight = 16
         output.append(NSAttributedString(string: "\n", attributes: [
-            .font: NSFont.systemFont(ofSize: 1),
+            .font: NSFont.monospacedSystemFont(ofSize: 1, weight: .regular),
             .paragraphStyle: spacing
         ]))
     }
