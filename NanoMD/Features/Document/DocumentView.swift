@@ -4,24 +4,32 @@ struct DocumentView: View {
     @Binding var document: NanoMDDocument
     @Binding var appearancePreference: String
     let filename: String
-    @Environment(\.colorScheme) private var colorScheme
+    let systemColorScheme: ColorScheme
     @State private var mode: Mode
 
     private enum Mode: String, CaseIterable {
         case read = "Read"
         case edit = "Edit"
+
+        var iconName: String {
+            switch self {
+            case .read: "DocumentPreview"
+            case .edit: "DocumentEdit"
+            }
+        }
     }
 
     init(document: Binding<NanoMDDocument>, isNewDocument: Bool, filename: String,
-         appearancePreference: Binding<String>) {
+         appearancePreference: Binding<String>, systemColorScheme: ColorScheme) {
         _document = document
         _appearancePreference = appearancePreference
         self.filename = filename
+        self.systemColorScheme = systemColorScheme
         _mode = State(initialValue: isNewDocument ? .edit : .read)
     }
 
     private var appearance: AppearanceMode { AppearanceMode(preference: appearancePreference) }
-    private var theme: AppTheme { appearance.theme(for: colorScheme) }
+    private var theme: AppTheme { appearance.theme(for: systemColorScheme) }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -68,22 +76,25 @@ struct DocumentView: View {
         .frame(minWidth: 360, minHeight: 240)
         .preferredColorScheme(appearance.colorScheme)
         .tint(Color(nsColor: theme.accent))
+        .toolbar(removing: .title)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 Picker("Document mode", selection: $mode) {
                     ForEach(Mode.allCases, id: \.self) { mode in
-                        Text(mode.rawValue).tag(mode)
+                        Label(mode.rawValue, image: mode.iconName)
+                            .labelStyle(.iconOnly)
+                            .help(mode.rawValue)
+                            .tag(mode)
                     }
                 }
                 .pickerStyle(.segmented)
                 .fixedSize()
             }
             ToolbarItem(placement: .primaryAction) {
-                Menu("Appearance") {
-                    AppearancePicker(preference: $appearancePreference)
-                        .pickerStyle(.inline)
-                }
-                .help("Appearance: \(appearance.name)")
+                AppearancePicker(preference: $appearancePreference)
+                    .pickerStyle(.segmented)
+                    .fixedSize()
+                    .help("Appearance: \(appearance.name)")
             }
         }
     }

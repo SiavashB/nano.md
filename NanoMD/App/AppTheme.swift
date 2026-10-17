@@ -1,10 +1,31 @@
 import AppKit
+import Observation
 import SwiftUI
 
+@MainActor
+@Observable
+final class SystemAppearance {
+    private(set) var colorScheme: ColorScheme
+    @ObservationIgnored private var observation: NSKeyValueObservation?
+
+    init() {
+        colorScheme = Self.currentColorScheme
+        observation = NSApplication.shared.observe(\.effectiveAppearance, options: [.new]) { [weak self] _, _ in
+            Task { @MainActor [weak self] in
+                self?.colorScheme = Self.currentColorScheme
+            }
+        }
+    }
+
+    private static var currentColorScheme: ColorScheme {
+        NSApplication.shared.effectiveAppearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua ? .dark : .light
+    }
+}
+
 nonisolated enum AppearanceMode: String, CaseIterable, Sendable {
-    case system
-    case light
     case dark
+    case light
+    case system
 
     static let preferenceKey = "appearanceTheme"
 

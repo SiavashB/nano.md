@@ -203,6 +203,28 @@ Unsigned Debug and Release builds passed with Xcode 26.6, including an arm64 Rel
 
 At the maintainer's installation request on October 17, 2026, the locally Apple Development-signed arm64 Release of build 12 passed compilation and strict signature verification and was installed at `/Applications/NanoMD.app`. All three older running copies exited through normal termination. The prior installed build 10 is preserved under `Temp/AppThemes/MetadataIntegration/Install/PreviousInstalled/NanoMD.app`. Installed and built executable SHA-256 values match. Stale nano.md build/backup registrations were removed, and macOS resolves the bundle identifier to the installed Applications copy. The signed bundle contains 3,817,589 regular-file bytes; website source metadata was refreshed from it. Installation evidence is retained under `Temp/AppThemes/MetadataIntegration/Install/`. The new app was not launched or visually tested, and no release or website deployment occurred.
 
+### Three-way appearance control (0.1.0, build 13)
+
+The document toolbar's Appearance dropdown is now a native segmented System / Light / Dark picker. It uses the same app-wide preference and existing two palettes; View > Appearance remains available. The existing centered Read/Edit icons were preserved. No parser, editor, persistence, dependency, or test changes were introduced.
+
+The same independent tester passed unsigned arm64 Debug and locally signed arm64 Release builds, metadata checks, `git diff --check`, and focused code review. Strict signature verification passed with normal keychain access; the sandboxed verification initially could not establish certificate trust. No applicable test targets exist. Build 13 was installed at `/Applications/NanoMD.app`, with the previous installed build 12 retained at `Temp/AppThemes/AppearanceToggle/PreviousInstalled/NanoMD.app`. Installed and built executable hashes match, and macOS resolves nano.md to the installed copy. Website metadata was refreshed from the signed Release (3,832,165 regular-file bytes). Evidence and logs are under `Temp/AppThemes/AppearanceToggle/`.
+
+At the maintainer's request, the installed app was opened with a disposable README copy, `Temp/AppThemes/AppearanceToggle/Preview.md`, to show the control. Opening the preview does not establish visual or runtime verification: no rendered UI was inspected, screenshots taken, or controls exercised. No release, merge, or website deployment occurred.
+
+### Hidden native window title (0.1.0, build 14)
+
+The native toolbar's filename title is hidden using `toolbar(removing: .title)`. The document header/footer still show its filename, and document metadata and native window controls retain their existing ownership. Independent unsigned arm64 Debug and signed arm64 Release builds, strict signature verification, focused review, and `git diff --check` passed. No applicable test targets exist. Build 14 was installed and reopened with the existing disposable preview; build 13 is preserved under `Temp/AppThemes/HiddenWindowTitle/PreviousInstalled/NanoMD.app`. Installed and built executable hashes match, and macOS resolves nano.md to the installed copy. Website metadata was refreshed from the signed Release (3,835,845 regular-file bytes). Logs are under `Temp/AppThemes/HiddenWindowTitle/`. No visual testing, publication, merge, or deployment occurred.
+
+### System appearance synchronization (Debug preview)
+
+Returning from explicit Dark to System could lighten the native toolbar while leaving the document dark because SwiftUI's inherited color scheme retained the earlier window override. System palette resolution now uses an app-owned observation of `NSApplication.effectiveAppearance`, independent of per-window overrides. Main-actor updates propagate the current macOS scheme to each document without replacing native editor/reader views. The manually chosen Dark / Light / System order is preserved.
+
+An independent ad-hoc signed arm64 Debug build, signature verification, `git diff --check`, and focused review passed. No tests were added and no applicable test targets exist. The corrected Debug preview was reopened for the maintainer to try; no rendered UI was inspected or controls exercised by the agents. Logs are under `Temp/DebugPreview/SystemAppearanceFix/`. No Release build, installed app replacement, website metadata refresh, merge, or deployment was performed for this preview iteration.
+
+### Theme consolidation (0.1.0, build 15)
+
+Build 15 consolidates the segmented Dark / Light / System selector, Read/Edit icons, hidden native filename title, and System appearance synchronization. Independent unsigned arm64 Debug and Release builds and `git diff --check` passed for the final source. No applicable test targets exist; no tests or visual checks were added. The only build warning was skipped App Intents metadata extraction. Website source metadata was refreshed from the exact unsigned Release bundle (3,858,301 regular-file bytes). Logs and the validation report are under `Temp/AppThemes/MergeValidation/`. The installed app and live website were not replaced or deployed during this consolidation; runtime acceptance remains separate from these build/code checks.
+
 ## 5. Final polish and performance
 
 - [ ] Measure parsing, layout, memory, and open-to-first-content latency using representative documents.
