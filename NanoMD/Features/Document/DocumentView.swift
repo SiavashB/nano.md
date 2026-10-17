@@ -2,6 +2,9 @@ import SwiftUI
 
 struct DocumentView: View {
     @Binding var document: NanoMDDocument
+    @Binding var appearancePreference: String
+    let filename: String
+    @Environment(\.colorScheme) private var colorScheme
     @State private var mode: Mode
 
     private enum Mode: String, CaseIterable {
@@ -9,31 +12,83 @@ struct DocumentView: View {
         case edit = "Edit"
     }
 
-    init(document: Binding<NanoMDDocument>, isNewDocument: Bool) {
+    init(document: Binding<NanoMDDocument>, isNewDocument: Bool, filename: String,
+         appearancePreference: Binding<String>) {
         _document = document
+        _appearancePreference = appearancePreference
+        self.filename = filename
         _mode = State(initialValue: isNewDocument ? .edit : .read)
     }
 
-    var body: some View {
-        ZStack {
-            // Keep the native editor and its undo targets alive while reading.
-            MarkdownEditorView(document: $document, isActive: mode == .edit)
-                .allowsHitTesting(mode == .edit)
-                .accessibilityHidden(mode != .edit)
+    private var appearance: AppearanceMode { AppearanceMode(preference: appearancePreference) }
+    private var theme: AppTheme { appearance.theme(for: colorScheme) }
 
-            if mode == .read {
-                ReaderView(source: document.source)
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 16) {
+                Text("nano.md").bold()
+                Spacer(minLength: 0)
+                Text(filename).truncationMode(.middle)
             }
-        }
-        .frame(minWidth: 360, minHeight: 240)
-        .toolbar {
-            Picker("Document mode", selection: $mode) {
-                ForEach(Mode.allCases, id: \.self) { mode in
-                    Text(mode.rawValue).tag(mode)
+            .font(.system(size: 12, design: .monospaced))
+            .lineLimit(1)
+            .padding(.horizontal, 17)
+            .padding(.vertical, 12)
+            .foregroundStyle(Color(nsColor: theme.headerText))
+            .background(Color(nsColor: theme.header))
+
+            rule
+            ZStack {
+                // Keep the native editor and its undo targets alive while reading.
+                MarkdownEditorView(document: $document, isActive: mode == .edit, theme: theme)
+                    .allowsHitTesting(mode == .edit)
+                    .accessibilityHidden(mode != .edit)
+
+                if mode == .read {
+                    ReaderView(source: document.source, theme: theme)
                 }
             }
-            .pickerStyle(.segmented)
-            .fixedSize()
+            rule
+            HStack {
+                Text(filename).truncationMode(.middle)
+                Spacer(minLength: 12)
+                Text("UTF-8")
+            }
+            .font(.system(size: 11, design: .monospaced))
+            .lineLimit(1)
+            .foregroundStyle(Color(nsColor: theme.secondary))
+            .padding(.horizontal, 17)
+            .padding(.vertical, 10)
+            .background(Color(nsColor: theme.surrounding))
         }
+        .background(Color(nsColor: theme.document))
+        .overlay(Rectangle().strokeBorder(Color(nsColor: theme.border), lineWidth: 1))
+        .padding(12)
+        .background(Color(nsColor: theme.surrounding))
+        .frame(minWidth: 360, minHeight: 240)
+        .preferredColorScheme(appearance.colorScheme)
+        .tint(Color(nsColor: theme.accent))
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Picker("Document mode", selection: $mode) {
+                    ForEach(Mode.allCases, id: \.self) { mode in
+                        Text(mode.rawValue).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .fixedSize()
+            }
+            ToolbarItem(placement: .primaryAction) {
+                Menu("Appearance") {
+                    AppearancePicker(preference: $appearancePreference)
+                        .pickerStyle(.inline)
+                }
+                .help("Appearance: \(appearance.name)")
+            }
+        }
+    }
+
+    private var rule: some View {
+        Color(nsColor: theme.border).frame(height: 1)
     }
 }

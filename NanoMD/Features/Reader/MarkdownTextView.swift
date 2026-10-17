@@ -3,6 +3,7 @@ import SwiftUI
 
 struct MarkdownTextView: NSViewRepresentable {
     let text: NSAttributedString
+    let theme: AppTheme
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -24,7 +25,6 @@ struct MarkdownTextView: NSViewRepresentable {
         textView.allowsUndo = false
         textView.isAutomaticLinkDetectionEnabled = false
         textView.isAutomaticDataDetectionEnabled = false
-        textView.backgroundColor = .textBackgroundColor
         textView.textContainerInset = NSSize(width: 28, height: 24)
         textView.isVerticallyResizable = true
         textView.isHorizontallyResizable = false
@@ -38,13 +38,26 @@ struct MarkdownTextView: NSViewRepresentable {
         textView.textStorage?.setAttributedString(text)
         context.coordinator.displayedText = text
         scrollView.documentView = textView
+        theme.apply(to: scrollView)
         return scrollView
     }
 
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
+        theme.apply(to: scrollView)
         guard context.coordinator.displayedText !== text,
               let textView = scrollView.documentView as? NSTextView else { return }
+        let retainsPosition = textView.string.utf8.elementsEqual(text.string.utf8)
+        let selection = textView.selectedRanges
+        let origin = scrollView.contentView.bounds.origin
         textView.textStorage?.setAttributedString(text)
+        if retainsPosition {
+            textView.selectedRanges = selection
+            if let container = textView.textContainer {
+                textView.layoutManager?.ensureLayout(for: container)
+            }
+            scrollView.contentView.scroll(to: origin)
+            scrollView.reflectScrolledClipView(scrollView.contentView)
+        }
         context.coordinator.displayedText = text
     }
 

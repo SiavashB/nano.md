@@ -1,6 +1,6 @@
 # nano.md website
 
-Source for https://nano.thirdeyeds.com/, served by the existing `nano-md` Cloudflare Worker. Edit `index.html` and the three PNG assets here. The site has no framework or build step. `.assetsignore` limits publication to the page, three images, `robots.txt`, and `sitemap.xml`.
+Source for https://nano.thirdeyeds.com/, served by the existing `nano-md` Cloudflare Worker. Edit `index.html` and the three PNG assets here. The site has no framework or build step. `.assetsignore` limits publication to the page, three images, `analytics.js`, `robots.txt`, and `sitemap.xml`.
 
 ## Deploy
 
@@ -25,6 +25,18 @@ Wrangler stores its login in the user's standard Cloudflare configuration direct
 Wrangler is a development-only dependency, pinned in `package.json` and `package-lock.json`. It provides Cloudflare's supported upload and authentication flow; no dependency is shipped with the site or Mac app. Its license is MIT OR Apache-2.0. Installation audited 36 packages with no reported vulnerabilities when this setup was added.
 
 This is an explicit, one-command deployment workflow. Git pushes do not automatically publish. Cloudflare's [static asset configuration](https://developers.cloudflare.com/workers/static-assets/binding/) and [deployment command](https://developers.cloudflare.com/workers/wrangler/commands/workers/#deploy) document the configuration.
+
+## Visit and download tracking
+
+`analytics.js` sends events to the TEDS Supabase `nano_events` table for display in TEDS Admin. It uses only the public publishable key; table permissions must allow anonymous inserts and restrict reads to authorized administrators. The backend must be ready before deploying this script.
+
+One `page_view` is sent on each page load. `download` events mean **download clicks**, not completed downloads or installs. Both release-asset links are covered, including primary clicks, keyboard activation, and middle clicks. The tracker accepts only versioned URLs matching `https://github.com/SiavashB/nano.md/releases/download/<tag>/<file>`; it does not count latest-release aliases, section navigation, source links, or release notes. Requests use `fetch` with `keepalive`, do not delay navigation, and silently ignore failures without retrying.
+
+Each event has a fresh UUID and an anonymous visitor UUID stored under `nano_md_visitor_id` in localStorage. If storage is unavailable, the visitor UUID lasts only for the page load, so unique visitor counts may be higher. Setting `localStorage.te_analytics_excluded` to `"true"` on this site's origin excludes that browser; the tracker checks it before each event. No cookies or user accounts are used by the tracker.
+
+Events contain the pathname (no query or fragment, maximum 300 characters), referrer hostname only (maximum 500), device category, and browser timezone (maximum 100). The timezone is an approximate region signal, not verified geographic location. A download event also contains the GitHub asset URL without query or fragment (maximum 1,000); page views use `null`. The database supplies the timestamp. Fetch requests omit credentials and the HTTP referrer.
+
+Tracking runs only on `https://nano.thirdeyeds.com`; local files, localhost, Workers preview addresses, and readily detectable automated browsers are excluded. No analytics are added to the native Mac app.
 
 ## Search and sharing
 

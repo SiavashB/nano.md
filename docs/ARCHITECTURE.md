@@ -32,6 +32,7 @@ Current source layout inside the existing `NanoMD/` synchronized Xcode folder:
 NanoMD/
   App/
     NanoMDApp.swift
+    AppTheme.swift
   Documents/
     NanoMDDocument.swift
     MarkdownContentType.swift
@@ -105,7 +106,19 @@ The system reads the document through the adapter. A renderer must not reopen th
 
 An empty file is a valid ready state. SwiftUI cancels the task when the view disappears or the source changes. A model revision check prevents obsolete work from replacing newer content. The actor checks cancellation before parsing, during tree conversion, and before returning. The synchronous cmark call cannot be interrupted mid-call. Formatting is capped at 1 MiB, 50,000 syntax nodes, and 64 levels of nesting; exceeding a limit shows source. Canceled requests waiting on the actor exit before parsing.
 
-AppKit view creation, attribute application, and layout remain on the main actor. Attributed-text construction yields between blocks, including nested blocks and table rows, to allow cancellation and UI work. Profile that cost separately from parsing. Do not reparse during `body`, native view updates, window resizing, or theme changes. Keep only the latest attributed output per reader; add caching or incremental updates only when measurements justify them.
+AppKit view creation, attribute application, and layout remain on the main actor. Attributed-text construction yields between blocks, including nested blocks and table rows, to allow cancellation and UI work. Profile that cost separately from parsing. Do not reparse during `body`, native view updates, window resizing, or theme changes. Each reader retains only its current semantic content and latest attributed output, discarding semantic content on source replacement. There is no cross-document or historical parse cache.
+
+Source loading and theme styling use separate SwiftUI tasks. Theme changes do not cancel an in-flight parse; its accepted content renders with the latest selected theme. Independent source and render revisions reject obsolete results when loading and restyling overlap. Restyling keeps the ready reader mounted, restores its native selection, completes text layout, and restores the scroll origin within the resulting bounds. Returning from Edit still mounts a new reader and resets reader state.
+
+## Appearance
+
+`AppTheme` is the concrete presentation palette for exactly Nano Dark and Linen Light. It lives alongside app composition and supplies SwiftUI colors and native AppKit text-view styling; Markdown parsing and document serialization remain independent of appearance. Both themes use system monospaced fonts and the same spacing. Native `NSTextBlock` backgrounds, padding, and one-point borders decorate fenced/indented code within the continuous selectable text storage. Inline code has a tinted background without a border. Native tables use theme colors for headers, cells, borders, and inline content.
+
+The app owns one `AppStorage` preference for `AppearanceMode`: System, Light, or Dark. Missing or invalid values resolve to System; the earlier `linenLight` and `nanoDark` values map to explicit Light and Dark. A shared native picker is available from View > Appearance and the right-side document toolbar menu, replacing the single-setting Settings scene. The Read/Edit control uses the native toolbar's principal (center) placement. Changes to this one preference propagate to all document windows.
+
+Light and Dark force the corresponding native color scheme. System removes that override and resolves the existing two palettes from SwiftUI's effective `colorScheme` environment, including changes from macOS. Each document passes the resolved palette to its existing reader/editor; no third palette, system-appearance observer, parser change, or extra rendering path is needed. Native window controls and scrollbars retain the appropriate light/dark appearance. The content header/footer obtain the filename from `DocumentGroup`'s file URL metadata; no additional file read occurs, including after saving or renaming.
+
+Theme updates change existing editor surfaces, selection, and caret colors without replacing source, registering document undo, changing mode, or moving focus. Plain-text foreground/typing color changes wait until marked text finishes, then apply the latest palette. The editor stays mounted throughout. Runtime verification of composition, undo, focus, selection, scrolling, multiple windows, and preference persistence remains pending; these are implementation invariants, not completed runtime checks.
 
 The parser handles malformed Markdown as content when possible. Unsupported presentation features retain readable content or show a clear fallback; they must not silently disappear. Failed rendering must offer access to selectable literal source without an editable control.
 

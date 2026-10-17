@@ -4,6 +4,7 @@ import SwiftUI
 struct MarkdownEditorView: NSViewRepresentable {
     @Binding var document: NanoMDDocument
     let isActive: Bool
+    let theme: AppTheme
     @Environment(\.undoManager) private var undoManager
 
     func makeCoordinator() -> Coordinator {
@@ -30,8 +31,6 @@ struct MarkdownEditorView: NSViewRepresentable {
         textView.isAutomaticDataDetectionEnabled = false
         textView.smartInsertDeleteEnabled = false
         textView.font = .monospacedSystemFont(ofSize: 14, weight: .regular)
-        textView.textColor = .textColor
-        textView.backgroundColor = .textBackgroundColor
         textView.textContainerInset = NSSize(width: 20, height: 20)
         textView.isVerticallyResizable = true
         textView.isHorizontallyResizable = false
@@ -49,9 +48,13 @@ struct MarkdownEditorView: NSViewRepresentable {
             Task { @MainActor in
                 guard let textView else { return }
                 coordinator?.applyReload(to: textView)
+                textView.applyTextTheme()
             }
         }
         scrollView.documentView = textView
+        theme.apply(to: scrollView)
+        textView.theme = theme
+        textView.applyTextTheme()
         context.coordinator.undoManager = undoManager
         scrollView.isHidden = !isActive
         return scrollView
@@ -63,6 +66,9 @@ struct MarkdownEditorView: NSViewRepresentable {
         coordinator.document = $document
         coordinator.undoManager = undoManager
         coordinator.applyReload(to: textView)
+        theme.apply(to: scrollView)
+        textView.theme = theme
+        textView.applyTextTheme()
 
         if !isActive, scrollView.window?.firstResponder === textView {
             textView.breakUndoCoalescing()
@@ -110,6 +116,7 @@ struct MarkdownEditorView: NSViewRepresentable {
 
         func textDidChange(_ notification: Notification) {
             guard !isApplyingReload, let textView = notification.object as? SourceTextView else { return }
+            textView.applyTextTheme()
             // The system owns conflict acceptance. Never publish an old editor over its reload.
             guard document.wrappedValue.loadIdentity == loadIdentity else {
                 applyReload(to: textView)
@@ -128,6 +135,16 @@ struct MarkdownEditorView: NSViewRepresentable {
     final class SourceTextView: NSTextView {
         var lineEnding = "\n"
         var compositionDidEnd: (() -> Void)?
+        var theme: AppTheme = .linenLight
+        private var appliedTextTheme: AppTheme?
+
+        func applyTextTheme() {
+            // Leave marked text under input-method ownership until composition finishes.
+            guard !hasMarkedText(), appliedTextTheme != theme else { return }
+            textColor = theme.secondary
+            typingAttributes[.foregroundColor] = theme.secondary
+            appliedTextTheme = theme
+        }
 
         override func insertNewline(_ sender: Any?) {
             insertText(lineEnding, replacementRange: NSRange(location: NSNotFound, length: 0))

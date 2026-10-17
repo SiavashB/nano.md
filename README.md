@@ -12,6 +12,12 @@ The editor stays alive across mode switches to retain selection, scroll position
 
 Files must contain valid UTF-8, with or without a byte-order mark (BOM). Empty files are supported. Invalid encodings produce an error instead of silently replacing characters. The reader never loads images or other resources automatically.
 
+## Appearance
+
+Choose **System**, **Light**, or **Dark** from **View > Appearance** in the menu bar or **Appearance** on the right of the document toolbar. The Read/Edit control sits in the toolbar's center. System is the default and follows macOS appearance; Light uses Linen Light and Dark uses Nano Dark. Previously saved explicit theme choices remain selected. This app-wide preference persists across launches and updates all document windows, including the plain-source editor and source fallback. Both palettes use native monospaced system fonts, the same layout, and outlined code blocks. The compact content header and footer show the document scene's filename, or Untitled until saved; the footer also shows UTF-8.
+
+Appearance changes restyle the existing native views without changing the document source or undo history. The reader retains its current parsed content to restyle without parsing again, preserving selection and scroll position where layout permits. Editor text-color updates wait for active input-method composition to finish. The three appearance modes and toolbar placement are implemented in build 10; visual appearance and runtime behavior, including following macOS changes in System mode, still require manual verification. The previous build's focused UI results do not validate these changes.
+
 ## Markdown support
 
 - Headings, paragraphs, emphasis, strong emphasis, inline code, and fenced/indented code blocks.

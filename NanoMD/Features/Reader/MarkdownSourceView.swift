@@ -3,6 +3,7 @@ import SwiftUI
 
 struct MarkdownSourceView: NSViewRepresentable {
     let source: String
+    let theme: AppTheme
 
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSScrollView()
@@ -19,8 +20,7 @@ struct MarkdownSourceView: NSViewRepresentable {
         textView.isAutomaticLinkDetectionEnabled = false
         textView.isAutomaticDataDetectionEnabled = false
         textView.font = .monospacedSystemFont(ofSize: 14, weight: .regular)
-        textView.textColor = .textColor
-        textView.backgroundColor = .textBackgroundColor
+        textView.textColor = theme.secondary
         textView.textContainerInset = NSSize(width: 20, height: 20)
         textView.isVerticallyResizable = true
         textView.isHorizontallyResizable = false
@@ -38,10 +38,13 @@ struct MarkdownSourceView: NSViewRepresentable {
         textView.string = source
 
         scrollView.documentView = textView
+        theme.apply(to: scrollView)
         return scrollView
     }
 
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
+        theme.apply(to: scrollView)
+        (scrollView.documentView as? NSTextView)?.textColor = theme.secondary
         // Canonically equivalent strings can still contain different source bytes.
         guard let textView = scrollView.documentView as? NSTextView,
               !textView.string.utf8.elementsEqual(source.utf8) else {

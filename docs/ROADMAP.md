@@ -141,6 +141,52 @@ The build blocker was corrected by using absolute build/cache paths; no source o
 
 This focused pass did not verify the unchecked editor cases above, browser navigation, other hardware/macOS versions, accessibility, profiling, stress cases, or the downloaded Developer ID/notarized package and its Gatekeeper first launch. No source edits or automated tests were introduced.
 
+## 4a. Appearance themes (0.1.0, build 9)
+
+Implemented on `feature/app-themes` in the current checkout: exactly Nano Dark and Linen Light, with a single native Settings Appearance picker (Command-comma), app-wide persistence, and Linen Light as the missing/invalid-preference default. Both share native monospaced typography, layout, themed selection/caret colors, content filename header/footer, and padded one-point code-block borders. No dependencies, tests, or Markdown features were added. The reader retains only current semantic content for restyling, with separate source/render revisions; the native editor remains mounted and its source/undo path is unchanged. Foreground styling defers during input-method composition.
+
+The same independent tester (`gpt-6-luna`, low reasoning, fresh context) performed baseline and final unsigned Debug/Release builds with code edits paused. Both configurations passed before and after on macOS 26.6.2 (25G83), Xcode 26.6 (17F113), arm64, Swift 6, using `ARCHS=arm64 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO`. The existing Xcode scheme and incidental project-file formatting changes were preserved. Initial sandboxed builds could not access Xcode's shared caches; normal permission escalation allowed successful builds without weakening project settings. No applicable existing test targets exist. Final `git diff --check` and focused code review passed. The only final build warning was skipped App Intents metadata extraction because the app does not link that framework.
+
+| Metric | Before (build 8) | After (build 9) | Change |
+| --- | ---: | ---: | ---: |
+| Release app regular-file bytes | 3,641,096 | 3,793,128 | +152,032 (+4.18%) |
+| Production Swift files | 13 | 14 | +1 |
+| Physical Swift lines | 910 | 1,111 | +201 |
+| Nonblank Swift lines | 818 | 1,001 | +183 |
+| Production Swift bytes | 34,586 | 42,378 | +7,792 |
+
+App size sums regular, nonsymlink files throughout the complete unsigned Release bundle; it is uncompressed size, not download size. Source counts include production `NanoMD/**/*.swift` only, excluding dependencies and generated output. Physical lines use byte `splitlines()`; nonblank lines use UTF-8 text `splitlines()` with `strip()`; bytes use actual file lengths. Identical measurement definitions and build settings were used before and after. The extra source is the concrete palette/Settings UI, header/footer, native text styling, and retained semantic restyling. App growth reflects the executable and version metadata, with no new bundled assets or dependencies. No performance benchmarks were performed.
+
+Evidence is retained under ignored `Temp/AppThemes/`: baseline/final reports, Debug/Release logs, measurement scripts, and JSON results. Builds used `-derivedDataPath "$PWD/Temp/AppThemes/DerivedData" -clonedSourcePackagesDirPath "$PWD/Temp/SourcePackages" -packageCachePath "$PWD/Temp/PackageCache"`, with the other README build arguments unchanged. Website app-size/version fields were refreshed from that exact Release bundle. No installed app replacement, release publication, merge, or deployment was performed.
+
+On the maintainer's subsequent installation request, a locally signed arm64 Release of build 9 passed compilation and strict signature verification and was installed at `/Applications/NanoMD.app`. The prior build 6 exited through normal termination and is preserved at `Temp/AppThemes/Install/PreviousInstalled/NanoMD.app`. Installed and built executable SHA-256 values match; stale nano.md build/backup registrations were removed, and macOS resolves the bundle identifier to the installed path. Installation evidence is under `Temp/AppThemes/Install/`. The signed app measures 3,787,204 regular-file bytes, and website metadata was refreshed from it; the unsigned before/after comparison above remains unchanged. The installed app was not launched or visually tested. No publication, merge, or deployment occurred.
+
+Visual and runtime validation of the appearance implementation remains pending. Prior UI checks do not establish acceptance of these themes. Build 10's controls below replace the original Settings picker. Remaining manual checks:
+
+- [ ] Open both themes in Read/Edit, resize, and check typography, contrast, native controls, selection/caret, filename/Untitled metadata, and loading/source fallback.
+- [ ] Use View > Appearance and the right-side toolbar menu; check centered Read/Edit placement, System/Light/Dark selection, following macOS changes in System, persistence after relaunch, immediate changes in multiple open windows, and inheritance in new windows.
+- [ ] Check fenced and indented code borders/padding/whitespace, inline code without borders, and continuous selection across blocks.
+- [ ] Check tables (headers, alignment, empty cells, wrapping, selection), quotes, lists, and links in both themes.
+- [ ] Switch while editing and composing input; check source, dirty state, focus, selection, scrolling, and native undo/redo. Switch while reading/loading to check position and stale-result behavior.
+
+### Appearance controls follow-up (0.1.0, build 10)
+
+At the maintainer's request, appearance now offers System, Light, and Dark in View > Appearance and the right-side toolbar menu; Read/Edit uses the native toolbar's center placement. The single-setting Settings window was removed. System is the missing/invalid-preference default and follows macOS through SwiftUI's effective color scheme. Light and Dark retain the existing Linen Light and Nano Dark palettes. Previously saved explicit choices map to Light/Dark, preserving the existing preference. Palette resolution still updates existing native text views and current semantic reader content without changing source or adding hidden preview parsing.
+
+The same independent tester passed unsigned arm64 Debug and Release builds with the identical build 9 settings and measurement definitions, plus `git diff --check` and focused code review. No applicable test targets exist, and no tests were added. The only build warning was skipped App Intents metadata extraction. Evidence is under `Temp/AppThemes/AppearanceModes/`; the original build 9 records remain preserved. This validation did not launch the app or verify toolbar layout, menu interaction, System-following behavior, preference migration, composition, or undo at runtime.
+
+| Metric | Build 9 | Build 10 | Change |
+| --- | ---: | ---: | ---: |
+| Unsigned Release app regular-file bytes | 3,793,128 | 3,802,361 | +9,233 |
+| Production Swift files | 14 | 14 | 0 |
+| Physical Swift lines | 1,111 | 1,152 | +41 |
+| Nonblank Swift lines | 1,001 | 1,039 | +38 |
+| Production Swift bytes | 42,378 | 43,550 | +1,172 |
+
+The added source is the concrete appearance-mode mapping and shared picker/menu/toolbar wiring. The two palettes and existing document serialization, editor, parser, and reader internals remain unchanged from build 9. No new dependency or bundled asset was added.
+
+The locally signed arm64 Release also passed compilation and strict signature verification and was installed at `/Applications/NanoMD.app`. Build 9 exited normally and is retained at `Temp/AppThemes/AppearanceModes/Install/PreviousInstalled/NanoMD.app`. Installed and built executable SHA-256 values match; macOS resolves the bundle identifier to the installed path, with stale nano.md build/backup registrations removed. The signed app measures 3,812,789 regular-file bytes; website metadata was refreshed from that installed bundle. Signed build and installation evidence is under `Temp/AppThemes/AppearanceModes/Install/`. No app launch, visual/runtime testing, release publication, merge, or deployment occurred during this follow-up.
+
 ## 5. Final polish and performance
 
 - [ ] Measure parsing, layout, memory, and open-to-first-content latency using representative documents.
