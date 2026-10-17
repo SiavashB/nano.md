@@ -44,6 +44,12 @@ Use `gh secret set NAME` to enter a value securely, or GitHub's repository secre
 
 Missing credentials stop the release workflow with the missing secret's name. A local ad-hoc signature cannot replace Developer ID signing for this workflow. See [GitHub's certificate setup](https://docs.github.com/en/actions/how-tos/deploy/deploy-to-third-party-platforms/sign-xcode-applications) and [Apple's Developer ID guidance](https://developer.apple.com/developer-id/).
 
+## Current release
+
+[0.1.0 beta 3](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.3), build 11, was published on October 17, 2026, from `4e6710e`. It adds compact, selectable panels for SKILL.md front matter while preserving the original source in Edit. The [release workflow](https://github.com/SiavashB/nano.md/actions/runs/38976804481) signed and notarized the arm64 app; Apple accepted submission `1b361e0c-d6ad-43d1-b19f-0d5ecc92a224`.
+
+The downloaded package passed checksum, strict Developer ID signature and secure timestamp, hardened runtime, sandbox/file-access permissions without debugger access, stapling, Gatekeeper, bundle metadata, and bundled-license checks. The exact packaged app also passed opening a real SKILL.md, metadata/body rendering, editing its name, undo/redo, saving, closing, and reopening. A file comparison showed only the intended name changed. The ZIP is 2,143,224 bytes; regular nonsymlink files in the app total 3,671,818 bytes. Evidence is retained under ignored `Temp/SkillFrontMatter/`. Broader editor and compatibility limitations remain in the roadmap.
+
 ## First beta
 
 The first published beta is version **0.1.0**, build **8**, tagged **`v0.1.0-beta.2`** at `3358691`. It targets Apple Silicon and macOS 26.5 or later, using Xcode 26.6. Its downloaded package passed signature, entitlement, notarization, stapling, checksum, and Gatekeeper checks. The maintainer confirmed that launch, opening, editing, undo, saving, and reopening passed on the notarized package and approved [publication](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.2). Broader hardware and older macOS support have not been verified.

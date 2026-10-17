@@ -3,6 +3,7 @@ nonisolated struct MarkdownContent: Sendable {
 }
 
 nonisolated indirect enum MarkdownBlock: Sendable {
+    case frontMatter(String)
     case paragraph([MarkdownRun])
     case heading(level: Int, runs: [MarkdownRun])
     case code(String)

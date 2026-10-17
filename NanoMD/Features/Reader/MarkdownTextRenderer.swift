@@ -21,6 +21,8 @@ struct MarkdownTextRenderer {
         try Task.checkCancellation()
         await Task.yield()
         switch block {
+        case let .frontMatter(metadata):
+            appendFrontMatter(metadata, to: output)
         case let .paragraph(runs):
             appendParagraph(runs, to: output, indent: indent, quoteDepth: quoteDepth, marker: marker)
         case let .heading(level, runs):
@@ -62,6 +64,40 @@ struct MarkdownTextRenderer {
             appendParagraph([MarkdownRun(text: "────────────")], to: output,
                             color: theme.border, indent: indent, quoteDepth: quoteDepth, marker: marker)
         }
+    }
+
+    private func appendFrontMatter(_ metadata: String, to output: NSMutableAttributedString) {
+        let table = NSTextTable()
+        table.numberOfColumns = 1
+        table.layoutAlgorithm = .fixedLayoutAlgorithm
+        let panel = NSTextTableBlock(
+            table: table, startingRow: 0, rowSpan: 1, startingColumn: 0, columnSpan: 1
+        )
+        panel.setWidth(12, type: .absoluteValueType, for: .padding)
+        panel.setWidth(0.5, type: .absoluteValueType, for: .border)
+        panel.setBorderColor(.separatorColor)
+        panel.backgroundColor = .quaternaryLabelColor
+
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.textBlocks = [panel]
+        paragraph.lineSpacing = 3
+        output.append(NSAttributedString(string: String(localized: "Metadata") + "\n", attributes: [
+            .font: NSFont.systemFont(ofSize: 11, weight: .semibold),
+            .foregroundColor: NSColor.secondaryLabelColor,
+            .paragraphStyle: paragraph
+        ]))
+        output.append(NSAttributedString(string: metadata + "\n", attributes: [
+            .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .regular),
+            .foregroundColor: NSColor.textColor,
+            .paragraphStyle: paragraph
+        ]))
+        let spacing = NSMutableParagraphStyle()
+        spacing.minimumLineHeight = 16
+        spacing.maximumLineHeight = 16
+        output.append(NSAttributedString(string: "\n", attributes: [
+            .font: NSFont.systemFont(ofSize: 1),
+            .paragraphStyle: spacing
+        ]))
     }
 
     private func appendTable(

@@ -2,7 +2,7 @@
 
 A lightweight native macOS app for reading and editing Markdown files.
 
-**Status:** the reader and source editor passed [focused local UI checks](docs/ROADMAP.md#focused-local-ui-validation-010-build-7) for version 0.1.0 (7). Version 0.1.0 (8) passed signing, notarization, and downloaded-package checks. The maintainer also confirmed that launching the notarized app, opening, editing, undo, saving, and reopening passed. nano.md opens `.md` and `.markdown` files with native formatting and continuous text selection.
+**Status:** [0.1.0 beta 3](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.3), build 11, is signed and notarized and adds compact SKILL.md metadata panels. The downloaded app passed opening, metadata rendering, editing, undo/redo, saving, and reopening checks. Broader runtime cases remain tracked in the [roadmap](docs/ROADMAP.md). nano.md opens `.md` and `.markdown` files with native formatting and continuous text selection.
 
 ## Read and edit a document
 
@@ -23,6 +23,7 @@ Appearance changes restyle the existing native views without changing the docume
 - Headings, paragraphs, emphasis, strong emphasis, inline code, and fenced/indented code blocks.
 - Nested ordered/unordered lists, blockquotes, thematic breaks, and clickable HTTP/HTTPS links.
 - Pipe tables with styled headers, cell borders, column alignment, and inline formatting.
+- Leading YAML front matter, including SKILL.md names and descriptions, appears in a compact, selectable metadata panel. All fields remain literal text; Edit retains the original source.
 - Images appear as text placeholders containing their description and destination.
 - HTML and unsupported blocks remain readable as literal text. Task markers remain text; they are not interactive controls.
 - Relative links, anchors, and non-web URL schemes are shown without navigation.
@@ -68,4 +69,4 @@ This checks compilation; it does not validate signing or distribution. Swift Pac
 
 ## License
 
-nano.md is licensed under the [MIT License](LICENSE), which is included in the app bundle. Dependency licenses and notices are retained in [ThirdPartyNotices.txt](NanoMD/Resources/ThirdPartyNotices.txt), which is also bundled. Download the signed, notarized [0.1.0 beta 2 release](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.2) for Apple Silicon and macOS 26.5 or later.
+nano.md is licensed under the [MIT License](LICENSE), which is included in the app bundle. Dependency licenses and notices are retained in [ThirdPartyNotices.txt](NanoMD/Resources/ThirdPartyNotices.txt), which is also bundled. Download the signed, notarized [0.1.0 beta 3 release](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.3) for Apple Silicon and macOS 26.5 or later.
