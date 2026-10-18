@@ -41,6 +41,7 @@ NanoMD/
     MarkdownFrontMatter.swift
     MarkdownParser.swift
   Features/
+    NativeTextViewConfiguration.swift
     Document/
       DocumentView.swift
     Editor/
@@ -59,6 +60,8 @@ NanoMD/
 ```
 
 `MarkdownParser` produces immutable, Sendable blocks and styled text runs. `ReaderModel` owns loading, ready, and source-fallback states. `MarkdownTextRenderer` builds attributed text and `MarkdownTextView` provides native selection and link handling. `MarkdownSourceView` remains the literal-source fallback. Keep documentation and development scripts outside the synchronized app folder so they do not become app resources.
+
+`NativeTextViewConfiguration` applies only the identical native scroll settings and vertically resizable, width-tracking text-container geometry to existing views. Each adapter creates and owns its native views, keeps its insets explicit (20 × 20 for editor/source, 28 × 24 for formatted reading), and uses the existing `AppTheme.apply` styling. The editor and source fallback select TextKit 2; the formatted reader selects TextKit 1 for tables. Undo, input methods, binding/reload synchronization, table layout, selection restoration, and link handling remain with their existing owners.
 
 Dependency direction:
 
@@ -126,6 +129,8 @@ The parser handles malformed Markdown as content when possible. Unsupported pres
 ## Initial rendering scope
 
 Before Markdown parsing, a leading `---` block with a top-level mapping field and a closing `---` or `...` is separated as literal front matter. `MarkdownFrontMatter` recognizes the envelope without interpreting YAML values, tags, aliases, or nested structures. The reader presents every field in a compact, bordered, single-cell native text table with a Metadata label and smaller monospaced text. Metadata stays selectable in the same text view as the body and never creates Markdown links or headings. Missing closing delimiters and leading thematic breaks without mapping fields retain ordinary Markdown behavior. The remaining body retains its original source representation; only the panel's derived line separators are normalized for display. File serialization and Edit continue to use the complete, unchanged document source. No YAML dependency is added.
+
+Recognition is deliberately narrower than YAML: at least one unindented, single-line field must have a nonempty plain key made of letters, numbers, hyphens, underscores, or dots, or a single- or double-quoted key. Quoted keys may contain spaces and colons; doubled single quotes and backslash-escaped characters in double quotes are skipped when locating the closing quote. Spaces or tabs may separate a closing quote from the separator colon. The separator must be followed by whitespace or end of line. Unterminated quotes, a trailing double-quoted escape, and extra characters between the closing quote and separator do not qualify. Delimiters must remain exact, unindented lines without surrounding whitespace. The recognizer does not decode quoted keys, validate YAML escape sequences or the full header, recognize multiline/complex keys, or interpret any values. One recognizable field qualifies the envelope; other header lines are displayed literally, including malformed YAML. BOM preservation belongs to the document adapter, which removes it from the parsing snapshot and restores it on serialization.
 
 The formatted reader supports paragraphs, headings, emphasis, strong emphasis, inline code, fenced/indented code blocks, ordered/unordered lists, blockquotes, pipe tables, thematic breaks, and explicitly activated web links. Preserve nested structure and code whitespace. Present images as descriptive text placeholders initially.
 

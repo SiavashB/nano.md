@@ -13,9 +13,6 @@ struct MarkdownEditorView: NSViewRepresentable {
 
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSScrollView()
-        scrollView.hasVerticalScroller = true
-        scrollView.autohidesScrollers = true
-        scrollView.borderType = .noBorder
 
         let textView = SourceTextView(usingTextLayoutManager: true)
         textView.delegate = context.coordinator
@@ -32,14 +29,7 @@ struct MarkdownEditorView: NSViewRepresentable {
         textView.smartInsertDeleteEnabled = false
         textView.font = .monospacedSystemFont(ofSize: 14, weight: .regular)
         textView.textContainerInset = NSSize(width: 20, height: 20)
-        textView.isVerticallyResizable = true
-        textView.isHorizontallyResizable = false
-        textView.autoresizingMask = [.width]
-        textView.minSize = .zero
-        textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
-        textView.textContainer?.widthTracksTextView = true
-        textView.textContainer?.containerSize = NSSize(width: 0, height: CGFloat.greatestFiniteMagnitude)
-        textView.textContainer?.lineFragmentPadding = 0
+        NativeTextViewConfiguration.apply(to: textView, in: scrollView)
         textView.setAccessibilityLabel(String(localized: "Markdown source editor"))
         textView.string = document.source
         textView.lineEnding = document.lineEnding

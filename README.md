@@ -23,7 +23,7 @@ Appearance changes restyle the existing native views without changing the docume
 - Headings, paragraphs, emphasis, strong emphasis, inline code, and fenced/indented code blocks.
 - Nested ordered/unordered lists, blockquotes, thematic breaks, and clickable HTTP/HTTPS links.
 - Pipe tables with styled headers, cell borders, column alignment, and inline formatting.
-- Leading YAML front matter, including SKILL.md names and descriptions, appears in a compact, selectable metadata panel styled with the selected theme. All fields remain literal text; Edit retains the original source.
+- Leading front matter with a recognized mapping field appears in a compact, selectable metadata panel styled with the selected theme. Recognized keys include plain names containing letters, numbers, hyphens, underscores, or dots, and single-line single- or double-quoted names. A leading `---` and a closing `---` or `...` must occupy their own lines, and the field's separator colon must be followed by whitespace or the end of the line. This is a limited YAML envelope recognizer, not a YAML parser; all metadata remains literal text and Edit retains the original source. See the [recognition subset](docs/ARCHITECTURE.md#initial-rendering-scope).
 - Images appear as text placeholders containing their description and destination.
 - HTML and unsupported blocks remain readable as literal text. Task markers remain text; they are not interactive controls.
 - Relative links, anchors, and non-web URL schemes are shown without navigation.
