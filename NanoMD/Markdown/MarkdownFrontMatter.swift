@@ -1,6 +1,6 @@
 import Foundation
 
-/// Recognizes a leading YAML mapping without interpreting or rewriting its values.
+/// Recognizes a subset of leading YAML mapping keys without interpreting their values.
 nonisolated struct MarkdownFrontMatter {
     let metadata: String
     let body: String
@@ -23,12 +23,35 @@ nonisolated struct MarkdownFrontMatter {
     }
 
     private static func isMappingField(_ line: Substring) -> Bool {
-        guard let colon = line.firstIndex(of: ":"), colon > line.startIndex else { return false }
-        let key = line[..<colon]
-        guard key.allSatisfy({ $0.isLetter || $0.isNumber || $0 == "-" || $0 == "_" }) else {
+        if let quote = line.first, quote == "\"" || quote == "'" {
+            var remainder = line.dropFirst()
+            while let character = remainder.first {
+                remainder.removeFirst()
+                if quote == "\"", character == "\\" {
+                    guard !remainder.isEmpty else { return false }
+                    remainder.removeFirst()
+                } else if character == quote {
+                    if quote == "'", remainder.first == quote {
+                        remainder.removeFirst()
+                    } else {
+                        return isMappingSeparator(remainder.drop(while: { $0 == " " || $0 == "\t" }))
+                    }
+                }
+            }
             return false
         }
-        let valueStart = line.index(after: colon)
+
+        guard let colon = line.firstIndex(of: ":"), colon > line.startIndex else { return false }
+        let key = line[..<colon]
+        guard key.allSatisfy({ $0.isLetter || $0.isNumber || $0 == "-" || $0 == "_" || $0 == "." }) else {
+            return false
+        }
+        return isMappingSeparator(line[colon...])
+    }
+
+    private static func isMappingSeparator(_ line: Substring) -> Bool {
+        guard line.first == ":" else { return false }
+        let valueStart = line.index(after: line.startIndex)
         return valueStart == line.endIndex || line[valueStart].isWhitespace
     }
 }

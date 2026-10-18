@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A79D185C736A4E499BA32EE1 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = A79D185C736A4E499BA32EE2 /* LICENSE */; };
 		3F90602C50834145A5333C01 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 3F90602C50834145A5333C02 /* Markdown */; };
+		A79D185C736A4E499BA32EE1 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = A79D185C736A4E499BA32EE2 /* LICENSE */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A79D185C736A4E499BA32EE2 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		BD7DE698C62A4BE3943116DD /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Signing.xcconfig; sourceTree = "<group>"; };
 		7C6A330C3050BD8100EFCD32 /* NanoMD.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NanoMD.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A79D185C736A4E499BA32EE2 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		BD7DE698C62A4BE3943116DD /* Config/Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -54,7 +54,7 @@
 			isa = PBXGroup;
 			children = (
 				A79D185C736A4E499BA32EE2 /* LICENSE */,
-				BD7DE698C62A4BE3943116DD /* Signing.xcconfig */,
+				BD7DE698C62A4BE3943116DD /* Config/Signing.xcconfig */,
 				7C6A330E3050BD8100EFCD32 /* NanoMD */,
 				7C6A330D3050BD8100EFCD32 /* Products */,
 			);
@@ -155,14 +155,14 @@
 /* Begin XCBuildConfiguration section */
 		7C6A331A3050BD8200EFCD32 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BD7DE698C62A4BE3943116DD /* Signing.xcconfig */;
+			baseConfigurationReference = BD7DE698C62A4BE3943116DD /* Config/Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_OPTIMIZATION = space;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 18;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -189,14 +189,14 @@
 		};
 		7C6A331B3050BD8200EFCD32 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BD7DE698C62A4BE3943116DD /* Signing.xcconfig */;
+			baseConfigurationReference = BD7DE698C62A4BE3943116DD /* Config/Signing.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_OPTIMIZATION = space;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 18;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -225,6 +225,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -274,7 +275,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -288,6 +289,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -331,7 +333,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 26.5;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;

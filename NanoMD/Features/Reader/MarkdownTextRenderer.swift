@@ -1,6 +1,8 @@
 import AppKit
 
 struct MarkdownTextRenderer {
+    let theme: AppTheme
+
     func render(_ content: MarkdownContent) async throws -> NSAttributedString {
         let output = NSMutableAttributedString(string: "")
         for block in content.blocks {
@@ -25,8 +27,9 @@ struct MarkdownTextRenderer {
             appendParagraph(runs, to: output, indent: indent, quoteDepth: quoteDepth, marker: marker)
         case let .heading(level, runs):
             let sizes: [CGFloat] = [30, 25, 21, 18, 16, 15]
-            let font = NSFont.systemFont(ofSize: sizes[min(max(level, 1), 6) - 1], weight: .semibold)
-            appendParagraph(runs, to: output, font: font, indent: indent, quoteDepth: quoteDepth, marker: marker)
+            let font = NSFont.monospacedSystemFont(ofSize: sizes[min(max(level, 1), 6) - 1], weight: .bold)
+            appendParagraph(runs, to: output, font: font, color: theme.primary,
+                            indent: indent, quoteDepth: quoteDepth, marker: marker)
         case let .code(text), let .literal(text):
             appendParagraph(
                 [MarkdownRun(text: text, style: .code)], to: output,
@@ -59,7 +62,7 @@ struct MarkdownTextRenderer {
             try await appendTable(table, to: output, indent: indent, quoteDepth: quoteDepth)
         case .thematicBreak:
             appendParagraph([MarkdownRun(text: "────────────")], to: output,
-                            indent: indent, quoteDepth: quoteDepth, marker: marker)
+                            color: theme.border, indent: indent, quoteDepth: quoteDepth, marker: marker)
         }
     }
 
@@ -71,28 +74,28 @@ struct MarkdownTextRenderer {
             table: table, startingRow: 0, rowSpan: 1, startingColumn: 0, columnSpan: 1
         )
         panel.setWidth(12, type: .absoluteValueType, for: .padding)
-        panel.setWidth(0.5, type: .absoluteValueType, for: .border)
-        panel.setBorderColor(.separatorColor)
-        panel.backgroundColor = .quaternaryLabelColor
+        panel.setWidth(1, type: .absoluteValueType, for: .border)
+        panel.setBorderColor(theme.border)
+        panel.backgroundColor = theme.codeBlock
 
         let paragraph = NSMutableParagraphStyle()
         paragraph.textBlocks = [panel]
         paragraph.lineSpacing = 3
         output.append(NSAttributedString(string: String(localized: "Metadata") + "\n", attributes: [
-            .font: NSFont.systemFont(ofSize: 11, weight: .semibold),
-            .foregroundColor: NSColor.secondaryLabelColor,
+            .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .bold),
+            .foregroundColor: theme.primary,
             .paragraphStyle: paragraph
         ]))
         output.append(NSAttributedString(string: metadata + "\n", attributes: [
             .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .regular),
-            .foregroundColor: NSColor.textColor,
+            .foregroundColor: theme.secondary,
             .paragraphStyle: paragraph
         ]))
         let spacing = NSMutableParagraphStyle()
         spacing.minimumLineHeight = 16
         spacing.maximumLineHeight = 16
         output.append(NSAttributedString(string: "\n", attributes: [
-            .font: NSFont.systemFont(ofSize: 1),
+            .font: NSFont.monospacedSystemFont(ofSize: 1, weight: .regular),
             .paragraphStyle: spacing
         ]))
     }
@@ -116,7 +119,7 @@ struct MarkdownTextRenderer {
             try Task.checkCancellation()
             await Task.yield()
             let isHeader = rowIndex == 0
-            let font = NSFont.systemFont(ofSize: 15, weight: isHeader ? .semibold : .regular)
+            let font = NSFont.monospacedSystemFont(ofSize: 15, weight: isHeader ? .bold : .regular)
 
             for (columnIndex, alignment) in content.columnAlignments.enumerated() {
                 let cell = NSTextTableBlock(
@@ -125,10 +128,12 @@ struct MarkdownTextRenderer {
                 )
                 cell.setWidth(8, type: .absoluteValueType, for: .padding)
                 cell.setWidth(0.5, type: .absoluteValueType, for: .border)
-                cell.setBorderColor(.separatorColor)
+                cell.setBorderColor(theme.border)
                 cell.verticalAlignment = .topAlignment
                 if isHeader {
-                    cell.backgroundColor = .quaternaryLabelColor
+                    cell.backgroundColor = theme.inlineCode
+                } else {
+                    cell.backgroundColor = theme.document
                 }
 
                 let paragraph = NSMutableParagraphStyle()
@@ -141,7 +146,7 @@ struct MarkdownTextRenderer {
                 }
                 let base: [NSAttributedString.Key: Any] = [
                     .font: font,
-                    .foregroundColor: quoteDepth > 0 ? NSColor.secondaryLabelColor : NSColor.textColor,
+                    .foregroundColor: isHeader ? theme.primary : theme.secondary,
                     .paragraphStyle: paragraph
                 ]
                 let runs = columnIndex < row.cells.count ? row.cells[columnIndex] : []
@@ -156,7 +161,7 @@ struct MarkdownTextRenderer {
         spacing.minimumLineHeight = 12
         spacing.maximumLineHeight = 12
         output.append(NSAttributedString(string: "\n", attributes: [
-            .font: NSFont.systemFont(ofSize: 1),
+            .font: NSFont.monospacedSystemFont(ofSize: 1, weight: .regular),
             .paragraphStyle: spacing
         ]))
     }
@@ -164,7 +169,8 @@ struct MarkdownTextRenderer {
     private func appendParagraph(
         _ runs: [MarkdownRun],
         to output: NSMutableAttributedString,
-        font: NSFont = .systemFont(ofSize: 15),
+        font: NSFont = .monospacedSystemFont(ofSize: 15, weight: .regular),
+        color: NSColor? = nil,
         indent: CGFloat,
         quoteDepth: Int,
         marker: String,
@@ -178,20 +184,24 @@ struct MarkdownTextRenderer {
         paragraph.tabStops = [NSTextTab(textAlignment: .left, location: indent)]
         paragraph.defaultTabInterval = 32
         if isLiteralBlock {
-            let block = RoundedCodeBlock()
+            let block = NSTextBlock()
             block.setContentWidth(100, type: .percentageValueType)
-            block.backgroundColor = .quaternaryLabelColor
-            block.setWidth(4, type: .absoluteValueType, for: .padding)
+            block.backgroundColor = theme.codeBlock
+            block.setWidth(12, type: .absoluteValueType, for: .padding)
+            block.setWidth(1, type: .absoluteValueType, for: .border)
+            block.setBorderColor(theme.border)
             paragraph.textBlocks = [block]
         }
 
         let base: [NSAttributedString.Key: Any] = [
             .font: font,
-            .foregroundColor: quoteDepth > 0 ? NSColor.secondaryLabelColor : NSColor.textColor,
+            .foregroundColor: color ?? theme.secondary,
             .paragraphStyle: paragraph
         ]
         let prefix = marker + (quoteDepth > 0 ? "│ " : "")
-        output.append(NSAttributedString(string: prefix, attributes: base))
+        var prefixAttributes = base
+        prefixAttributes[.foregroundColor] = theme.accent
+        output.append(NSAttributedString(string: prefix, attributes: prefixAttributes))
         appendRuns(runs, to: output, font: font, base: base, usesInlineCodeBackground: !isLiteralBlock)
         if runs.last?.text.hasSuffix("\n") != true || runs.last?.destination != nil {
             output.append(NSAttributedString(string: "\n", attributes: base))
@@ -224,12 +234,19 @@ struct MarkdownTextRenderer {
                 runFont = NSFontManager.shared.convert(runFont, toHaveTrait: .italicFontMask)
             }
             attributes[.font] = runFont
+            if run.style.contains(.strong) {
+                attributes[.foregroundColor] = theme.primary
+            }
+            if run.style.contains(.code) {
+                attributes[.foregroundColor] = theme.accent
+            }
             if run.style.contains(.code), usesInlineCodeBackground {
-                attributes[.backgroundColor] = NSColor.quaternaryLabelColor
+                attributes[.backgroundColor] = theme.inlineCode
             }
             if let destination = run.destination {
                 if let url = ReaderLinkPolicy.allowedURL(destination) {
                     attributes[.link] = url
+                    attributes[.foregroundColor] = theme.accent
                     attributes[.toolTip] = destination
                 } else {
                     output.append(NSAttributedString(string: run.text, attributes: attributes))
@@ -241,18 +258,5 @@ struct MarkdownTextRenderer {
             }
             output.append(NSAttributedString(string: run.text, attributes: attributes))
         }
-    }
-}
-
-private nonisolated final class RoundedCodeBlock: NSTextBlock {
-    override func drawBackground(
-        withFrame frameRect: NSRect,
-        in controlView: NSView,
-        characterRange charRange: NSRange,
-        layoutManager: NSLayoutManager
-    ) {
-        guard let backgroundColor else { return }
-        backgroundColor.setFill()
-        NSBezierPath(roundedRect: frameRect, xRadius: 3, yRadius: 3).fill()
     }
 }

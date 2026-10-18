@@ -3,6 +3,7 @@ import SwiftUI
 
 struct MarkdownTextView: NSViewRepresentable {
     let text: NSAttributedString
+    let theme: AppTheme
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -10,9 +11,6 @@ struct MarkdownTextView: NSViewRepresentable {
 
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSScrollView()
-        scrollView.hasVerticalScroller = true
-        scrollView.autohidesScrollers = true
-        scrollView.borderType = .noBorder
 
         // Native text tables use the TextKit 1 layout path.
         let textView = ReaderTextView(usingTextLayoutManager: false)
@@ -24,27 +22,32 @@ struct MarkdownTextView: NSViewRepresentable {
         textView.allowsUndo = false
         textView.isAutomaticLinkDetectionEnabled = false
         textView.isAutomaticDataDetectionEnabled = false
-        textView.backgroundColor = .textBackgroundColor
         textView.textContainerInset = NSSize(width: 28, height: 24)
-        textView.isVerticallyResizable = true
-        textView.isHorizontallyResizable = false
-        textView.autoresizingMask = [.width]
-        textView.minSize = .zero
-        textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
-        textView.textContainer?.widthTracksTextView = true
-        textView.textContainer?.containerSize = NSSize(width: 0, height: CGFloat.greatestFiniteMagnitude)
-        textView.textContainer?.lineFragmentPadding = 0
+        NativeTextViewConfiguration.apply(to: textView, in: scrollView)
         textView.setAccessibilityLabel(String(localized: "Markdown document"))
         textView.textStorage?.setAttributedString(text)
         context.coordinator.displayedText = text
         scrollView.documentView = textView
+        theme.apply(to: scrollView)
         return scrollView
     }
 
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
+        theme.apply(to: scrollView)
         guard context.coordinator.displayedText !== text,
               let textView = scrollView.documentView as? NSTextView else { return }
+        let retainsPosition = textView.string.utf8.elementsEqual(text.string.utf8)
+        let selection = textView.selectedRanges
+        let origin = scrollView.contentView.bounds.origin
         textView.textStorage?.setAttributedString(text)
+        if retainsPosition {
+            textView.selectedRanges = selection
+            if let container = textView.textContainer {
+                textView.layoutManager?.ensureLayout(for: container)
+            }
+            scrollView.contentView.scroll(to: origin)
+            scrollView.reflectScrolledClipView(scrollView.contentView)
+        }
         context.coordinator.displayedText = text
     }
 

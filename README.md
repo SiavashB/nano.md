@@ -12,12 +12,18 @@ The editor stays alive across mode switches to retain selection, scroll position
 
 Files must contain valid UTF-8, with or without a byte-order mark (BOM). Empty files are supported. Invalid encodings produce an error instead of silently replacing characters. The reader never loads images or other resources automatically.
 
+## Appearance
+
+Choose **System**, **Light**, or **Dark** from **View > Appearance** in the menu bar or the **Dark / Light / System** segmented control on the right of the document toolbar. The Read/Edit control sits in the toolbar's center, using a page-and-eye icon for Read and a page-and-pencil icon for Edit, with text labels retained for accessibility and tooltips. System is the default and follows macOS appearance; Light uses Linen Light and Dark uses Nano Dark. Previously saved explicit theme choices remain selected. This app-wide preference persists across launches and updates all document windows, including the plain-source editor and source fallback. Both palettes use native monospaced system fonts, the same layout, and outlined code blocks. The compact content header and footer show the document scene's filename, or Untitled until saved; the footer also shows UTF-8. The native window toolbar hides its filename title.
+
+Appearance changes restyle the existing native views without changing the document source or undo history. The reader retains its current parsed content to restyle without parsing again, preserving selection and scroll position where layout permits. Editor text-color updates wait for active input-method composition to finish. The three appearance modes and toolbar placement are implemented in build 10; visual appearance and runtime behavior, including following macOS changes in System mode, still require manual verification. The previous build's focused UI results do not validate these changes.
+
 ## Markdown support
 
 - Headings, paragraphs, emphasis, strong emphasis, inline code, and fenced/indented code blocks.
 - Nested ordered/unordered lists, blockquotes, thematic breaks, and clickable HTTP/HTTPS links.
 - Pipe tables with styled headers, cell borders, column alignment, and inline formatting.
-- Leading YAML front matter, including SKILL.md names and descriptions, appears in a compact, selectable metadata panel. All fields remain literal text; Edit retains the original source.
+- Leading front matter with a recognized mapping field appears in a compact, selectable metadata panel styled with the selected theme. Recognized keys include plain names containing letters, numbers, hyphens, underscores, or dots, and single-line single- or double-quoted names. A leading `---` and a closing `---` or `...` must occupy their own lines, and the field's separator colon must be followed by whitespace or the end of the line. This is a limited YAML envelope recognizer, not a YAML parser; all metadata remains literal text and Edit retains the original source. See the [recognition subset](docs/ARCHITECTURE.md#initial-rendering-scope).
 - Images appear as text placeholders containing their description and destination.
 - HTML and unsupported blocks remain readable as literal text. Task markers remain text; they are not interactive controls.
 - Relative links, anchors, and non-web URL schemes are shown without navigation.
@@ -33,7 +39,7 @@ Parsing runs off the main thread. Documents over 1 MiB, or with excessive nestin
 
 ## Build
 
-The project uses Xcode 26.6, Swift 6 language mode, and a macOS 26.5 deployment target. The broader compatibility policy has not yet been finalized.
+The project uses Xcode 26.6, Swift 6 language mode, and a macOS 15.0 deployment target. Debug and Release builds target Apple Silicon (`arm64`) only; Intel and universal builds are outside the current support scope. The development build targets macOS 15 and later; runtime verification on macOS 15 remains pending. The published beta 3 download still requires macOS 26.5 or later.
 
 Open `NanoMD.xcodeproj`, select the `NanoMD` scheme, and run the macOS app. For a local build without configuring a signing team, run from the repository root:
 
@@ -42,15 +48,18 @@ xcodebuild \
   -project NanoMD.xcodeproj \
   -scheme NanoMD \
   -configuration Debug \
-  -destination 'platform=macOS' \
+  -destination 'platform=macOS,arch=arm64' \
   -derivedDataPath "$PWD/Temp/DerivedData" \
   -clonedSourcePackagesDirPath "$PWD/Temp/SourcePackages" \
   -packageCachePath "$PWD/Temp/PackageCache" \
-  CODE_SIGNING_ALLOWED=NO \
+  -onlyUsePackageVersionsFromResolvedFile \
+  ARCHS=arm64 CODE_SIGNING_ALLOWED=NO \
   build
 ```
 
 This checks compilation; it does not validate signing or distribution. Swift Package Manager resolves Swift Markdown 0.8.0 and swift-cmark 0.9.0 using the included `Package.resolved` file. There are no test targets. See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow.
+
+For app-size measurements, use the same command with `-configuration Release`, then run `npm --prefix website run update-app-size -- "$PWD/Temp/DerivedData/Build/Products/Release/NanoMD.app"`. The updater requires an arm64-only Release bundle matching this checkout. See the [measurement policy](CONTRIBUTING.md#app-size-measurements) for comparable before/after results.
 
 ## Project documentation
 

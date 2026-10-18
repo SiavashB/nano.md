@@ -32,6 +32,7 @@ Current source layout inside the existing `NanoMD/` synchronized Xcode folder:
 NanoMD/
   App/
     NanoMDApp.swift
+    AppTheme.swift
   Documents/
     NanoMDDocument.swift
     MarkdownContentType.swift
@@ -40,6 +41,7 @@ NanoMD/
     MarkdownFrontMatter.swift
     MarkdownParser.swift
   Features/
+    NativeTextViewConfiguration.swift
     Document/
       DocumentView.swift
     Editor/
@@ -58,6 +60,8 @@ NanoMD/
 ```
 
 `MarkdownParser` produces immutable, Sendable blocks and styled text runs. `ReaderModel` owns loading, ready, and source-fallback states. `MarkdownTextRenderer` builds attributed text and `MarkdownTextView` provides native selection and link handling. `MarkdownSourceView` remains the literal-source fallback. Keep documentation and development scripts outside the synchronized app folder so they do not become app resources.
+
+`NativeTextViewConfiguration` applies only the identical native scroll settings and vertically resizable, width-tracking text-container geometry to existing views. Each adapter creates and owns its native views, keeps its insets explicit (20 × 20 for editor/source, 28 × 24 for formatted reading), and uses the existing `AppTheme.apply` styling. The editor and source fallback select TextKit 2; the formatted reader selects TextKit 1 for tables. Undo, input methods, binding/reload synchronization, table layout, selection restoration, and link handling remain with their existing owners.
 
 Dependency direction:
 
@@ -106,13 +110,27 @@ The system reads the document through the adapter. A renderer must not reopen th
 
 An empty file is a valid ready state. SwiftUI cancels the task when the view disappears or the source changes. A model revision check prevents obsolete work from replacing newer content. The actor checks cancellation before parsing, during tree conversion, and before returning. The synchronous cmark call cannot be interrupted mid-call. Formatting is capped at 1 MiB, 50,000 syntax nodes, and 64 levels of nesting; exceeding a limit shows source. Canceled requests waiting on the actor exit before parsing.
 
-AppKit view creation, attribute application, and layout remain on the main actor. Attributed-text construction yields between blocks, including nested blocks and table rows, to allow cancellation and UI work. Profile that cost separately from parsing. Do not reparse during `body`, native view updates, window resizing, or theme changes. Keep only the latest attributed output per reader; add caching or incremental updates only when measurements justify them.
+AppKit view creation, attribute application, and layout remain on the main actor. Attributed-text construction yields between blocks, including nested blocks and table rows, to allow cancellation and UI work. Profile that cost separately from parsing. Do not reparse during `body`, native view updates, window resizing, or theme changes. Each reader retains only its current semantic content and latest attributed output, discarding semantic content on source replacement. There is no cross-document or historical parse cache.
+
+Source loading and theme styling use separate SwiftUI tasks. Theme changes do not cancel an in-flight parse; its accepted content renders with the latest selected theme. Independent source and render revisions reject obsolete results when loading and restyling overlap. Restyling keeps the ready reader mounted, restores its native selection, completes text layout, and restores the scroll origin within the resulting bounds. Returning from Edit still mounts a new reader and resets reader state.
+
+## Appearance
+
+`AppTheme` is the concrete presentation palette for exactly Nano Dark and Linen Light. It lives alongside app composition and supplies SwiftUI colors and native AppKit text-view styling; Markdown parsing and document serialization remain independent of appearance. Both themes use system monospaced fonts and the same spacing. Native `NSTextBlock` backgrounds, padding, and one-point borders decorate fenced/indented code within the continuous selectable text storage. Inline code has a tinted background without a border. Native tables use theme colors for headers, cells, borders, and inline content. Front-matter panels share the code-block background and one-point theme border, with a small bold monospaced primary-color label and secondary-color literal metadata. They use the existing reader restyling path when the resolved palette changes.
+
+The app owns one `AppStorage` preference for `AppearanceMode`: System, Light, or Dark. Missing or invalid values resolve to System; the earlier `linenLight` and `nanoDark` values map to explicit Light and Dark. A shared native picker is available from View > Appearance and the right-side document toolbar segmented control, replacing the single-setting Settings scene. The Read/Edit control uses the native toolbar's principal (center) placement. `toolbar(removing: .title)` hides the native filename title without changing document metadata or replacing the window frame. Changes to this one preference propagate to all document windows.
+
+Light and Dark force the corresponding native color scheme. System removes that override and resolves the existing two palettes from `NSApplication.effectiveAppearance`. A single app-owned `SystemAppearance` observation tracks macOS appearance changes on the main actor and passes the current system color scheme to each document. This avoids deriving System from a SwiftUI environment value that can retain the previous per-window override. Each document passes the resolved palette to its existing reader/editor; no third palette, parser change, or extra rendering path is needed. Native window controls and scrollbars retain the appropriate light/dark appearance. The content header/footer obtain the filename from `DocumentGroup`'s file URL metadata; no additional file read occurs, including after saving or renaming.
+
+Theme updates change existing editor surfaces, selection, and caret colors without replacing source, registering document undo, changing mode, or moving focus. Plain-text foreground/typing color changes wait until marked text finishes, then apply the latest palette. The editor stays mounted throughout. Runtime verification of composition, undo, focus, selection, scrolling, multiple windows, and preference persistence remains pending; these are implementation invariants, not completed runtime checks.
 
 The parser handles malformed Markdown as content when possible. Unsupported presentation features retain readable content or show a clear fallback; they must not silently disappear. Failed rendering must offer access to selectable literal source without an editable control.
 
 ## Initial rendering scope
 
 Before Markdown parsing, a leading `---` block with a top-level mapping field and a closing `---` or `...` is separated as literal front matter. `MarkdownFrontMatter` recognizes the envelope without interpreting YAML values, tags, aliases, or nested structures. The reader presents every field in a compact, bordered, single-cell native text table with a Metadata label and smaller monospaced text. Metadata stays selectable in the same text view as the body and never creates Markdown links or headings. Missing closing delimiters and leading thematic breaks without mapping fields retain ordinary Markdown behavior. The remaining body retains its original source representation; only the panel's derived line separators are normalized for display. File serialization and Edit continue to use the complete, unchanged document source. No YAML dependency is added.
+
+Recognition is deliberately narrower than YAML: at least one unindented, single-line field must have a nonempty plain key made of letters, numbers, hyphens, underscores, or dots, or a single- or double-quoted key. Quoted keys may contain spaces and colons; doubled single quotes and backslash-escaped characters in double quotes are skipped when locating the closing quote. Spaces or tabs may separate a closing quote from the separator colon. The separator must be followed by whitespace or end of line. Unterminated quotes, a trailing double-quoted escape, and extra characters between the closing quote and separator do not qualify. Delimiters must remain exact, unindented lines without surrounding whitespace. The recognizer does not decode quoted keys, validate YAML escape sequences or the full header, recognize multiline/complex keys, or interpret any values. One recognizable field qualifies the envelope; other header lines are displayed literally, including malformed YAML. BOM preservation belongs to the document adapter, which removes it from the parsing snapshot and restores it on serialization.
 
 The formatted reader supports paragraphs, headings, emphasis, strong emphasis, inline code, fenced/indented code blocks, ordered/unordered lists, blockquotes, pipe tables, thematic breaks, and explicitly activated web links. Preserve nested structure and code whitespace. Present images as descriptive text placeholders initially.
 
@@ -152,7 +170,9 @@ Keep acceptance focused on rendering, selection/copying, keyboard access, and ba
 
 The initial 1 MiB formatting cap and complexity limits are conservative guardrails, not measured budgets. No latency or memory guarantees are claimed yet. Performance work should validate or adjust these limits on a named reference Mac and check memory release after document closure.
 
-Keep the current deployment target until compatibility is deliberately evaluated. Swift 6 language mode is enabled in both build configurations; the document adapter and content-type declaration are explicitly nonisolated, while UI uses the project's main-actor default. Resolve future isolation diagnostics at their actual boundaries. Extract a Swift package only when reuse or a compile-time boundary has demonstrated value.
+The deployment target is macOS 15.0 on Apple Silicon. The existing toolbar title-removal API is available from macOS 15, so this target retains the current UI without compatibility branches. Xcode 26.6 and Swift 6 language mode remain the build baseline; lowering the runtime target does not require an older compiler. Runtime validation on macOS 15 remains pending. The document adapter and content-type declaration are explicitly nonisolated, while UI uses the project's main-actor default. Resolve future isolation diagnostics at their actual boundaries. Extract a Swift package only when reuse or a compile-time boundary has demonstrated value.
+
+Debug and Release target Apple Silicon (`arm64`) only, consistent with distribution. The bundle records `NanoMDBuildConfiguration` from Xcode's configuration so size tooling can reject Debug and older unidentified builds. The website updater also verifies the executable contains only arm64. Size comparisons use Release with matching toolchain and signing settings; see [Contributing](../CONTRIBUTING.md#app-size-measurements). This keeps local universal-build overhead from being presented as application growth.
 
 Record major changes here with context, decision, alternatives, and consequences. Add a separate decision record only when the reasoning warrants more space.
 

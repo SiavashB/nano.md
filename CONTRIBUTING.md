@@ -6,13 +6,19 @@ nano.md now includes the reader and the first source editor. Start with the [arc
 
 Keep temporary files, sample documents, logs, and build output in the repository-root `Temp/` folder, which is ignored by Git.
 
-Open `NanoMD.xcodeproj` and select the macOS `NanoMD` scheme. The current baseline is Xcode 26.6, Swift 6 language mode, and a macOS 26.5 deployment target. The source folder uses Xcode's synchronized groups; place new Swift files under the app's `NanoMD/` folder and keep tooling/documentation outside it.
+Open `NanoMD.xcodeproj` and select the macOS `NanoMD` scheme. The current baseline is Xcode 26.6, Swift 6 language mode, and a macOS 15.0 deployment target on Apple Silicon. Keep the modern build toolchain; the deployment target specifies the oldest supported runtime, not the Xcode version. Builds check API availability, while launch, editing/undo, saving, and native window behavior still require runtime verification on macOS 15. The source folder uses Xcode's synchronized groups; place new Swift files under the app's `NanoMD/` folder and keep tooling/documentation outside it.
 
 Use the unsigned Debug build command in [README.md](README.md) for local compilation. Change `-configuration Debug` to `-configuration Release` when validating dependency changes, compiler settings, or performance-sensitive code. Unsigned compilation does not validate sandbox permissions, signing, notarization, or UI behavior.
 
 For a signed local run, create `Config/Local.xcconfig` with `DEVELOPMENT_TEAM = YOUR_TEAM_ID`, using the team shown in Xcode's account settings. Both configurations optionally load that ignored file through `Config/Signing.xcconfig`; a fresh checkout needs no local file for unsigned builds. Keep automatic signing enabled and do not commit your team or certificate settings. CI provides signing settings explicitly.
 
 For Finder and Open With checks, use the current signed Release installed at `/Applications/NanoMD.app`. Building or running in Xcode updates its build directory, not the installed app. When updating the installed copy, request normal termination of older NanoMD instances and stop if unsaved work requires user action. Preserve the previous app under `Temp/`, replace it with the validated locally signed Release, unregister only stale NanoMD build copies with Launch Services, and register the installed app. Keep unrelated associations unchanged. Confirm that macOS resolves the bundle identifier to the installed path.
+
+## App-size measurements
+
+Use Apple Silicon (`ARCHS=arm64`), the Release configuration, Xcode 26.6, and the committed package versions for size measurements, matching the release workflow. For local before/after comparisons, run the README command with `-configuration Release` and `CODE_SIGNING_ALLOWED=NO` for both builds; keep the toolchain, architecture, signing mode, and measurement method identical. Record those settings with the results. Do not compare Debug, universal, or differently signed bundles as evidence of code growth.
+
+Measure the complete `.app` by summing regular-file bytes without following symbolic links; report decimal MB (1 MB = 1,000,000 bytes). Exclude adjacent dSYMs, build caches, and ZIPs. Published download metadata must come from the exact signed release bundle; signing can change its size slightly from a local unsigned build. `website/update-app-size.mjs` checks the executable's architecture and the build configuration recorded in `Info.plist` before updating the page. Older bundles without that configuration metadata must be rebuilt.
 
 ## Change standards
 
