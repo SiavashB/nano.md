@@ -3,9 +3,10 @@
   "private": true,
   "scripts": {
     "update-app-size": "node update-app-size.mjs",
-    "predeploy": "npm run update-app-size",
+    "update-release": "node update-release.mjs",
+    "predeploy": "npm run update-release",
     "deploy": "WRANGLER_SEND_METRICS=false WRANGLER_LOG_PATH=../Temp/WebsiteDeploy/logs/ wrangler deploy",
-    "precheck": "npm run update-app-size",
+    "precheck": "npm run update-release",
     "check": "WRANGLER_SEND_METRICS=false WRANGLER_LOG_PATH=../Temp/WebsiteDeploy/logs/ wrangler deploy --dry-run --outdir ../Temp/WebsiteDeploy/output",
     "login": "WRANGLER_SEND_METRICS=false WRANGLER_LOG_PATH=../Temp/WebsiteDeploy/logs/ wrangler login --browser=false --scopes account:read user:read workers:write workers_scripts:write workers_routes:write zone:read",
     "whoami": "WRANGLER_SEND_METRICS=false WRANGLER_LOG_PATH=../Temp/WebsiteDeploy/logs/ wrangler whoami"

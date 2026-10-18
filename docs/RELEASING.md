@@ -6,6 +6,7 @@ Test locally with AI assistance, merge the changes, push a version tag, and revi
 
 - **Build** runs unsigned Debug and Release builds on pull requests and pushes to `main`. It reports compilation failures and keeps build logs for seven days.
 - **Draft release** runs on `v*` tags. It builds the tagged commit for Apple Silicon, signs with Developer ID, notarizes and staples the app, and creates a draft release with a ZIP and SHA-256 checksum. Tags must point to a commit included in `main`. Normal pushes to `main` never create a release.
+- **Deploy website** runs when a release is published, including prereleases, or when manually dispatched. It synchronizes download links, sizes, build metadata, macOS requirements, and structured data from the newest published release's verified ZIP, then deploys the website. It requires the separate `CLOUDFLARE_API_TOKEN` Actions secret described in [website/README.md](../website/README.md#deploy); local Wrangler OAuth does not configure CI credentials.
 
 Both workflows use the standard `macos-26` runner and Xcode 26.6. Build products, package caches, logs, and release staging stay under `Temp/`. The release workflow retains the signed submission ZIP for seven days as `notarization-input-<attempt>` before waiting for Apple, along with its checksum and submission ID in the release logs. This allows packaging the exact accepted build after a timeout. CI compilation does not verify editing behavior, file preservation, or the downloaded app's first launch.
 
@@ -79,12 +80,12 @@ xcrun stapler validate NanoMD.app
 spctl --assess --type execute --verbose=2 NanoMD.app
 ```
 
-Launch the downloaded app through Finder and repeat opening, editing, saving/reopening, and undo. Check any first-launch failure before publishing; do not bypass Gatekeeper to count the release as verified. Review the draft's notes, mark known unsupported syntax, and publish only after the packaged app passes the intended checks. Make the repository public after its license is in place, then update and explicitly deploy the website with the verified release download and source links.
+Launch the downloaded app through Finder and repeat opening, editing, saving/reopening, and undo. Check any first-launch failure before publishing; do not bypass Gatekeeper to count the release as verified. Review the draft's notes, mark known unsupported syntax, and publish only after the packaged app passes the intended checks. Make the repository public after its license is in place. Subsequent release publications trigger the website workflow once its Cloudflare credential is configured.
 
 ## Each release
 
 1. Make changes on a branch and test locally with AI assistance. Focus on the changed behavior and opening, editing, saving/reopening, and undo. Record what was actually checked in the PR; do not treat a green build as functional verification.
-2. Set `MARKETING_VERSION` consistently in Debug and Release and increment `CURRENT_PROJECT_VERSION`. For example, version `0.1.0` can use the tag `v0.1.0-beta.2`, then `v0.1.0` for the stable release. Tags also accept two-part app versions, such as `v1.0`. Refresh the website's size/version from the updated Release bundle as described in [website/README.md](../website/README.md).
+2. Set `MARKETING_VERSION` consistently in Debug and Release and increment `CURRENT_PROJECT_VERSION`. For example, version `0.1.0` can use the tag `v0.1.0-beta.2`, then `v0.1.0` for the stable release. Tags also accept two-part app versions, such as `v1.0`. Local size measurements remain available, but website deployment always synchronizes metadata from the exact published release bundle.
 3. Merge after the Build workflow passes. From a clean, updated `main`, create and push the intended version tag:
 
    ```sh
@@ -97,7 +98,7 @@ Launch the downloaded app through Finder and repeat opening, editing, saving/reo
    Replace the example version with the app version being released. The tag's numeric version must exactly match `MARKETING_VERSION`; `alpha`, `beta`, and `rc` suffixes use a numeric iteration. Pushing the tag starts release preparation, not publication.
 
 4. Wait for **Draft release** to succeed. Inspect the generated draft, download the ZIP, verify it with `shasum -a 256 -c SHA256SUMS.txt`, and perform the intended local checks on that packaged app. Edit the generated notes to explain user-visible changes and known limitations. Beta/alpha/RC tags are automatically marked as prereleases.
-5. Publish the draft when ready. Choose the project license before making the repository publicly available as open source. Website deployment remains a separate explicit action.
+5. Publish the draft when ready. This triggers **Deploy website** once its Cloudflare secret is configured and the workflow is on `main`. Check that job's result; a website deployment failure leaves the published app release intact and can be retried from Actions. Draft preparation never changes the live website.
 
 The workflow never publishes automatically. If a run fails before creating the draft, correct the configuration and rerun it when appropriate. If a partial draft already exists, inspect it and remove only that unpublished draft before retrying; the workflow does not overwrite existing releases. Source changes need a new commit and tag. Never move a published tag or replace a published binary; ship a new version.
 
