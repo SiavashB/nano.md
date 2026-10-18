@@ -10,6 +10,7 @@ NanoMD is a lightweight native macOS Markdown app. The reader and first source e
 - Work in the user's saved project directory and current checkout. Do not create or use a worktree unless explicitly requested. Preserve unrelated changes.
 - Put temporary files, sample documents, logs, and build output in the repository-root `Temp/` folder. Create it when needed and keep it ignored by Git. Do not deliberately write project artifacts to system temporary directories or other locations without the user's permission.
 - Complete the requested work with reasonable implementation choices. Ask only when a missing decision materially changes the requested behavior or cannot be resolved from context.
+- For every release, including prereleases and hotfixes, follow [the release checklist](docs/RELEASING.md#each-release). Release work is incomplete until `README.md`, the public website, and GitHub release notes reflect the shipped app's features, limitations, version/build, compatibility, installation, and download facts. Review prose as well as generated metadata, confirm website deployment, and report any unfinished item explicitly.
 
 ## Architecture
 

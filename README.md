@@ -1,47 +1,80 @@
-# Nano.MD
+<p align="center">
+  <img src="website/nano-md-icon.png" alt="nano.md app icon" width="128" height="128">
+</p>
 
-A lightweight native macOS app for reading and editing Markdown files.
+<h1 align="center">nano.md</h1>
 
-**Status:** [0.1.0 beta 3](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.3), build 11, is signed and notarized and adds compact SKILL.md metadata panels. The downloaded app passed opening, metadata rendering, editing, undo/redo, saving, and reopening checks. Broader runtime cases remain tracked in the [roadmap](docs/ROADMAP.md). nano.md opens `.md` and `.markdown` files with native formatting and continuous text selection.
+<p align="center">
+  A small, free, native Mac app for reading and editing Markdown, including <code>SKILL.md</code>, <code>AGENTS.md</code>, README files, and notes.
+</p>
 
-## Read and edit a document
+<p align="center">
+  <a href="https://github.com/SiavashB/nano.md/releases"><img alt="Latest release, including betas" src="https://img.shields.io/github/v/release/SiavashB/nano.md?include_prereleases&amp;label=release"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/SiavashB/nano.md"></a>
+  <img alt="macOS 15+ on Apple Silicon" src="https://img.shields.io/badge/macOS-15%2B%20%C2%B7%20Apple%20Silicon-black?logo=apple">
+  <img alt="Uncompressed app size: 3.9 MB" src="https://img.shields.io/badge/app%20bundle-3.9%20MB-blue">
+  <a href="https://github.com/SiavashB/nano.md/actions/workflows/ci.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/SiavashB/nano.md/ci.yml?branch=main&amp;label=build"></a>
+</p>
 
-Use File > Open (Command-O) or Finder's Open With menu to open a Markdown file. Each document has its own window and initially opens in Read mode. Use the Read/Edit control to edit the literal Markdown in a native, plain-text monospaced editor, then return to Read to render the current source. New documents (Command-N) start in Edit. Standard File and Edit commands provide saving, undo, and redo through the macOS document lifecycle. The app requests macOS’s native keep-changes confirmation when closing modified documents or quitting, including documents that have been autosaved. Explicitly saved, unchanged documents can close directly. Save, discard, and cancel were verified for closing documents and quitting with multiple edited windows.
+## Download
 
-The editor stays alive across mode switches to retain selection, scroll position, and native undo targets. The reader's selection and scroll position reset on returning to Read. After switching to Edit, click the editor or press Tab to focus it; undo/redo shortcuts require editor focus. Source is saved directly as UTF-8, retaining the loaded BOM and existing line endings; newly inserted line breaks follow the first existing line ending, or LF for a new document. Pasted plain text retains its own line endings. Smart substitutions and automatic correction are disabled. Failed saves, external conflicts, input-method composition, and other remaining runtime cases are tracked in the [roadmap](docs/ROADMAP.md#4-source-editing).
+**[Download nano.md 0.1.0 beta 4 for Apple Silicon](https://github.com/SiavashB/nano.md/releases/download/v0.1.0-beta.4/nano.md-v0.1.0-beta.4-arm64.zip)** · [Release notes and checksum](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.4) · [Website](https://nano.thirdeyeds.com/)
 
-Files must contain valid UTF-8, with or without a byte-order mark (BOM). Empty files are supported. Invalid encodings produce an error instead of silently replacing characters. The reader never loads images or other resources automatically.
+Build 18 · **2.19 MB ZIP download** · **3.9 MB uncompressed app** (decimal MB).
+
+Requires macOS 15.0 or later on Apple Silicon. Unzip the download and move `NanoMD.app` to Applications. The app is Developer ID signed and notarized; verify the ZIP with the `SHA256SUMS.txt` attached to the release.
+
+**Beta compatibility note:** the release targets macOS 15.0, but runtime checks on macOS 15 remain pending. See the [roadmap](docs/ROADMAP.md#macos-15-deployment-target-010-build-18). Please report problems in [Issues](https://github.com/SiavashB/nano.md/issues).
+
+## Why nano.md
+
+- **Free to read and edit.** No account, no subscription, no paid tier.
+- **Edit your Markdown directly.** Saving writes the edited source, preserving the loaded UTF-8 BOM and existing line endings. It does not reconstruct your file from the rendered view. Smart quotes and autocorrect are off.
+- **Works locally.** The Mac app has no network entitlement or telemetry and does not load images or other remote resources. Clicking an HTTP/HTTPS link opens it in your browser.
+- **SKILL.md front matter is shown as a metadata panel** instead of being rendered as a heading. Edit mode keeps the original text.
+- **Light and dark themes** (Linen Light, Nano Dark), or follow the system setting.
+- **Small and native.** A 3.9 MB app bundle built with SwiftUI and AppKit. Markdown parsing uses [Swift Markdown](https://github.com/swiftlang/swift-markdown), which depends on swift-cmark. No WebView or Electron.
+
+## Current limitations
+
+- Images are not loaded; they appear as text placeholders.
+- No syntax highlighting in code blocks.
+- Partial CommonMark/GFM: HTML shows as literal text, task lists aren't interactive, and relative links and anchors don't navigate. See [Markdown support](#markdown-support).
+- Apple Silicon only. There is no Intel or universal build.
+- No Quick Look extension.
+
+## Reading and editing
+
+Open a `.md` or `.markdown` file with File > Open (Command-O) or Finder's **Open With** menu. Each document opens in its own window in **Read** mode. Switch to **Edit** to change the literal Markdown in a monospaced plain-text editor, then switch back to Read to see the rendered result. New documents (Command-N) start in Edit. Saving, undo, redo, and the keep-changes prompt on close or quit follow the standard macOS document behavior.
+
+- The editor keeps its selection, scroll position, and undo history across mode switches. The reader's selection and scroll reset when you return to Read.
+- After switching to Edit, click the editor or press Tab to focus it; undo/redo shortcuts need editor focus.
+- Files must be valid UTF-8, with or without a BOM. Invalid encodings show an error instead of silently replacing characters. Empty files are fine.
+- Inserted line breaks follow the file's first existing line ending (LF for new documents). Pasted text keeps its own line endings.
+
+Failed saves, external file conflicts, input-method composition, and other remaining cases are tracked in the [roadmap](docs/ROADMAP.md#4-source-editing).
 
 ## Appearance
 
-Choose **System**, **Light**, or **Dark** from **View > Appearance** in the menu bar or the **Dark / Light / System** segmented control on the right of the document toolbar. The Read/Edit control sits in the toolbar's center, using a page-and-eye icon for Read and a page-and-pencil icon for Edit, with text labels retained for accessibility and tooltips. System is the default and follows macOS appearance; Light uses Linen Light and Dark uses Nano Dark. Previously saved explicit theme choices remain selected. This app-wide preference persists across launches and updates all document windows, including the plain-source editor and source fallback. Both palettes use native monospaced system fonts, the same layout, and outlined code blocks. The compact content header and footer show the document scene's filename, or Untitled until saved; the footer also shows UTF-8. The native window toolbar hides its filename title.
-
-Appearance changes restyle the existing native views without changing the document source or undo history. The reader retains its current parsed content to restyle without parsing again, preserving selection and scroll position where layout permits. Editor text-color updates wait for active input-method composition to finish. The three appearance modes and toolbar placement are implemented in build 10; visual appearance and runtime behavior, including following macOS changes in System mode, still require manual verification. The previous build's focused UI results do not validate these changes.
+Choose **System**, **Light** (Linen Light), or **Dark** (Nano Dark) from **View > Appearance** or the segmented control on the right of the toolbar. System is the default. The choice applies to all windows and persists across launches. Changing it restyles the current views without touching the document source or undo history.
 
 ## Markdown support
 
 - Headings, paragraphs, emphasis, strong emphasis, inline code, and fenced/indented code blocks.
-- Nested ordered/unordered lists, blockquotes, thematic breaks, and clickable HTTP/HTTPS links.
+- Nested ordered and unordered lists, blockquotes, thematic breaks, and clickable HTTP/HTTPS links.
 - Pipe tables with styled headers, cell borders, column alignment, and inline formatting.
-- Leading front matter with a recognized mapping field appears in a compact, selectable metadata panel styled with the selected theme. Recognized keys include plain names containing letters, numbers, hyphens, underscores, or dots, and single-line single- or double-quoted names. A leading `---` and a closing `---` or `...` must occupy their own lines, and the field's separator colon must be followed by whitespace or the end of the line. This is a limited YAML envelope recognizer, not a YAML parser; all metadata remains literal text and Edit retains the original source. See the [recognition subset](docs/ARCHITECTURE.md#initial-rendering-scope).
-- Images appear as text placeholders containing their description and destination.
-- HTML and unsupported blocks remain readable as literal text. Task markers remain text; they are not interactive controls.
-- Relative links, anchors, and non-web URL schemes are shown without navigation.
+- Leading YAML front matter (a `---` line, at least one `key: value` field, then `---` or `...`) appears in a compact, selectable metadata panel. Keys may be plain names (letters, numbers, `-`, `_`, `.`) or single-line quoted names. The field's separator colon must be followed by whitespace or the end of the line. This is a limited recognizer, not a YAML parser: values stay literal text. See the [recognition subset](docs/ARCHITECTURE.md#initial-rendering-scope).
+- Images appear as text placeholders with their description and destination.
+- HTML and unsupported blocks stay readable as literal text. Task markers are plain text.
+- Relative links, anchors, and non-web URL schemes are shown but don't navigate.
 
-Parsing runs off the main thread. Documents over 1 MiB, or with excessive nesting/node counts, fall back to selectable source with an explanation. These are conservative initial limits, not a measured performance guarantee. Full CommonMark/GFM presentation, image loading, syntax highlighting, and richer editing controls are not yet supported.
-
-## Direction
-
-- Native document windows, selectable text, keyboard interaction, and accessible reading.
-- Local files remain ordinary Markdown files. Saving writes the authoritative source; the reader never rewrites it.
-- SwiftUI application shell, native text presentation, and a separate Markdown parsing boundary.
-- A small dependency footprint and measured performance.
+Parsing runs off the main thread. Documents over 1 MiB, or with excessive nesting or node counts, fall back to selectable source with an explanation. These are conservative initial limits, not a measured performance guarantee.
 
 ## Build
 
-The project uses Xcode 26.6, Swift 6 language mode, and a macOS 15.0 deployment target. Debug and Release builds target Apple Silicon (`arm64`) only; Intel and universal builds are outside the current support scope. The development build targets macOS 15 and later; runtime verification on macOS 15 remains pending. The published beta 3 download still requires macOS 26.5 or later.
+Requires Xcode 26.6. The project uses Swift 6 language mode, a macOS 15.0 deployment target, and builds for Apple Silicon (`arm64`) only.
 
-Open `NanoMD.xcodeproj`, select the `NanoMD` scheme, and run the macOS app. For a local build without configuring a signing team, run from the repository root:
+Open `NanoMD.xcodeproj`, select the `NanoMD` scheme, and run. For a local build without a signing team, run from the repository root:
 
 ```sh
 xcodebuild \
@@ -57,19 +90,19 @@ xcodebuild \
   build
 ```
 
-This checks compilation; it does not validate signing or distribution. Swift Package Manager resolves Swift Markdown 0.8.0 and swift-cmark 0.9.0 using the included `Package.resolved` file. There are no test targets. See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow.
+This checks compilation only; it doesn't validate signing or distribution. Swift Package Manager resolves Swift Markdown 0.8.0 and swift-cmark 0.9.0 from the included `Package.resolved`. There are no test targets. The build badge reports compilation, not functional or compatibility testing. See [CONTRIBUTING.md](CONTRIBUTING.md) for validation expectations.
 
-For app-size measurements, use the same command with `-configuration Release`, then run `npm --prefix website run update-app-size -- "$PWD/Temp/DerivedData/Build/Products/Release/NanoMD.app"`. The updater requires an arm64-only Release bundle matching this checkout. See the [measurement policy](CONTRIBUTING.md#app-size-measurements) for comparable before/after results.
+For app-size measurements, build with `-configuration Release`, then run `npm --prefix website run update-app-size -- "$PWD/Temp/DerivedData/Build/Products/Release/NanoMD.app"`. See the [measurement policy](CONTRIBUTING.md#app-size-measurements).
 
 ## Project documentation
 
 - [Architecture](docs/ARCHITECTURE.md): boundaries, state ownership, rendering decisions, and source editing.
-- [Roadmap](docs/ROADMAP.md): implementation milestones and completion criteria.
+- [Roadmap](docs/ROADMAP.md): milestones, completion criteria, and open verification items.
 - [AI development rules](AGENTS.md): repository-wide instructions for coding agents.
 - [Contributing](CONTRIBUTING.md): change scope, validation, and review expectations.
 - [Releasing](docs/RELEASING.md): build-only CI, local AI-assisted checks, and version-tagged draft releases.
-- [Website](website/README.md): landing page source and Cloudflare deployment commands.
+- [Website](website/README.md): landing page source and deployment.
 
 ## License
 
-nano.md is licensed under the [MIT License](LICENSE), which is included in the app bundle. Dependency licenses and notices are retained in [ThirdPartyNotices.txt](NanoMD/Resources/ThirdPartyNotices.txt), which is also bundled. Download the signed, notarized [0.1.0 beta 3 release](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.3) for Apple Silicon and macOS 26.5 or later.
+nano.md is licensed under the [MIT License](LICENSE), which is included in the app bundle. Dependency licenses and notices are in [ThirdPartyNotices.txt](NanoMD/Resources/ThirdPartyNotices.txt), also bundled with the app.
