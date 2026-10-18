@@ -39,7 +39,7 @@ Parsing runs off the main thread. Documents over 1 MiB, or with excessive nestin
 
 ## Build
 
-The project uses Xcode 26.6, Swift 6 language mode, and a macOS 26.5 deployment target. The broader compatibility policy has not yet been finalized.
+The project uses Xcode 26.6, Swift 6 language mode, and a macOS 15.0 deployment target. Debug and Release builds target Apple Silicon (`arm64`) only; Intel and universal builds are outside the current support scope. The development build targets macOS 15 and later; runtime verification on macOS 15 remains pending. The published beta 3 download still requires macOS 26.5 or later.
 
 Open `NanoMD.xcodeproj`, select the `NanoMD` scheme, and run the macOS app. For a local build without configuring a signing team, run from the repository root:
 
@@ -48,15 +48,18 @@ xcodebuild \
   -project NanoMD.xcodeproj \
   -scheme NanoMD \
   -configuration Debug \
-  -destination 'platform=macOS' \
+  -destination 'platform=macOS,arch=arm64' \
   -derivedDataPath "$PWD/Temp/DerivedData" \
   -clonedSourcePackagesDirPath "$PWD/Temp/SourcePackages" \
   -packageCachePath "$PWD/Temp/PackageCache" \
-  CODE_SIGNING_ALLOWED=NO \
+  -onlyUsePackageVersionsFromResolvedFile \
+  ARCHS=arm64 CODE_SIGNING_ALLOWED=NO \
   build
 ```
 
 This checks compilation; it does not validate signing or distribution. Swift Package Manager resolves Swift Markdown 0.8.0 and swift-cmark 0.9.0 using the included `Package.resolved` file. There are no test targets. See [CONTRIBUTING.md](CONTRIBUTING.md) for the development workflow.
+
+For app-size measurements, use the same command with `-configuration Release`, then run `npm --prefix website run update-app-size -- "$PWD/Temp/DerivedData/Build/Products/Release/NanoMD.app"`. The updater requires an arm64-only Release bundle matching this checkout. See the [measurement policy](CONTRIBUTING.md#app-size-measurements) for comparable before/after results.
 
 ## Project documentation
 

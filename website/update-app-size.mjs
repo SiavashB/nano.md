@@ -34,6 +34,14 @@ try {
   if (plistValue("CFBundleIdentifier") !== "com.thirdeyeds.NanoMD") {
     throw new Error("The app bundle is not nano.md.");
   }
+  const executable = join(appPath, "Contents/MacOS", plistValue("CFBundleExecutable"));
+  const architectures = execFileSync("/usr/bin/lipo", ["-archs", executable], { encoding: "utf8" }).trim();
+  if (architectures !== "arm64") {
+    throw new Error(`App size requires an Apple Silicon-only Release build; found architectures: ${architectures}. Rebuild with ARCHS=arm64.`);
+  }
+  if (plistValue("NanoMDBuildConfiguration") !== "Release") {
+    throw new Error("App size requires the Release configuration. Rebuild with -configuration Release.");
+  }
   const version = plistValue("CFBundleShortVersionString");
   const build = plistValue("CFBundleVersion");
   const minimumMacOS = plistValue("LSMinimumSystemVersion");
@@ -58,9 +66,9 @@ try {
   updated = replaceValue(updated, "app-build", build);
   updated = replaceValue(updated, "app-minimum-macos", minimumMacOS);
   if (updated !== original) writeFileSync(pagePath, updated);
-  console.log(`nano.md ${version} (build ${build}): ${size}, ${bytes.toLocaleString("en-US")} bytes uncompressed; macOS ${minimumMacOS}+.`);
+  console.log(`nano.md ${version} (build ${build}, arm64 Release): ${size}, ${bytes.toLocaleString("en-US")} bytes uncompressed; macOS ${minimumMacOS}+.`);
 } catch (error) {
   console.error(`Cannot update the website's app size: ${error.message}`);
-  console.error("Use a current Release app: npm --prefix website run update-app-size -- /path/to/NanoMD.app");
+  console.error("Use a freshly built arm64 Release app: npm --prefix website run update-app-size -- /path/to/NanoMD.app");
   process.exitCode = 1;
 }

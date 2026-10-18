@@ -170,7 +170,9 @@ Keep acceptance focused on rendering, selection/copying, keyboard access, and ba
 
 The initial 1 MiB formatting cap and complexity limits are conservative guardrails, not measured budgets. No latency or memory guarantees are claimed yet. Performance work should validate or adjust these limits on a named reference Mac and check memory release after document closure.
 
-Keep the current deployment target until compatibility is deliberately evaluated. Swift 6 language mode is enabled in both build configurations; the document adapter and content-type declaration are explicitly nonisolated, while UI uses the project's main-actor default. Resolve future isolation diagnostics at their actual boundaries. Extract a Swift package only when reuse or a compile-time boundary has demonstrated value.
+The deployment target is macOS 15.0 on Apple Silicon. The existing toolbar title-removal API is available from macOS 15, so this target retains the current UI without compatibility branches. Xcode 26.6 and Swift 6 language mode remain the build baseline; lowering the runtime target does not require an older compiler. Runtime validation on macOS 15 remains pending. The document adapter and content-type declaration are explicitly nonisolated, while UI uses the project's main-actor default. Resolve future isolation diagnostics at their actual boundaries. Extract a Swift package only when reuse or a compile-time boundary has demonstrated value.
+
+Debug and Release target Apple Silicon (`arm64`) only, consistent with distribution. The bundle records `NanoMDBuildConfiguration` from Xcode's configuration so size tooling can reject Debug and older unidentified builds. The website updater also verifies the executable contains only arm64. Size comparisons use Release with matching toolchain and signing settings; see [Contributing](../CONTRIBUTING.md#app-size-measurements). This keeps local universal-build overhead from being presented as application growth.
 
 Record major changes here with context, decision, alternatives, and consequences. Add a separate decision record only when the reasoning warrants more space.
 

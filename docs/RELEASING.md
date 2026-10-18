@@ -9,6 +9,10 @@ Test locally with AI assistance, merge the changes, push a version tag, and revi
 
 Both workflows use the standard `macos-26` runner and Xcode 26.6. Build products, package caches, logs, and release staging stay under `Temp/`. The release workflow retains the signed submission ZIP for seven days as `notarization-input-<attempt>` before waiting for Apple, along with its checksum and submission ID in the release logs. This allows packaging the exact accepted build after a timeout. CI compilation does not verify editing behavior, file preservation, or the downloaded app's first launch.
 
+Local and distribution builds target Apple Silicon (`arm64`) only. Standardize app-size measurements on Release and follow the [measurement policy](../CONTRIBUTING.md#app-size-measurements); published size metadata comes from the exact signed release bundle. The website updater rejects universal/Intel executables, Debug builds, and bundles without build-configuration metadata.
+
+New builds target macOS 15.0 and later using Xcode 26.6. Before advertising verified macOS 15 compatibility, check launch, Read/Edit, undo, saving/reopening, and theme/toolbar behavior on macOS 15. Compilation on the current OS does not establish those runtime results. The existing beta 3 asset retains its macOS 26.5 requirement; update download compatibility claims only alongside a newly verified release.
+
 Distribution builds use [Config/Distribution.entitlements](../Config/Distribution.entitlements) with base entitlement injection disabled. The release workflow checks the signed app for sandboxing, user-selected file read/write access, and the absence of debugger access before submission. Keep these distribution permissions aligned with the app's capabilities. Normal Xcode builds retain their generated entitlements for local debugging.
 
 Standard runner time is free for public repositories. Private repositories use the account's included Actions allowance and may incur charges beyond it; check the account's Actions budget before enabling paid overages.
