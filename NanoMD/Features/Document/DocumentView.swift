@@ -90,13 +90,33 @@ struct DocumentView: View {
                 .pickerStyle(.segmented)
                 .fixedSize()
             }
+            appearanceToolbarItem
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var appearanceToolbarItem: some ToolbarContent {
+        if #available(macOS 26.0, *) {
             ToolbarItem(placement: .primaryAction) {
-                AppearancePicker(preference: $appearancePreference)
-                    .pickerStyle(.segmented)
-                    .fixedSize()
-                    .help("Appearance: \(appearance.name)")
+                appearanceControl
+                    .glassEffect(.regular, in: .capsule)
+                    .padding(.trailing, 4)
+            }
+            .sharedBackgroundVisibility(.hidden)
+        } else {
+            ToolbarItem(placement: .primaryAction) {
+                appearanceControl
+                    .padding(.trailing, 4)
             }
         }
+    }
+
+    private var appearanceControl: some View {
+        AppearancePicker(preference: $appearancePreference)
+            .labelStyle(.iconOnly)
+            .pickerStyle(.segmented)
+            .fixedSize()
+            .help("Appearance: \(appearance.name)")
     }
 
     private var rule: some View {

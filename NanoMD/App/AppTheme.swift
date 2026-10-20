@@ -45,6 +45,14 @@ nonisolated enum AppearanceMode: String, CaseIterable, Sendable {
         }
     }
 
+    var iconName: String {
+        switch self {
+        case .system: "AppearanceSystem"
+        case .light: "AppearanceLight"
+        case .dark: "AppearanceDark"
+        }
+    }
+
     var colorScheme: ColorScheme? {
         switch self {
         case .system: nil
@@ -107,7 +115,9 @@ struct AppearancePicker: View {
             set: { preference = $0.rawValue }
         )) {
             ForEach(AppearanceMode.allCases, id: \.self) { mode in
-                Text(mode.name).tag(mode)
+                Label(mode.name, image: mode.iconName)
+                    .help(mode.name)
+                    .tag(mode)
             }
         }
     }
