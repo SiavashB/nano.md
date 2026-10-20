@@ -6,6 +6,8 @@ Status: the document foundation, native Markdown rendering, and first source edi
 
 nano.md opens local Markdown files in native macOS document windows. Existing files start in Read; new documents start in Edit. Source editing, undo/redo, and native saving reuse the same document and existing reader.
 
+`Resources/en.lproj/InfoPlist.strings` supplies `nano.md` as the localized `CFBundleName` and `CFBundleDisplayName` through the development-language fallback. The base display name matches `$(PRODUCT_NAME)` so Finder accepts the localized name rather than treating the bundle as user-renamed, following [Apple's display-name rules](https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html). The Xcode target, generated base bundle name, executable, bundle identifier, and `NanoMD.app` product filename retain their existing technical names.
+
 Favor small, explicit boundaries and macOS conventions. Keep document ownership in the system document lifecycle, preserve the user's source, and measure performance before adding caches or custom infrastructure. Accounts, synchronization, a document database, plugins, and an embedded browser are outside the initial scope.
 
 ## Decisions
@@ -54,6 +56,8 @@ NanoMD/
       MarkdownSourceView.swift
       ReaderLinkPolicy.swift
   Resources/
+    en.lproj/
+      InfoPlist.strings
     ThirdPartyNotices.txt
   Assets.xcassets/
   Info.plist

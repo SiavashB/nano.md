@@ -106,6 +106,14 @@ Debug and Release now target macOS 15.0 on Apple Silicon, retaining Xcode 26.6. 
 
 The unsigned Release contains 3,862,520 regular-file bytes (3.9 decimal MB), 8,624 bytes above the identically built arm64 build 17. The increase is confined to the executable; no frameworks or dylibs were added to the bundle. Website source metadata reflects build 18 while the beta 3 download section retains its actual macOS 26.5 requirement. Evidence is under ignored `Temp/MacOS15/`. No app launch, installation, deployment, release publication, or test creation occurred. Runtime validation on macOS 15 remains pending: launch, reading/tables, editing/undo, saving/reopening, and theme/toolbar behavior must be checked on that OS before claiming verified compatibility.
 
+### macOS display name (0.1.0, build 19)
+
+The installed bundle previously exposed `NanoMD` as its base name without a public display name. Build 19 supplies `nano.md` through localized bundle-name/display-name values, while the base display name matches the existing product filename so Finder honors localization. Technical target, executable, bundle identifier, and product filename remain unchanged.
+
+Unsigned arm64 Debug and locally Apple Development-signed arm64 Release builds passed with Xcode 26.6 and the macOS 15.0 target. Property-list checks, `git diff --check`, and strict signature verification passed. Native macOS name APIs resolved the localized bundle name and running application name to `nano.md`, and Finder's file display name to `nano.md.app`. These are API checks; no rendered UI, screenshots, or automated tests were used.
+
+With maintainer approval, the running build 18 quit normally and was preserved under `Temp/DisplayName/PreviousInstalled/NanoMD.app`. Build 19 was installed and reopened at `/Applications/NanoMD.app`; its executable SHA-256 matches the validated Release and its signature passed strict verification. Only stale registrations with the exact nano.md bundle identifier were removed, then the installed app was registered. macOS resolves that identifier to the installed path. Logs, API results, and the validation report are under `Temp/DisplayName/`. Public website metadata remains tied to the published beta 4 release; no release or website deployment occurred.
+
 ## 4. Source editing
 
 - [x] Add Read/Edit controls over the same document source and retain the existing reader path.
