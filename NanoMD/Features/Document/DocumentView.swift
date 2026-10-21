@@ -6,6 +6,7 @@ struct DocumentView: View {
     let filename: String
     let systemColorScheme: ColorScheme
     @State private var mode: Mode
+    @State private var isFeedbackHovered = false
 
     private enum Mode: String, CaseIterable {
         case read = "Read"
@@ -94,7 +95,7 @@ struct DocumentView: View {
         HStack(spacing: 12) {
             modeShortcut
             Spacer(minLength: 0)
-            Text("UTF-8").fixedSize()
+            feedbackLink
         }
         .font(.system(size: 11, design: .monospaced))
         .lineLimit(1)
@@ -102,6 +103,25 @@ struct DocumentView: View {
         .padding(.horizontal, 17)
         .padding(.vertical, 4)
         .background(Color(nsColor: theme.surrounding))
+    }
+
+    @ViewBuilder
+    private var feedbackLink: some View {
+        if let destination = URL(string: "https://nano.thirdeyeds.com/feedback") {
+            Link(destination: destination) {
+                Text("Feedback")
+                    .underline(isFeedbackHovered)
+                    .foregroundStyle(Color(nsColor: theme.accent))
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 3)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Send feedback")
+            .help("Open feedback options in your browser")
+            .fixedSize()
+            .onHover { isFeedbackHovered = $0 }
+        }
     }
 
     private var modeShortcut: some View {

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#202724" />
+    <meta name="description" content="Share feedback about nano.md, the minimal Markdown reader and editor for Mac, using your own email." />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://nano.thirdeyeds.com/feedback" />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64" />
+    <link rel="apple-touch-icon" href="/nano-md-icon.png" />
+    <title>Feedback — nano.md</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="nano.md" />
+    <meta property="og:title" content="Feedback — nano.md" />
+    <meta property="og:description" content="Share feedback about nano.md using your own email." />
+    <meta property="og:url" content="https://nano.thirdeyeds.com/feedback" />
+    <meta property="og:image" content="https://nano.thirdeyeds.com/nano-md-icon.png" />
+    <meta property="og:image:alt" content="nano.md app icon: two mint green hash marks on charcoal" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Feedback — nano.md" />
+    <meta name="twitter:description" content="Share feedback about nano.md using your own email." />
+    <meta name="twitter:image" content="https://nano.thirdeyeds.com/nano-md-icon.png" />
+    <meta name="twitter:image:alt" content="nano.md app icon: two mint green hash marks on charcoal" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --paper: #202724;
+        --ink: #edf3ee;
+        --muted: #b0c0b5;
+        --line: #43564a;
+        --accent: #86d89f;
+        --panel: #18201c;
+        --mono: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--mono);
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; text-underline-offset: 5px; }
+      a:hover { color: var(--accent); }
+      a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+      ::selection { background: var(--accent); color: var(--paper); }
+      .shell { width: min(100% - 48px, 1120px); margin-inline: auto; }
+      .topbar { min-height: 88px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; padding-block: 12px; border-bottom: 1px solid var(--line); }
+      .brand { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); font-size: 28px; font-weight: 700; letter-spacing: -.055em; text-decoration: none; }
+      .brand-mark { display: block; width: 54px; height: 34px; color: var(--accent); }
+      .toplink { font-size: 13px; font-weight: 700; }
+      main { padding-block: clamp(64px, 9vw, 112px); }
+      .feedback { max-width: 720px; margin-inline: auto; }
+      .eyebrow { margin: 0 0 24px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .03em; }
+      .eyebrow::before { content: "> "; }
+      h1 { margin: 0; font-size: clamp(30px, 4vw, 44px); line-height: 1.15; letter-spacing: -.055em; }
+      .intro { max-width: 600px; margin: 24px 0 32px; color: var(--muted); font-size: 16px; line-height: 1.75; }
+      .contact { padding: clamp(24px, 5vw, 40px); border: 1px solid var(--line); border-top: 3px solid var(--accent); border-radius: 4px; background: var(--panel); }
+      .email-label { display: block; margin-bottom: 12px; color: var(--muted); font-size: 13px; }
+      .email-address { display: block; width: 100%; min-height: 48px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 2px; background: var(--paper); color: var(--accent); font-family: var(--mono); font-size: clamp(14px, 2.5vw, 18px); }
+      .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+      .button { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 12px 20px; border: 1px solid var(--accent); border-radius: 4px; background: var(--accent); color: var(--paper); font-family: var(--mono); font-size: 14px; font-weight: 700; line-height: 1.5; text-align: center; text-decoration: none; cursor: pointer; }
+      .button:hover { background: #a4e3b6; color: var(--paper); }
+      .button-secondary { background: transparent; color: var(--ink); }
+      .button-secondary:hover { background: var(--paper); color: var(--accent); }
+      .copy-button { display: block; margin-top: 20px; padding: 8px 0; min-height: 44px; border: 0; background: transparent; color: var(--muted); font-family: var(--mono); font-size: 13px; text-decoration: underline; text-underline-offset: 5px; cursor: pointer; }
+      .copy-button:hover { color: var(--accent); }
+      .copy-button:disabled { opacity: .6; cursor: default; }
+      .note { margin: 18px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+      .copy-status { min-height: 1.7em; margin: 4px 0 0; color: var(--accent); font-size: 13px; line-height: 1.7; }
+      .privacy-note { margin: 24px 0 0; color: var(--muted); font-size: 13px; line-height: 1.75; }
+      footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; padding-block: 28px 44px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; line-height: 1.7; }
+      @media (max-width: 520px) {
+        .shell { width: min(100% - 36px, 1120px); }
+        .topbar { min-height: 74px; }
+        .brand { font-size: 25px; }
+        .actions { flex-direction: column; }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar shell">
+      <a class="brand" href="/" aria-label="nano.md home">
+        <svg class="brand-mark" viewBox="260 400 760 470" aria-hidden="true">
+          <g fill="none" stroke="currentColor" stroke-width="67" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M445 449 L348 820 M569 449 L473 820 M338 575 L604 575 M310 704 L577 704" />
+            <path transform="translate(369 0)" d="M445 449 L348 820 M569 449 L473 820 M338 575 L604 575 M310 704 L577 704" />
+          </g>
+        </svg>
+        <span>nano.md</span>
+      </a>
+      <a class="toplink" href="/">Back to home</a>
+    </header>
+
+    <main class="shell">
+      <section class="feedback" aria-labelledby="feedback-title">
+        <p class="eyebrow">nano.md feedback</p>
+        <h1 id="feedback-title">Tell us what you think.</h1>
+        <p class="intro">Found a bug, have an idea, or want to share how you use nano.md? Send us an email.</p>
+        <div class="contact">
+          <label class="email-label" for="feedback-email">Email address</label>
+          <input class="email-address" id="feedback-email" type="text" value="feedback@thirdeyeds.com" readonly spellcheck="false" />
+          <div class="actions">
+            <a class="button" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=feedback%40thirdeyeds.com&amp;su=nano.md%20feedback" target="_blank" rel="noopener noreferrer" aria-describedby="gmail-note">Send with Gmail</a>
+            <a class="button button-secondary" href="mailto:feedback@thirdeyeds.com?subject=nano.md%20feedback">Open email app</a>
+          </div>
+          <p class="note" id="gmail-note">Gmail opens in a new tab and may ask you to sign in. Your email app needs to be set up to open email links.</p>
+          <button class="copy-button" id="copy-email" type="button" disabled>Copy email address</button>
+          <p class="copy-status" id="copy-status" role="status" aria-live="polite" aria-atomic="true"></p>
+          <noscript><p class="note">Select the email address above and copy it to use it in your preferred email service.</p></noscript>
+        </div>
+        <p class="privacy-note">Messages are sent using your own email account. Your message isn’t submitted on this page; you review and send it in Gmail or your email app.</p>
+      </section>
+    </main>
+
+    <footer class="shell">
+      <span>© <span id="year">2026</span> nano.md</span>
+      <span>Made by <a href="https://thirdeyeds.com/">Third Eye Digital Studio</a></span>
+    </footer>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      const copyButton = document.getElementById("copy-email");
+      const emailAddress = document.getElementById("feedback-email");
+      const copyStatus = document.getElementById("copy-status");
+      copyButton.disabled = false;
+      copyButton.addEventListener("click", async () => {
+        copyStatus.textContent = "Copying email address…";
+        try {
+          await navigator.clipboard.writeText(emailAddress.value);
+          copyStatus.textContent = "Email address copied.";
+        } catch {
+          emailAddress.focus();
+          emailAddress.select();
+          copyStatus.textContent = "Copy wasn’t available. The address is selected; press Command+C or Ctrl+C, or use your device’s Copy action.";
+        }
+      });
+    </script>
+    <script src="/analytics.js" defer></script>
+  </body>
+</html>

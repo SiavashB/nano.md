@@ -60,6 +60,8 @@ Choose **System**, **Light** (Linen Light), or **Dark** (Nano Dark) from **View 
 
 The development checkout also includes a clickable footer shortcut: **^R Edit** / **^R Read** (Control-R) switches the active document's mode. The same action is available from **View > Edit/Read**. This control is not part of the beta 4 download above; runtime checks remain tracked in the [roadmap](docs/ROADMAP.md#footer-shortcuts-development-checkout).
 
+The development checkout replaces the footer's UTF-8 label with a borderless green **Feedback** link that opens [feedback options](https://nano.thirdeyeds.com/feedback) in your browser: send with Gmail, open your email app, or copy `feedback@thirdeyeds.com`. The address is also available in **About nano.md**. These feedback controls are not part of the beta 4 download above.
+
 ## Markdown support
 
 - Headings, paragraphs, emphasis, strong emphasis, inline code, and fenced/indented code blocks.

@@ -1,6 +1,14 @@
 # nano.md website
 
-Source for https://nano.thirdeyeds.com/, served by the existing `nano-md` Cloudflare Worker. Edit `index.html` and the three PNG assets here. The site has no framework or build step. `.assetsignore` limits publication to the page, three images, `analytics.js`, `robots.txt`, and `sitemap.xml`.
+Source for https://nano.thirdeyeds.com/, served by the existing `nano-md` Cloudflare Worker. Edit `index.html`, `feedback.html`, and the three PNG assets here. The site has no framework or build step. `.assetsignore` limits publication to those two pages, three images, `analytics.js`, `robots.txt`, and `sitemap.xml`.
+
+## Feedback
+
+`feedback.html` is served at the canonical URL `https://nano.thirdeyeds.com/feedback`, linked from the home page footer. Cloudflare's default [automatic HTML handling](https://developers.cloudflare.com/workers/static-assets/routing/advanced/html-handling/) serves the individual HTML file at `/feedback` and redirects `/feedback.html` and `/feedback/` there; no Worker script or custom redirect is needed.
+
+The page offers three actions: **Send with Gmail** opens browser compose in a new tab (sign-in may be needed); **Open email app** uses a `mailto:` link; **Copy email address** copies the visible, selectable address. Both compose links prefill `feedback@thirdeyeds.com` and the subject `nano.md feedback`. Clipboard success is announced in a live status region. If copying is unavailable or denied, the address is focused and selected with instructions for manual copying. Without JavaScript, the compose links and manually selectable address still work.
+
+Messages are reviewed and sent from the visitor's own email account. This page does not submit messages or add a backend, CAPTCHA, dependency, or feedback-specific tracking. It uses the existing `analytics.js` page-view behavior described below. To validate, inspect the local static route, link destinations, and clipboard success/failure without sending any message. Keep temporary output under `Temp/`; do not run `check` just for a page-only validation because it synchronizes release metadata.
 
 ## Deploy
 
@@ -44,7 +52,7 @@ Tracking runs only on `https://nano.thirdeyeds.com`; local files, localhost, Wor
 
 ## Search and sharing
 
-The canonical URL is `https://nano.thirdeyeds.com/`. Keep it consistent across the page's canonical link, Open Graph URL, JSON-LD, and sitemap if the domain changes. `robots.txt` allows crawling and points to the sitemap. Add any future public pages to `sitemap.xml`; list canonical URLs only.
+The home page's canonical URL is `https://nano.thirdeyeds.com/`; the feedback page uses `https://nano.thirdeyeds.com/feedback`. Keep each page's canonical link, Open Graph URL, any JSON-LD, and sitemap consistent if the domain changes. `robots.txt` allows crawling and points to the sitemap. Add any future public pages to `sitemap.xml`; list canonical URLs only.
 
 The page title and descriptions cover the Markdown reader/editor and its skills and agent-file use cases. Open Graph and Twitter cards use the existing app icon. JSON-LD identifies the application and publisher without claiming reviews. The release synchronizer keeps the release channel, structured-data version, download URL, app size, and OS requirement aligned with the visible download information.
 

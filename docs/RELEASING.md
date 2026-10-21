@@ -49,6 +49,10 @@ Use `gh secret set NAME` to enter a value securely, or GitHub's repository secre
 
 Missing credentials stop the release workflow with the missing secret's name. A local ad-hoc signature cannot replace Developer ID signing for this workflow. See [GitHub's certificate setup](https://docs.github.com/en/actions/how-tos/deploy/deploy-to-third-party-platforms/sign-xcode-applications) and [Apple's Developer ID guidance](https://developer.apple.com/developer-id/).
 
+## Upcoming beta 5
+
+Version 0.1.0 beta 5, build 20, is being prepared with browser-based feedback choices, the feedback email in About, the Control-R Read/Edit footer shortcut, compact document bars, clearer toolbar icons, and the native nano.md display name. The published download remains beta 4 until the draft's exact signed/notarized package has been verified and published. Local unsigned arm64 Debug and Release builds passed with Xcode 26.6; this does not establish packaged-app behavior or macOS 15 runtime compatibility.
+
 ## Current release
 
 [0.1.0 beta 4](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.4), build 18, was published on October 18, 2026, from `708de89`. It adds Nano Dark and Linen Light themes with saved Dark / Light / System controls, themed metadata panels, outlined code blocks, clearer Read/Edit controls, and quoted/dotted front-matter keys. The Apple Silicon release targets macOS 15.0 or later. Runtime validation on macOS 15 remains pending.

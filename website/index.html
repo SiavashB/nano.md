@@ -215,7 +215,8 @@
       .document pre { margin: 18px 0; padding: 14px; border: 1px solid var(--line); border-radius: 2px; background: #111914; overflow-x: auto; }
       .document pre code { padding: 0; background: none; font-size: 12px; line-height: 1.7; }
       .window-status { display: flex; justify-content: space-between; gap: 12px; padding: 10px 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
-      .window-status::after { content: "▌"; color: var(--accent); }
+      .window-status-key { padding: 1px 3px; background: var(--accent); color: var(--paper); }
+      .window-status-feedback { color: var(--accent); }
       .sample-label { margin: 15px 3px 1px; color: var(--muted); font-size: 11px; text-align: right; }
       .features { border-top: 1px solid var(--line); padding-block: 77px 88px; }
       .section-kicker { margin: 0 0 18px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
@@ -328,7 +329,7 @@
               <p>Before finishing, run:</p>
               <pre><code>npm run check</code></pre>
             </div>
-            <div class="window-status" aria-hidden="true"><span>[ AGENTS.md ]</span><span>UTF-8</span></div>
+            <div class="window-status" aria-hidden="true"><span><span class="window-status-key">^R</span> Edit</span><span class="window-status-feedback">Feedback</span></div>
           </div>
           <p class="sample-label">Example AGENTS.md document</p>
         </div>
@@ -341,7 +342,7 @@
           <div class="feature">
             <span class="feature-number">01</span>
             <h3>Skills &amp; agent files</h3>
-            <p>Open <code>SKILL.md</code> and <code>AGENTS.md</code> from Finder. Read the instructions, switch to Edit, and save changes to the same file.</p>
+            <p>Open <code>SKILL.md</code> and <code>AGENTS.md</code> from Finder. Switch between Read and Edit with Control-R, then save changes to the same file.</p>
           </div>
           <div class="feature">
             <span class="feature-number">02</span>
@@ -361,6 +362,7 @@
           <p class="section-kicker">Download &amp; source</p>
           <h2 id="release-title">Free. Try the beta.</h2>
           <p>Nano Dark and Linen Light themes, with Dark, Light, or System appearance. Compact SKILL.md metadata panels and direct Markdown source editing.</p>
+          <p>Compact bars and clearer toolbar icons keep your document in focus. The green Feedback footer link opens email options in your browser, and the feedback address is also in About nano.md.</p>
           <p>Signed and notarized for Apple Silicon. Unzip the download and move NanoMD.app to Applications.</p>
           <p><a data-release-download href="https://github.com/SiavashB/nano.md/releases/download/v0.1.0-beta.4/nano.md-v0.1.0-beta.4-arm64.zip">Download 0.1.0 beta 4</a> (<span id="download-size">2.19 MB</span> ZIP). <a id="release-notes" href="https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.4">Release notes &amp; checksum ↗</a></p>
           <p><a href="https://github.com/SiavashB/nano.md">View source on GitHub ↗</a>. MIT-licensed.</p>
@@ -374,6 +376,7 @@
 
     <footer class="shell">
       <span>© <span id="year">2026</span> nano.md</span>
+      <a href="/feedback">Send feedback</a>
     </footer>
     <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
     <script src="./analytics.js" defer></script>
