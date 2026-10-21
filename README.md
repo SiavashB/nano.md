@@ -58,6 +58,8 @@ Failed saves, external file conflicts, input-method composition, and other remai
 
 Choose **System**, **Light** (Linen Light), or **Dark** (Nano Dark) from **View > Appearance** or the segmented control on the right of the toolbar. System is the default. The choice applies to all windows and persists across launches. Changing it restyles the current views without touching the document source or undo history.
 
+The development checkout also includes a clickable footer shortcut: **^R Edit** / **^R Read** (Control-R) switches the active document's mode. The same action is available from **View > Edit/Read**. This control is not part of the beta 4 download above; runtime checks remain tracked in the [roadmap](docs/ROADMAP.md#footer-shortcuts-development-checkout).
+
 ## Markdown support
 
 - Headings, paragraphs, emphasis, strong emphasis, inline code, and fenced/indented code blocks.

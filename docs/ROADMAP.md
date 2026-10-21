@@ -134,6 +134,34 @@ Implementation and build verification are distinct from runtime acceptance. The 
 
 Completion of runtime acceptance: edits, undo, reopening, failed saves, and external changes preserve user work. The unchecked cases above remain open; the focused build 7 check does not establish full runtime acceptance. Richer Markdown features remain separately scoped.
 
+### Footer shortcuts (development checkout)
+
+The development checkout adds a terminal-style footer button and matching View menu command. Control-R toggles the active document between Read and Edit; the footer shows the destination (`^R Edit` or `^R Read`). The plain native button uses a rectangular green accent key badge and muted monospaced text, separated by one character-sized gap, following the maintainer's nano reference for highlighting. The app's existing palette supplies all colors. Reduced header/footer vertical padding targets roughly 20% thinner bars while keeping the text size. Only the menu command registers the keyboard equivalent; the footer click uses the same action. Native button repetition is disabled. At the maintainer's request, the Control-G appearance cycle and footer/menu cycle controls were removed; the toolbar and View > Appearance pickers still use the existing saved preference. The single-row footer retains the informational UTF-8 encoding label; the filename appears only in the header. No editor, parser, serialization, dependency, or project-setting changes are included.
+
+One independent `gpt-6-luna` tester with low reasoning effort validated the baseline and implementation in the current checkout on `feature/nano-footer-shortcuts`, with edits paused during validation. Baseline Release and final Debug/Release builds passed using Xcode 26.6 (17F113), SDK 26.5, `ARCHS=arm64`, macOS 15.0 deployment, pinned package versions, and `CODE_SIGNING_ALLOWED=NO`. Both measured bundles report arm64, Release, minimum OS 15.0, version 0.1.0/build 19. `git diff --check` and focused code review passed. No applicable existing test targets exist; no tests were written. The only build warning was skipped App Intents metadata extraction. Simulator-service diagnostics did not prevent the macOS builds.
+
+| Metric | Before | After | Change |
+| --- | ---: | ---: | ---: |
+| Unsigned arm64 Release app bytes | 3,896,993 | 3,979,617 | +82,624 |
+| App decimal MB | 3.896993 | 3.979617 | +0.082624 |
+| Production Swift files | 16 | 17 | +1 |
+| Production Swift bytes | 48,918 | 51,183 | +2,265 |
+| Physical Swift lines | 1,301 | 1,370 | +69 |
+| Nonblank Swift lines | 1,170 | 1,230 | +60 |
+
+App measurements sum regular-file bytes across the complete `.app` without following symlinks; adjacent dSYMs, caches, and archives are excluded. Source measurements include only `NanoMD/**/*.swift`: actual file bytes, physical lines from byte `splitlines()`, and nonblank decoded lines. Toolchain, architecture, signing, build paths, and measurement method match before and after. Commands, logs, measurements, and the tester's report are under ignored `Temp/FooterShortcuts/`. After removing the footer filename and adopting the nano-style indicators, the same tester repeated Debug/Release builds, code review, and measurements. The table reflects the final Read/Edit-only shortcut, original muted footer text color, and compact layout under `Temp/FooterShortcuts/RemoveAppearanceShortcut/`, including the two-point outer top inset below the toolbar. Only the Read/Edit key badge uses highlighted colors. The same tester repeated both builds and measurements after these styling adjustments, and earlier records remain preserved. With the appearance shortcut removed, the Read/Edit control and UTF-8 label fit in a compact single-row footer.
+
+Static conflict review found no other app shortcut handlers and no Control-R/Control-G entries in the development OS's standard AppKit key-binding dictionary. The Read/Edit command shares its action with the footer button and uses native menu dispatch before text input, with repetition disabled. Independent validation did not exercise runtime behavior, visual presentation, signing, or macOS 15 compatibility. The installed app, published release, and live website were not updated.
+
+Remaining manual checks for these controls:
+
+- [ ] With the editor focused, press Control-R once, rapidly in succession, and while holding the keys; confirm one action per press, no inserted control characters, and no unexpected text command. Also check Read mode, source fallback, and toolbar/footer focus.
+- [ ] Compare keyboard, footer, and View > Edit/Read menu activation; confirm mode labels. Confirm Control-G no longer cycles appearance, and the existing toolbar/View > Appearance pickers still work with saved legacy/invalid appearance values.
+- [ ] Open two documents; confirm mode changes affect only the active document, appearance updates both, and the mode menu disables without an active document. Confirm preference persistence after relaunch.
+- [ ] Type, select text, scroll, switch mode/appearance, and refocus the editor; confirm exact source, selection, scroll, dirty state, and undo/redo retention. Include marked-text composition.
+- [ ] Check both themes at narrow and wide window sizes with long filenames; confirm the complete Read/Edit shortcut label, usable controls, footer metadata, keyboard focus, and VoiceOver labels.
+- [ ] Run these checks on macOS 15 as well as the current development OS.
+
 ### Editing implementation validation
 
 Starting checkout: `main`, commit `9a278123033405c4325d9d1ba8db4952470ec7e5`, no pre-existing changes. Implementation is on `feature/source-editing`, in the existing project directory. Exactly one independent tester uses `gpt-6-luna` with medium reasoning and a fresh context for baseline and final verification. No applicable existing test targets exist.
