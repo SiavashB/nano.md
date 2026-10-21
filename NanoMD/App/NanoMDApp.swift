@@ -21,12 +21,7 @@ struct NanoMDApp: App {
         }
         .defaultSize(width: 800, height: 600)
         .commands {
-            CommandGroup(after: .toolbar) {
-                Menu("Appearance") {
-                    AppearancePicker(preference: $themePreference)
-                        .pickerStyle(.inline)
-                }
-            }
+            DocumentCommands(appearancePreference: $themePreference)
         }
     }
 }

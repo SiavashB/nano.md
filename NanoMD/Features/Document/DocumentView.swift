@@ -30,6 +30,11 @@ struct DocumentView: View {
 
     private var appearance: AppearanceMode { AppearanceMode(preference: appearancePreference) }
     private var theme: AppTheme { appearance.theme(for: systemColorScheme) }
+    private var modeAction: DocumentModeAction {
+        DocumentModeAction(title: mode == .read ? "Edit" : "Read") {
+            mode = mode == .read ? .edit : .read
+        }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -41,7 +46,7 @@ struct DocumentView: View {
             .font(.system(size: 12, design: .monospaced))
             .lineLimit(1)
             .padding(.horizontal, 17)
-            .padding(.vertical, 12)
+            .padding(.vertical, 8)
             .foregroundStyle(Color(nsColor: theme.headerText))
             .background(Color(nsColor: theme.header))
 
@@ -57,25 +62,16 @@ struct DocumentView: View {
                 }
             }
             rule
-            HStack {
-                Text(filename).truncationMode(.middle)
-                Spacer(minLength: 12)
-                Text("UTF-8")
-            }
-            .font(.system(size: 11, design: .monospaced))
-            .lineLimit(1)
-            .foregroundStyle(Color(nsColor: theme.secondary))
-            .padding(.horizontal, 17)
-            .padding(.vertical, 10)
-            .background(Color(nsColor: theme.surrounding))
+            footer
         }
         .background(Color(nsColor: theme.document))
         .overlay(Rectangle().strokeBorder(Color(nsColor: theme.border), lineWidth: 1))
-        .padding(12)
+        .padding(EdgeInsets(top: 2, leading: 12, bottom: 12, trailing: 12))
         .background(Color(nsColor: theme.surrounding))
         .frame(minWidth: 360, minHeight: 240)
         .preferredColorScheme(appearance.colorScheme)
         .tint(Color(nsColor: theme.accent))
+        .focusedSceneValue(\.documentModeAction, modeAction)
         .toolbar(removing: .title)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -92,6 +88,44 @@ struct DocumentView: View {
             }
             appearanceToolbarItem
         }
+    }
+
+    private var footer: some View {
+        HStack(spacing: 12) {
+            modeShortcut
+            Spacer(minLength: 0)
+            Text("UTF-8").fixedSize()
+        }
+        .font(.system(size: 11, design: .monospaced))
+        .lineLimit(1)
+        .foregroundStyle(Color(nsColor: theme.secondary))
+        .padding(.horizontal, 17)
+        .padding(.vertical, 4)
+        .background(Color(nsColor: theme.surrounding))
+    }
+
+    private var modeShortcut: some View {
+        Button(action: modeAction.perform) {
+            shortcutLabel("^R", title: modeAction.title)
+        }
+        .accessibilityLabel("Switch to \(modeAction.title) mode")
+        .help("Switch to \(modeAction.title) mode (Control+R)")
+        .font(.system(size: 12, design: .monospaced))
+        .buttonStyle(.plain)
+        .buttonRepeatBehavior(.disabled)
+        .fixedSize()
+    }
+
+    private func shortcutLabel(_ key: String, title: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text(key)
+                .padding(.vertical, 1)
+                .foregroundStyle(Color(nsColor: theme.document))
+                .background(Color(nsColor: theme.accent))
+            Text(title)
+        }
+        .padding(.vertical, 2)
+        .contentShape(Rectangle())
     }
 
     @ToolbarContentBuilder
