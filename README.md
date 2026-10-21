@@ -12,15 +12,15 @@
   <a href="https://github.com/SiavashB/nano.md/releases"><img alt="Latest release, including betas" src="https://img.shields.io/github/v/release/SiavashB/nano.md?include_prereleases&amp;label=release"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/SiavashB/nano.md"></a>
   <img alt="macOS 15+ on Apple Silicon" src="https://img.shields.io/badge/macOS-15%2B%20%C2%B7%20Apple%20Silicon-black?logo=apple">
-  <img alt="Uncompressed app size: 3.9 MB" src="https://img.shields.io/badge/app%20bundle-3.9%20MB-blue">
+  <img alt="Uncompressed app size: 4.0 MB" src="https://img.shields.io/badge/app%20bundle-4.0%20MB-blue">
   <a href="https://github.com/SiavashB/nano.md/actions/workflows/ci.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/SiavashB/nano.md/ci.yml?branch=main&amp;label=build"></a>
 </p>
 
 ## Download
 
-**[Download nano.md 0.1.0 beta 4 for Apple Silicon](https://github.com/SiavashB/nano.md/releases/download/v0.1.0-beta.4/nano.md-v0.1.0-beta.4-arm64.zip)** · [Release notes and checksum](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.4) · [Website](https://nano.thirdeyeds.com/)
+**[Download nano.md 0.1.0 beta 5 for Apple Silicon](https://github.com/SiavashB/nano.md/releases/download/v0.1.0-beta.5/nano.md-v0.1.0-beta.5-arm64.zip)** · [Release notes and checksum](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.5) · [Website](https://nano.thirdeyeds.com/)
 
-Build 18 · **2.19 MB ZIP download** · **3.9 MB uncompressed app** (decimal MB).
+Build 20 · **2.23 MB ZIP download** · **4.0 MB uncompressed app** (decimal MB).
 
 Requires macOS 15.0 or later on Apple Silicon. Unzip the download and move `NanoMD.app` to Applications. The app is Developer ID signed and notarized; verify the ZIP with the `SHA256SUMS.txt` attached to the release.
 
@@ -33,7 +33,7 @@ Requires macOS 15.0 or later on Apple Silicon. Unzip the download and move `Nano
 - **Works locally.** The Mac app has no network entitlement or telemetry and does not load images or other remote resources. Clicking an HTTP/HTTPS link opens it in your browser.
 - **SKILL.md front matter is shown as a metadata panel** instead of being rendered as a heading. Edit mode keeps the original text.
 - **Light and dark themes** (Linen Light, Nano Dark), or follow the system setting.
-- **Small and native.** A 3.9 MB app bundle built with SwiftUI and AppKit. Markdown parsing uses [Swift Markdown](https://github.com/swiftlang/swift-markdown), which depends on swift-cmark. No WebView or Electron.
+- **Small and native.** A 4.0 MB app bundle built with SwiftUI and AppKit. Markdown parsing uses [Swift Markdown](https://github.com/swiftlang/swift-markdown), which depends on swift-cmark. No WebView or Electron.
 
 ## Current limitations
 
@@ -58,9 +58,9 @@ Failed saves, external file conflicts, input-method composition, and other remai
 
 Choose **System**, **Light** (Linen Light), or **Dark** (Nano Dark) from **View > Appearance** or the segmented control on the right of the toolbar. System is the default. The choice applies to all windows and persists across launches. Changing it restyles the current views without touching the document source or undo history.
 
-The development checkout also includes a clickable footer shortcut: **^R Edit** / **^R Read** (Control-R) switches the active document's mode. The same action is available from **View > Edit/Read**. This control is not part of the beta 4 download above; runtime checks remain tracked in the [roadmap](docs/ROADMAP.md#footer-shortcuts-development-checkout).
+The clickable footer shortcut **^R Edit** / **^R Read** (Control-R) switches the active document's mode. The same action is available from **View > Edit/Read**. Remaining runtime checks are tracked in the [roadmap](docs/ROADMAP.md#footer-shortcuts-development-checkout).
 
-The development checkout replaces the footer's UTF-8 label with a borderless green **Feedback** link that opens [feedback options](https://nano.thirdeyeds.com/feedback) in your browser: send with Gmail, open your email app, or copy `feedback@thirdeyeds.com`. The address is also available in **About nano.md**. These feedback controls are not part of the beta 4 download above.
+The footer includes a borderless green **Feedback** link that opens [feedback options](https://nano.thirdeyeds.com/feedback) in your browser: send with Gmail, open your email app, or copy `feedback@thirdeyeds.com`. The address is also available in **About nano.md**.
 
 ## Markdown support
 

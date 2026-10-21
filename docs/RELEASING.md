@@ -49,13 +49,17 @@ Use `gh secret set NAME` to enter a value securely, or GitHub's repository secre
 
 Missing credentials stop the release workflow with the missing secret's name. A local ad-hoc signature cannot replace Developer ID signing for this workflow. See [GitHub's certificate setup](https://docs.github.com/en/actions/how-tos/deploy/deploy-to-third-party-platforms/sign-xcode-applications) and [Apple's Developer ID guidance](https://developer.apple.com/developer-id/).
 
-## Upcoming beta 5
-
-Version 0.1.0 beta 5, build 20, is prepared with browser-based feedback choices, the feedback email in About, the Control-R Read/Edit footer shortcut, compact document bars, clearer toolbar icons, and the native nano.md display name. Local and GitHub arm64 Debug/Release builds passed. The exact draft ZIP passed checksum, Developer ID signature/timestamp, hardened runtime, notarization staple, Gatekeeper, entitlements, bundle metadata, and resource checks. It is 2,228,541 bytes; the app contains 4,022,047 regular nonsymlink-file bytes. The draft remains unpublished pending final packaged-app functional checks. Debug accessibility-based editing, undo/redo, saving, and Control-R checks passed; no screenshots or visual testing were performed. Runtime compatibility on macOS 15 remains unverified.
-
-The feedback page is published at https://nano.thirdeyeds.com/feedback. Local route, compose-link, clipboard success/failure, and publication-allowlist checks passed. Live HTTP checks confirmed canonical routes, exact feedback-page source, and internal-file exclusions. The homepage retains beta 4 download metadata and clearly labels beta 5 features as upcoming. The existing local Cloudflare login was used; release-triggered CI deployment still requires its separate repository secret.
-
 ## Current release
+
+[0.1.0 beta 5](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.5), build 20, was published on October 21, 2026, from `50ca88f`. It adds the browser-based feedback page, the feedback email in About, the Control-R Read/Edit footer shortcut, compact document bars, clearer toolbar icons, and the native nano.md display name. It requires macOS 15.0 or later on Apple Silicon; runtime compatibility on macOS 15 remains unverified.
+
+The [release workflow](https://github.com/SiavashB/nano.md/actions/runs/39548265781) completed Developer ID signing and notarization. The exact downloaded ZIP passed checksum, strict signature and secure timestamp, hardened runtime, stapling, Gatekeeper, sandbox/file-access permissions without debugger or network access, bundle metadata, and bundled-license/resource checks. The ZIP is 2,228,541 bytes (2.23 MB); regular nonsymlink files in the app total 4,022,047 bytes (4.0 MB). Verification records are under ignored `Temp/ReleaseBeta5/`.
+
+The downloaded app passed accessibility-based opening, Control-R, typing, undo/redo, saving/reopening, byte-preservation, and browser-handoff checks with disposable files. The untouched BOM/CRLF fixture retained its exact hash. The feedback page passed local route, compose-link, clipboard success/failure, and public-asset exclusion checks; live checks confirmed its canonical route and exact source. No email was sent and no screenshots or visual testing were performed. Broader runtime cases remain in the [roadmap](ROADMAP.md).
+
+The feedback page is published at https://nano.thirdeyeds.com/feedback. Website metadata is synchronized from the exact published release ZIP. Deployment uses the existing local Cloudflare login; release-triggered CI deployment still requires its separate repository secret.
+
+## Previous beta 4
 
 [0.1.0 beta 4](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.4), build 18, was published on October 18, 2026, from `708de89`. It adds Nano Dark and Linen Light themes with saved Dark / Light / System controls, themed metadata panels, outlined code blocks, clearer Read/Edit controls, and quoted/dotted front-matter keys. The Apple Silicon release targets macOS 15.0 or later. Runtime validation on macOS 15 remains pending.
 

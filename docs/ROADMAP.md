@@ -162,11 +162,17 @@ Remaining manual checks for these controls:
 - [ ] Check both themes at narrow and wide window sizes with long filenames; confirm the complete Read/Edit shortcut label, usable controls, footer metadata, keyboard focus, and VoiceOver labels.
 - [ ] Run these checks on macOS 15 as well as the current development OS.
 
-### Footer feedback (development checkout)
+### Footer feedback (0.1.0 beta 5, build 20)
 
 The right side of the footer now shows only a borderless **Feedback** link in the active theme's green accent, replacing UTF-8. Hovering underlines the label. Activating it opens `https://nano.thirdeyeds.com/feedback` in the default browser; it has no keyboard shortcut. The page offers Gmail, the default email app, and copying `feedback@thirdeyeds.com`. The feedback address also appears as an email link in the native About window. Document encoding and the Read/Edit shortcut are unchanged.
 
-The unsigned arm64 Debug build passed with Xcode 26.6 and a macOS 15.0 deployment target, and `git diff --check` passed. Build output is under `Temp/FooterFeedback/`. No visual or email-handler runtime checks were performed, and no tests were added. This change is not part of the published beta 4 download.
+The unsigned arm64 Debug build passed with Xcode 26.6 and a macOS 15.0 deployment target, and `git diff --check` passed. Build output is under `Temp/FooterFeedback/`. No visual or email-handler runtime checks were performed, and no tests were added. This change ships in beta 5, build 20.
+
+### Beta 5 package verification (0.1.0, build 20)
+
+Published on October 21, 2026, as [v0.1.0-beta.5](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.5) from `50ca88f`. Local and GitHub arm64 Debug/Release builds passed with Xcode 26.6. The exact signed/notarized ZIP passed checksum, strict Developer ID signature/timestamp, hardened runtime, stapling, Gatekeeper, sandbox/file-access entitlements without debugger or network access, bundle metadata, and bundled-license/resource checks. ZIP bytes: 2,228,541; regular nonsymlink app bytes: 4,022,047 (decimal MB: 2.23 download, 4.0 uncompressed).
+
+Accessibility-based checks on the downloaded package passed opening, Control-R, typing, undo/redo, saving, closing/reopening, and opening the live feedback page through the native footer link. A saved fixture matched the single intended edit; an untouched BOM/CRLF/trailing-space fixture retained its exact SHA-256 after reading and closing. The live page exposed both correct compose destinations and announced successful copying. Clipboard success/failure behavior was also checked locally. No email was sent, and no screenshots or visual testing were performed. These focused checks do not establish macOS 15 runtime compatibility or resolve the broader unchecked editor cases above. Evidence is under ignored `Temp/ReleaseBeta5/`; website checks are also under `Temp/WebsiteFeedback/`.
 
 ### Editing implementation validation
 
