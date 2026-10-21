@@ -30,7 +30,7 @@ npm --prefix website run deploy
 
 Wrangler stores its login in the user's standard Cloudflare configuration directory; never commit credentials. Deployment logs and dry-run output go under `Temp/WebsiteDeploy/`. The deployment preserves dashboard environment variables and keeps the existing `nano-md.xyzo1310.workers.dev` address enabled.
 
-Wrangler is a development-only dependency, pinned in `package.json` and `package-lock.json`. It provides Cloudflare's supported upload and authentication flow; no dependency is shipped with the site or Mac app. Its license is MIT OR Apache-2.0. Installation audited 36 packages with no reported vulnerabilities when this setup was added.
+Wrangler is a development-only dependency, pinned in `package.json` and `package-lock.json`. It provides Cloudflare's supported upload and authentication flow; no dependency is shipped with the site or Mac app. Its license is MIT OR Apache-2.0.
 
 Publishing a GitHub release triggers [Deploy website](../.github/workflows/website.yml), including published betas. Drafts do not deploy. The workflow checks out `main`, synchronizes the most recently published versioned release, and deploys through the same npm command. A shared concurrency group serializes website deployments, and every run reselects the newest published release to avoid reverting to an older event's version. Ordinary Git pushes do not publish the website. The workflow can also be run manually from Actions.
 

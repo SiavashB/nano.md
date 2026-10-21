@@ -6,6 +6,7 @@ NanoMD is a lightweight native macOS Markdown app. The reader and first source e
 
 - The public-facing product name is `nano.md`, all lowercase with a period. `NanoMD`/`nanomd` are the existing project and code names; keep those technical identifiers unless explicitly asked to rename them.
 - Read [README.md](README.md) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before changing app code. Consult [docs/ROADMAP.md](docs/ROADMAP.md) for scope and [CONTRIBUTING.md](CONTRIBUTING.md) for validation.
+- Keep public documentation focused on current behavior, architectural decisions, and outstanding work. Put release history and change-specific validation in release notes or pull requests. Do not append agent session reports, model settings, local installation history, or per-iteration measurements to the roadmap or architecture document.
 - Inspect the current code, project settings, and Git diff. Architecture documents describe the intended design; do not assume planned components exist.
 - Work in the user's saved project directory and current checkout. Do not create or use a worktree unless explicitly requested. Preserve unrelated changes.
 - Put temporary files, sample documents, logs, and build output in the repository-root `Temp/` folder. Create it when needed and keep it ignored by Git. Do not deliberately write project artifacts to system temporary directories or other locations without the user's permission.

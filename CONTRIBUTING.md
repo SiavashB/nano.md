@@ -1,6 +1,6 @@
 # Contributing
 
-nano.md now includes the reader and the first source editor. Start with the [architecture](docs/ARCHITECTURE.md) and [roadmap](docs/ROADMAP.md). Keep contributions focused on a concrete behavior or maintenance problem.
+Start with the [architecture](docs/ARCHITECTURE.md) and [roadmap](docs/ROADMAP.md). Keep contributions focused on a concrete behavior or maintenance problem.
 
 ## Development
 
@@ -20,6 +20,14 @@ Use Apple Silicon (`ARCHS=arm64`), the Release configuration, Xcode 26.6, and th
 
 Measure the complete `.app` by summing regular-file bytes without following symbolic links; report decimal MB (1 MB = 1,000,000 bytes). Exclude adjacent dSYMs, build caches, and ZIPs. Published download metadata must come from the exact signed release bundle; signing can change its size slightly from a local unsigned build. `website/update-app-size.mjs` checks the executable's architecture and the build configuration recorded in `Info.plist` before updating the page. Older bundles without that configuration metadata must be rebuilt.
 
+After building Release, use Node.js 22 or newer to record the local bundle's size:
+
+```sh
+npm --prefix website run update-app-size -- "$PWD/Temp/DerivedData/Build/Products/Release/NanoMD.app"
+```
+
+This command updates local website metadata for development measurements. Deployment replaces those values with the exact published release's metadata.
+
 ## Change standards
 
 - Follow Swift naming conventions, four-space indentation, narrow access control, and explicit state ownership.
@@ -28,7 +36,7 @@ Measure the complete `.app` by summing regular-file bytes without following symb
 - Justify new dependencies with their functional benefit, maintenance, license, transitive cost, and effect on build/app size.
 - Preserve unrelated changes. Do not include build output, credentials, or personal Xcode state.
 
-[AGENTS.md](AGENTS.md) contains the instructions for AI-assisted work. Keep that file as the single repository rule source rather than maintaining divergent copies for each assistant. Codex supports project instructions in a root `AGENTS.md`; see [OpenAI's instruction discovery documentation](https://learn.chatgpt.com/docs/agent-configuration/agents-md). When using another assistant, ensure it reads the same rules through that tool's supported configuration.
+[AGENTS.md](AGENTS.md) is the shared instruction source for AI-assisted contributions.
 
 ## Validation
 
@@ -56,4 +64,4 @@ For documentation changes, verify local links, commands, current project facts, 
 
 Describe the problem, resulting behavior, and any meaningful tradeoff. Include the build/configuration used, focused manual checks, and known limitations. Screenshots help for visible changes. Keep claims proportional to the evidence; do not claim compatibility, performance, security, or coverage that was not checked.
 
-The Build workflow compiles Debug and Release for pull requests and `main`; it does not run automated tests. Functional testing is performed locally with AI assistance before release. Follow [Releasing](docs/RELEASING.md) to create a version-tagged draft. Publication prerequisites, including license selection and distribution verification, remain tracked in the [roadmap](docs/ROADMAP.md).
+The Build workflow compiles Debug and Release for pull requests and `main`; it does not run automated tests. Functional checks are performed locally before release. Follow [Releasing](docs/RELEASING.md) for package verification and publication. The [roadmap](docs/ROADMAP.md) tracks outstanding work.
