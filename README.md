@@ -58,7 +58,7 @@ Failed saves, external file conflicts, input-method composition, and other remai
 
 Choose **System**, **Light** (Linen Light), or **Dark** (Nano Dark) from **View > Appearance** or the segmented control on the right of the toolbar. System is the default. The choice applies to all windows and persists across launches. Changing it restyles the current views without touching the document source or undo history.
 
-The clickable footer shortcut **^R Edit** / **^R Read** (Control-R) switches the active document's mode. The same action is available from **View > Edit/Read**. Remaining runtime checks are tracked in the [roadmap](docs/ROADMAP.md#footer-shortcuts-development-checkout).
+The clickable footer shortcut **^R Edit** / **^R Read** (Control-R) switches the active document's mode. The same action is available from **View > Edit/Read**. Remaining runtime checks are tracked in the [roadmap](docs/ROADMAP.md#footer-shortcuts-010-beta-5-build-20).
 
 The footer includes a borderless green **Feedback** link that opens [feedback options](https://nano.thirdeyeds.com/feedback) in your browser: send with Gmail, open your email app, or copy `feedback@thirdeyeds.com`. The address is also available in **About nano.md**.
 
