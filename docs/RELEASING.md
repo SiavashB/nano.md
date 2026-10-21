@@ -51,7 +51,9 @@ Missing credentials stop the release workflow with the missing secret's name. A 
 
 ## Upcoming beta 5
 
-Version 0.1.0 beta 5, build 20, is being prepared with browser-based feedback choices, the feedback email in About, the Control-R Read/Edit footer shortcut, compact document bars, clearer toolbar icons, and the native nano.md display name. The published download remains beta 4 until the draft's exact signed/notarized package has been verified and published. Local unsigned arm64 Debug and Release builds passed with Xcode 26.6; this does not establish packaged-app behavior or macOS 15 runtime compatibility.
+Version 0.1.0 beta 5, build 20, is prepared with browser-based feedback choices, the feedback email in About, the Control-R Read/Edit footer shortcut, compact document bars, clearer toolbar icons, and the native nano.md display name. Local and GitHub arm64 Debug/Release builds passed. The exact draft ZIP passed checksum, Developer ID signature/timestamp, hardened runtime, notarization staple, Gatekeeper, entitlements, bundle metadata, and resource checks. It is 2,228,541 bytes; the app contains 4,022,047 regular nonsymlink-file bytes. The draft remains unpublished pending final packaged-app functional checks. Debug accessibility-based editing, undo/redo, saving, and Control-R checks passed; no screenshots or visual testing were performed. Runtime compatibility on macOS 15 remains unverified.
+
+The feedback page is published at https://nano.thirdeyeds.com/feedback. Local route, compose-link, clipboard success/failure, and publication-allowlist checks passed. Live HTTP checks confirmed canonical routes, exact feedback-page source, and internal-file exclusions. The homepage retains beta 4 download metadata and clearly labels beta 5 features as upcoming. The existing local Cloudflare login was used; release-triggered CI deployment still requires its separate repository secret.
 
 ## Current release
 
