@@ -66,6 +66,10 @@ Before tagging, use disposable files under `Temp/` to check the changed behavior
 
 Record the version/build, OS, hardware, outcomes, and limitations in the PR or release notes. Use the broader [validation checklist](../CONTRIBUTING.md#validation) where relevant. Build success alone does not establish functional acceptance. AI-assisted work follows [AGENTS.md](../AGENTS.md), including its visual-testing requirements.
 
+## Installed-app checks
+
+For Finder and Open With checks, use the current signed Release installed at `/Applications/NanoMD.app`. Building or running in Xcode updates its build directory, not the installed app. When updating the installed copy, request normal termination of older NanoMD instances and stop if unsaved work requires user action. Preserve the previous app under `Temp/`, replace it with the validated locally signed Release, unregister only stale NanoMD build copies with Launch Services, and register the installed app. Keep unrelated associations unchanged. Confirm that macOS resolves the bundle identifier to the installed path.
+
 ## Each release
 
 This checklist applies to releases, prereleases, and hotfixes. Documentation and website updates are part of completion.

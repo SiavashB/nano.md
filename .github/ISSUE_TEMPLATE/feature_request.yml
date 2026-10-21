@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest a focused improvement to reading or editing Markdown.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check [existing issues](https://github.com/SiavashB/nano.md/issues) and the [roadmap](https://github.com/SiavashB/nano.md/blob/main/docs/ROADMAP.md) for related work.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: Describe what you are trying to do and where the current behavior falls short.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Explain how the improvement would work, with a small example if helpful.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives or workarounds
+      description: Optional alternatives you have considered or currently use.
+    validations:
+      required: false

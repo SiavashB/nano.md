@@ -58,7 +58,7 @@ The reader supports headings, lists, quotes, code blocks, tables, and web links.
 - Documents over 1 MiB or beyond complexity limits fall back to selectable source.
 - Apple Silicon only; no Intel build or Quick Look extension.
 
-Remaining save-error, input-method, external-conflict, and recovery checks are tracked in the [roadmap](docs/ROADMAP.md#1-document-reliability). Report problems in [Issues](https://github.com/SiavashB/nano.md/issues) or use [Feedback](https://nano.thirdeyeds.com/feedback).
+Remaining save-error, input-method, external-conflict, and recovery checks are tracked in the [roadmap](docs/ROADMAP.md#1-document-reliability). Use the [bug report form](https://github.com/SiavashB/nano.md/issues/new?template=bug_report.yml) or [Feedback](https://nano.thirdeyeds.com/feedback) for ordinary problems. Report security vulnerabilities [privately](SECURITY.md).
 
 ## Build
 

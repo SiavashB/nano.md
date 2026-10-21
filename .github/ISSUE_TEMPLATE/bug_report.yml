@@ -1,0 +1,57 @@
+name: Bug report
+description: Report a reproducible problem with nano.md.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check [existing issues](https://github.com/SiavashB/nano.md/issues) before opening a report.
+        For a security vulnerability, use [private reporting](https://github.com/SiavashB/nano.md/security/advisories/new) instead of a public issue.
+  - type: input
+    id: version
+    attributes:
+      label: App version and build
+      description: Include the release tag or commit SHA if known.
+      placeholder: "For example: 0.1.0 beta 5, build 20"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: macOS version and Mac model or chip
+      placeholder: "For example: macOS 15.7, MacBook Air M2"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Include the starting mode, actions taken, and how often the problem occurs.
+      placeholder: |
+        1. Open ...
+        2. Switch to ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Explain what you expected and what happened.
+    validations:
+      required: true
+  - type: textarea
+    id: sample
+    attributes:
+      label: Minimal Markdown sample
+      description: If relevant, paste the smallest sample that reproduces the problem. Remove private content, credentials, and personal paths first.
+      render: text
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Optional error messages, sanitized logs, or screenshots.
+    validations:
+      required: false

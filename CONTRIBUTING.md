@@ -1,18 +1,28 @@
 # Contributing
 
-Start with the [architecture](docs/ARCHITECTURE.md) and [roadmap](docs/ROADMAP.md). Keep contributions focused on a concrete behavior or maintenance problem.
+Contributions should address a concrete behavior or maintenance problem. Start with an [open issue](https://github.com/SiavashB/nano.md/issues), the [roadmap](docs/ROADMAP.md), and the [architecture](docs/ARCHITECTURE.md).
+
+## Reporting bugs
+
+Search existing issues, then use the [bug report form](https://github.com/SiavashB/nano.md/issues/new?template=bug_report.yml). Include the app version/build, macOS version and hardware, steps to reproduce, and expected versus actual behavior. A small Markdown sample helps; remove private content, credentials, and personal paths before sharing it.
+
+Report suspected security vulnerabilities through the [private reporting process](SECURITY.md), rather than a public issue or pull request.
+
+## Proposing changes
+
+Use the [feature request form](https://github.com/SiavashB/nano.md/issues/new?template=feature_request.yml) to describe the problem and proposed behavior before starting a substantial feature. Small documentation fixes can go directly to a pull request. Link related issues and keep each PR focused on one change.
 
 ## Development
 
 Keep temporary files, sample documents, logs, and build output in the repository-root `Temp/` folder, which is ignored by Git.
 
-Open `NanoMD.xcodeproj` and select the macOS `NanoMD` scheme. The current baseline is Xcode 26.6, Swift 6 language mode, and a macOS 15.0 deployment target on Apple Silicon. Keep the modern build toolchain; the deployment target specifies the oldest supported runtime, not the Xcode version. Builds check API availability, while launch, editing/undo, saving, and native window behavior still require runtime verification on macOS 15. The source folder uses Xcode's synchronized groups; place new Swift files under the app's `NanoMD/` folder and keep tooling/documentation outside it.
+Open `NanoMD.xcodeproj` and select the macOS `NanoMD` scheme. Use Xcode 26.6, Swift 6, and Apple Silicon. The deployment target is macOS 15.0; runtime verification on that OS remains pending. The project uses Xcode's synchronized groups: place app source under `NanoMD/` and keep tooling/documentation outside it.
 
 Use the unsigned Debug build command in [README.md](README.md) for local compilation. Change `-configuration Debug` to `-configuration Release` when validating dependency changes, compiler settings, or performance-sensitive code. Unsigned compilation does not validate sandbox permissions, signing, notarization, or UI behavior.
 
 For a signed local run, create `Config/Local.xcconfig` with `DEVELOPMENT_TEAM = YOUR_TEAM_ID`, using the team shown in Xcode's account settings. Both configurations optionally load that ignored file through `Config/Signing.xcconfig`; a fresh checkout needs no local file for unsigned builds. Keep automatic signing enabled and do not commit your team or certificate settings. CI provides signing settings explicitly.
 
-For Finder and Open With checks, use the current signed Release installed at `/Applications/NanoMD.app`. Building or running in Xcode updates its build directory, not the installed app. When updating the installed copy, request normal termination of older NanoMD instances and stop if unsaved work requires user action. Preserve the previous app under `Temp/`, replace it with the validated locally signed Release, unregister only stale NanoMD build copies with Launch Services, and register the installed app. Keep unrelated associations unchanged. Confirm that macOS resolves the bundle identifier to the installed path.
+Finder and Open With verification requires an installed signed Release; see the [maintainer procedure](docs/RELEASING.md#installed-app-checks).
 
 ## App-size measurements
 
@@ -40,7 +50,7 @@ This command updates local website metadata for development measurements. Deploy
 
 ## Validation
 
-For code changes, build the affected configuration and review the changed code. Run relevant existing tests if they become available. Do not create or update tests unless the maintainer explicitly requests them; the repository currently has no test targets. AI assistants must not visually test implementations, inspect rendered UI, take verification screenshots, or interact with previews unless explicitly requested.
+For code changes, build the affected configuration and review the changed code. Run relevant existing tests if they become available. Test additions or updates require explicit maintainer agreement; the repository currently has no test targets. AI-assisted validation follows [AGENTS.md](AGENTS.md), including its requirements for visual testing.
 
 When manual validation is requested for document and reader changes, choose the relevant checks from this list:
 
@@ -62,6 +72,6 @@ For documentation changes, verify local links, commands, current project facts, 
 
 ## Pull requests
 
-Describe the problem, resulting behavior, and any meaningful tradeoff. Include the build/configuration used, focused manual checks, and known limitations. Screenshots help for visible changes. Keep claims proportional to the evidence; do not claim compatibility, performance, security, or coverage that was not checked.
+The [PR template](.github/pull_request_template.md) asks for the problem, resulting behavior, validation, and meaningful limitations. Include the build/configuration used and any focused manual checks. Screenshots help for visible changes. Keep claims proportional to the evidence; do not claim compatibility, performance, security, or coverage that was not checked.
 
 The Build workflow compiles Debug and Release for pull requests and `main`; it does not run automated tests. Functional checks are performed locally before release. Follow [Releasing](docs/RELEASING.md) for package verification and publication. The [roadmap](docs/ROADMAP.md) tracks outstanding work.
