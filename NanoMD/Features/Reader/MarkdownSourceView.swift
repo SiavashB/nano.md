@@ -4,11 +4,13 @@ import SwiftUI
 struct MarkdownSourceView: NSViewRepresentable {
     let source: String
     let theme: AppTheme
+    let navigation: DocumentNavigation
+    let onEdit: (EditorEntryPoint) -> Void
 
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSScrollView()
 
-        let textView = NSTextView(usingTextLayoutManager: true)
+        let textView = ReaderInteractionTextView(usingTextLayoutManager: true)
         textView.isEditable = false
         textView.isSelectable = true
         textView.isRichText = false
@@ -23,6 +25,11 @@ struct MarkdownSourceView: NSViewRepresentable {
         textView.setAccessibilityLabel(String(localized: "Markdown source"))
         textView.setAccessibilityHelp(String(localized: "Read-only Markdown source. Select text to copy it."))
         textView.string = source
+        textView.sourceSnapshot = source
+        textView.displaysSource = true
+        textView.onEdit = onEdit
+        textView.enableForceClick()
+        navigation.reader = textView
 
         scrollView.documentView = textView
         theme.apply(to: scrollView)
@@ -31,10 +38,13 @@ struct MarkdownSourceView: NSViewRepresentable {
 
     func updateNSView(_ scrollView: NSScrollView, context: Context) {
         theme.apply(to: scrollView)
-        (scrollView.documentView as? NSTextView)?.textColor = theme.secondary
+        guard let textView = scrollView.documentView as? ReaderInteractionTextView else { return }
+        textView.textColor = theme.secondary
+        textView.sourceSnapshot = source
+        textView.onEdit = onEdit
+        navigation.reader = textView
         // Canonically equivalent strings can still contain different source bytes.
-        guard let textView = scrollView.documentView as? NSTextView,
-              !textView.string.utf8.elementsEqual(source.utf8) else {
+        guard !textView.string.utf8.elementsEqual(source.utf8) else {
             return
         }
 

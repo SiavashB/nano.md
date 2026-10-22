@@ -5,6 +5,7 @@ struct MarkdownEditorView: NSViewRepresentable {
     @Binding var document: NanoMDDocument
     let isActive: Bool
     let theme: AppTheme
+    let entryRequest: EditorEntryRequest?
     @Environment(\.undoManager) private var undoManager
 
     func makeCoordinator() -> Coordinator {
@@ -39,6 +40,7 @@ struct MarkdownEditorView: NSViewRepresentable {
                 guard let textView else { return }
                 coordinator?.applyReload(to: textView)
                 textView.applyTextTheme()
+                coordinator?.scheduleActivation(of: textView)
             }
         }
         scrollView.documentView = textView
@@ -47,6 +49,11 @@ struct MarkdownEditorView: NSViewRepresentable {
         textView.applyTextTheme()
         context.coordinator.undoManager = undoManager
         scrollView.isHidden = !isActive
+        textView.didAttachToWindow = { [weak coordinator = context.coordinator, weak textView] in
+            guard let textView else { return }
+            coordinator?.scheduleActivation(of: textView)
+        }
+        context.coordinator.updateActivation(isActive, request: entryRequest, textView: textView)
         return scrollView
     }
 
@@ -65,11 +72,13 @@ struct MarkdownEditorView: NSViewRepresentable {
             scrollView.window?.makeFirstResponder(nil)
         }
         scrollView.isHidden = !isActive
+        coordinator.updateActivation(isActive, request: entryRequest, textView: textView)
     }
 
     static func dismantleNSView(_ scrollView: NSScrollView, coordinator: Coordinator) {
         // The manager is document-scoped; its native text targets must not outlive the window.
         coordinator.undoManager?.removeAllActions()
+        coordinator.cancelActivation()
         (scrollView.documentView as? NSTextView)?.delegate = nil
     }
 
@@ -78,6 +87,10 @@ struct MarkdownEditorView: NSViewRepresentable {
         weak var undoManager: UndoManager?
         private var loadIdentity: UUID
         private var isApplyingReload = false
+        private var isActive = false
+        private var entryRequest: EditorEntryRequest?
+        private var needsActivation = false
+        private var activationTask: Task<Void, Never>?
 
         init(document: Binding<NanoMDDocument>) {
             self.document = document
@@ -86,6 +99,65 @@ struct MarkdownEditorView: NSViewRepresentable {
 
         func undoManager(for view: NSTextView) -> UndoManager? {
             undoManager
+        }
+
+        func updateActivation(_ active: Bool, request: EditorEntryRequest?, textView: SourceTextView) {
+            let changed = active && (!isActive || request?.id != entryRequest?.id)
+            isActive = active
+            entryRequest = request
+            if !active {
+                cancelActivation()
+            } else if changed {
+                needsActivation = true
+                scheduleActivation(of: textView)
+            }
+        }
+
+        func cancelActivation() {
+            activationTask?.cancel()
+            activationTask = nil
+            needsActivation = false
+        }
+
+        func scheduleActivation(of textView: SourceTextView) {
+            guard needsActivation else { return }
+            activationTask?.cancel()
+            activationTask = Task { @MainActor [weak self, weak textView] in
+                // Wait for SwiftUI to reveal the persistent editor and remove the reader.
+                await Task.yield()
+                guard !Task.isCancelled, let self, self.isActive,
+                      let textView, let window = textView.window,
+                      !textView.isHiddenOrHasHiddenAncestor, !textView.hasMarkedText() else { return }
+                self.needsActivation = false
+                let oldOrigin = textView.enclosingScrollView?.contentView.bounds.origin
+                window.makeFirstResponder(textView)
+                guard let request = self.entryRequest,
+                      request.loadIdentity == self.loadIdentity,
+                      request.loadIdentity == self.document.wrappedValue.loadIdentity else {
+                    if let oldOrigin, let scrollView = textView.enclosingScrollView {
+                        scrollView.contentView.scroll(to: oldOrigin)
+                        scrollView.reflectScrolledClipView(scrollView.contentView)
+                    }
+                    return
+                }
+                let source = textView.string as NSString
+                var offset = min(max(0, request.point.sourceOffset), source.length)
+                if offset < source.length {
+                    offset = source.rangeOfComposedCharacterSequence(at: offset).location
+                }
+                let selection = NSRange(location: offset, length: 0)
+                textView.breakUndoCoalescing()
+                textView.setSelectedRange(selection)
+                textView.scrollRangeToVisible(selection)
+                if let viewportOffset = request.point.viewportOffset,
+                   let rect = textView.characterRect(at: offset),
+                   let scrollView = textView.enclosingScrollView {
+                    let maximumY = max(0, textView.bounds.height - scrollView.contentView.bounds.height)
+                    let y = min(max(0, rect.minY - viewportOffset), maximumY)
+                    scrollView.contentView.scroll(to: NSPoint(x: 0, y: y))
+                    scrollView.reflectScrolledClipView(scrollView.contentView)
+                }
+            }
         }
 
         func applyReload(to textView: SourceTextView) {
@@ -122,11 +194,17 @@ struct MarkdownEditorView: NSViewRepresentable {
         }
     }
 
-    final class SourceTextView: NSTextView {
+    final class SourceTextView: DocumentTextView {
         var lineEnding = "\n"
         var compositionDidEnd: (() -> Void)?
+        var didAttachToWindow: (() -> Void)?
         var theme: AppTheme = .linenLight
         private var appliedTextTheme: AppTheme?
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            if window != nil { didAttachToWindow?() }
+        }
 
         func applyTextTheme() {
             // Leave marked text under input-method ownership until composition finishes.

@@ -11,11 +11,13 @@ actor MarkdownParser {
         }
 
         let frontMatter = MarkdownFrontMatter(source)
-        let document = Document(parsing: frontMatter?.body ?? source, options: [.disableSmartOpts])
+        let body = frontMatter?.body ?? source
+        let sourceIndex = MarkdownSourceIndex(body, baseOffset: frontMatter?.bodyOffset ?? 0)
+        let document = Document(parsing: body, options: [.disableSmartOpts])
         try validateComplexity(document)
-        var blocks = try document.children.map(block)
+        var blocks = try document.children.map { try block($0, sourceIndex: sourceIndex) }
         if let frontMatter {
-            blocks.insert(.frontMatter(frontMatter.metadata), at: 0)
+            blocks.insert(.located(.frontMatter(frontMatter.metadata), frontMatter.metadataSpan), at: 0)
         }
         let content = MarkdownContent(blocks: blocks)
         try Task.checkCancellation()
@@ -35,21 +37,26 @@ actor MarkdownParser {
         }
     }
 
-    private func block(_ node: any Markup) throws -> MarkdownBlock {
+    private func block(_ node: any Markup, sourceIndex: MarkdownSourceIndex) throws -> MarkdownBlock {
+        let content = try blockContent(node, sourceIndex: sourceIndex)
+        return sourceIndex.contentSpan(for: node).map { .located(content, $0) } ?? content
+    }
+
+    private func blockContent(_ node: any Markup, sourceIndex: MarkdownSourceIndex) throws -> MarkdownBlock {
         try Task.checkCancellation()
         switch node {
         case let heading as Heading:
-            return .heading(level: heading.level, runs: try inlineChildren(heading))
+            return .heading(level: heading.level, runs: try inlineChildren(heading, sourceIndex: sourceIndex))
         case let paragraph as Paragraph:
-            return .paragraph(try inlineChildren(paragraph))
+            return .paragraph(try inlineChildren(paragraph, sourceIndex: sourceIndex))
         case let code as CodeBlock:
             return .code(code.code)
         case let quote as BlockQuote:
-            return .quote(try quote.children.map(block))
+            return .quote(try quote.children.map { try block($0, sourceIndex: sourceIndex) })
         case let list as OrderedList:
-            return .list(start: list.startIndex, items: try list.children.map(listItem))
+            return .list(start: list.startIndex, items: try list.children.map { try listItem($0, sourceIndex: sourceIndex) })
         case let list as UnorderedList:
-            return .list(start: nil, items: try list.children.map(listItem))
+            return .list(start: nil, items: try list.children.map { try listItem($0, sourceIndex: sourceIndex) })
         case let table as Table:
             let alignments: [MarkdownTable.Alignment] = table.columnAlignments.map {
                 switch $0 {
@@ -60,10 +67,10 @@ actor MarkdownParser {
             }
             return .table(MarkdownTable(
                 columnAlignments: alignments,
-                header: MarkdownTable.Row(cells: try table.head.cells.map { try inlineChildren($0) }),
+                header: MarkdownTable.Row(cells: try table.head.cells.map { try tableCell($0, sourceIndex: sourceIndex) }),
                 rows: try table.body.rows.map { row in
                     try Task.checkCancellation()
-                    return MarkdownTable.Row(cells: try row.cells.map { try inlineChildren($0) })
+                    return MarkdownTable.Row(cells: try row.cells.map { try tableCell($0, sourceIndex: sourceIndex) })
                 }
             ))
         case is ThematicBreak:
@@ -75,26 +82,38 @@ actor MarkdownParser {
         }
     }
 
-    private func listItem(_ node: any Markup) throws -> MarkdownListItem {
+    private func tableCell(_ node: any Markup, sourceIndex: MarkdownSourceIndex) throws -> MarkdownTable.Cell {
+        MarkdownTable.Cell(runs: try inlineChildren(node, sourceIndex: sourceIndex), sourceSpan: sourceIndex.span(for: node))
+    }
+
+    private func listItem(_ node: any Markup, sourceIndex: MarkdownSourceIndex) throws -> MarkdownListItem {
         let checkbox: String?
         switch (node as? ListItem)?.checkbox {
         case .checked: checkbox = "[x]"
         case .unchecked: checkbox = "[ ]"
         case nil: checkbox = nil
         }
-        return MarkdownListItem(checkbox: checkbox, blocks: try node.children.map(block))
+        return MarkdownListItem(checkbox: checkbox, blocks: try node.children.map { try block($0, sourceIndex: sourceIndex) })
     }
 
     private func inlineChildren(
         _ node: any Markup,
+        sourceIndex: MarkdownSourceIndex,
         style: MarkdownRun.Style = [],
         destination: String? = nil
     ) throws -> [MarkdownRun] {
-        try node.children.flatMap { try inline($0, style: style, destination: destination) }
+        try node.children.flatMap { child in
+            var runs = try inline(child, sourceIndex: sourceIndex, style: style, destination: destination)
+            for index in runs.indices where runs[index].sourceSpan == nil {
+                runs[index].sourceSpan = sourceIndex.contentSpan(for: child)
+            }
+            return runs
+        }
     }
 
     private func inline(
         _ node: any Markup,
+        sourceIndex: MarkdownSourceIndex,
         style: MarkdownRun.Style,
         destination: String?
     ) throws -> [MarkdownRun] {
@@ -107,13 +126,15 @@ actor MarkdownParser {
         case is LineBreak:
             return [MarkdownRun(text: "\u{2028}", style: style, destination: destination)]
         case is Emphasis:
-            return try inlineChildren(node, style: style.union(.emphasis), destination: destination)
+            return try inlineChildren(node, sourceIndex: sourceIndex, style: style.union(.emphasis), destination: destination)
         case is Strong:
-            return try inlineChildren(node, style: style.union(.strong), destination: destination)
+            return try inlineChildren(node, sourceIndex: sourceIndex, style: style.union(.strong), destination: destination)
         case let code as InlineCode:
             return [MarkdownRun(text: code.code, style: style.union(.code), destination: destination)]
         case let link as Link:
-            return try inlineChildren(link, style: style, destination: link.destination)
+            var runs = try inlineChildren(link, sourceIndex: sourceIndex, style: style, destination: link.destination)
+            for index in runs.indices { runs[index].linkSpan = sourceIndex.span(for: link) }
+            return runs
         case let image as Image:
             let description = image.plainText.isEmpty ? "Image" : image.plainText
             let location = image.source.map { " (\($0))" } ?? ""

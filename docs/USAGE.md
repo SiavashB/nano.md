@@ -10,9 +10,13 @@ Switch modes with the toolbar, Control-R, the **^R Edit** / **^R Read** footer b
 
 Saving, undo, redo, and the keep-changes prompt on close or quit use the macOS document system.
 
-- The editor keeps its selection, scroll position, and undo history across mode switches.
+- Highlight text in Read, then switch to Edit to place the cursor at the beginning of that text.
+- With no selection, switching from a scrolled reader brings the corresponding source into view, approximately retaining its vertical position. Source and formatted layouts can differ.
+- Force-click text on a Force Touch trackpad to enter Edit at that location. This gesture takes precedence over selection and replaces the reader's normal force-click lookup.
+- Edit receives keyboard focus automatically. Without a reader selection or scroll destination, the editor keeps its previous selection and scroll. Undo history survives mode switches.
 - The reader's selection and scroll reset when returning to Read.
-- After switching to Edit, click the editor or press Tab to focus it. Undo/redo shortcuts require editor focus.
+
+Rendered decorations and text that cannot be matched exactly use the surrounding Markdown source as a destination. The same entry controls work when a document falls back to read-only source.
 
 ## Files and source preservation
 

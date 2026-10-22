@@ -31,11 +31,11 @@ Track acceptance in [#12: Verify the downloaded release on macOS 15](https://git
 
 Basic Control-R behavior passed focused beta 5 checks. Broader control and appearance acceptance remains open on both macOS 15 and the development OS.
 
-Complete checks for shortcut focus/repetition, independent windows, appearance persistence and System mode, state retention, layout, keyboard access, and VoiceOver.
+Complete checks for shortcut focus/repetition, independent windows, appearance persistence and System mode, state retention, layout, keyboard access, and VoiceOver. Reader-to-editor navigation also needs runtime checks for selection, scroll alignment, automatic editor focus, and force-click on supported hardware, including links, tables, Unicode, and source fallback.
 
 Track acceptance in [#13: Complete keyboard, appearance, and accessibility acceptance checks](https://github.com/SiavashB/nano.md/issues/13).
 
-Known limitations remain: returning to Read resets reader selection and scroll; switching to Edit requires a click or Tab to focus the editor, and undo/redo requires editor focus.
+Known limitations remain: returning to Read resets reader selection and scroll; undo/redo requires editor focus. Source navigation is approximate for generated or unmatched rendered text and when reader/editor layouts differ.
 
 ## 4. Release presentation and deployment
 
