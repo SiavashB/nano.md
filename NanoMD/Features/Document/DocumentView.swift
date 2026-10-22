@@ -7,6 +7,8 @@ struct DocumentView: View {
     let systemColorScheme: ColorScheme
     @State private var mode: Mode
     @State private var isFeedbackHovered = false
+    @State private var navigation = DocumentNavigation()
+    @State private var editorEntry: EditorEntryRequest?
 
     private enum Mode: String, CaseIterable {
         case read = "Read"
@@ -33,8 +35,23 @@ struct DocumentView: View {
     private var theme: AppTheme { appearance.theme(for: systemColorScheme) }
     private var modeAction: DocumentModeAction {
         DocumentModeAction(title: mode == .read ? "Edit" : "Read") {
-            mode = mode == .read ? .edit : .read
+            switchMode(to: mode == .read ? .edit : .read)
         }
+    }
+
+    private func switchMode(to destination: Mode) {
+        guard destination != mode else { return }
+        if destination == .edit {
+            beginEditing(at: navigation.entryPoint(for: document.source))
+        } else {
+            mode = .read
+        }
+    }
+
+    private func beginEditing(at point: EditorEntryPoint?) {
+        guard mode == .read else { return }
+        editorEntry = point.map { EditorEntryRequest(loadIdentity: document.loadIdentity, point: $0) }
+        mode = .edit
     }
 
     var body: some View {
@@ -54,12 +71,15 @@ struct DocumentView: View {
             rule
             ZStack {
                 // Keep the native editor and its undo targets alive while reading.
-                MarkdownEditorView(document: $document, isActive: mode == .edit, theme: theme)
+                MarkdownEditorView(document: $document, isActive: mode == .edit, theme: theme, entryRequest: editorEntry)
                     .allowsHitTesting(mode == .edit)
                     .accessibilityHidden(mode != .edit)
 
                 if mode == .read {
-                    ReaderView(source: document.source, theme: theme)
+                    ReaderView(source: document.source, theme: theme, navigation: navigation) { point in
+                        guard navigation.matches(document.source) else { return }
+                        beginEditing(at: point)
+                    }
                 }
             }
             rule
@@ -76,7 +96,7 @@ struct DocumentView: View {
         .toolbar(removing: .title)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Picker("Document mode", selection: $mode) {
+                Picker("Document mode", selection: Binding(get: { mode }, set: { switchMode(to: $0) })) {
                     ForEach(Mode.allCases, id: \.self) { mode in
                         Label(mode.rawValue, image: mode.iconName)
                             .labelStyle(.iconOnly)

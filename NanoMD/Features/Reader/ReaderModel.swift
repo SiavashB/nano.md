@@ -5,7 +5,7 @@ import Observation
 final class ReaderModel {
     enum State {
         case loading
-        case ready(NSAttributedString)
+        case ready(NSAttributedString, source: String)
         case source(String)
     }
 
@@ -14,6 +14,7 @@ final class ReaderModel {
     private var revision = UUID()
     private var renderRevision = UUID()
     private var content: MarkdownContent?
+    private var sourceSnapshot = ""
     private var theme: AppTheme
 
     init(theme: AppTheme) {
@@ -33,6 +34,7 @@ final class ReaderModel {
             try Task.checkCancellation()
             guard revision == request else { return }
             self.content = content
+            sourceSnapshot = source
             await renderCurrentContent()
         } catch is CancellationError {
             return
@@ -50,13 +52,14 @@ final class ReaderModel {
 
     private func renderCurrentContent() async {
         guard let content else { return }
+        let source = sourceSnapshot
         let request = UUID()
         renderRevision = request
         do {
             let text = try await MarkdownTextRenderer(theme: theme).render(content)
             try Task.checkCancellation()
             guard renderRevision == request else { return }
-            state = .ready(text)
+            state = .ready(text, source: source)
         } catch is CancellationError {
             return
         } catch {

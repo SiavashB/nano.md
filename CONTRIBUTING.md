@@ -1,6 +1,6 @@
 # Contributing
 
-Contributions should address a concrete behavior or maintenance problem. Start with an [open issue](https://github.com/SiavashB/nano.md/issues), the [roadmap](docs/ROADMAP.md), and the [architecture](docs/ARCHITECTURE.md).
+Contributions should address a concrete behavior or maintenance problem. Start with an [open issue](https://github.com/SiavashB/nano.md/issues) and the [code organization](#code-organization) below.
 
 ## Reporting bugs
 
@@ -22,7 +22,19 @@ Use the unsigned Debug build command in [README.md](README.md) for local compila
 
 For a signed local run, create `Config/Local.xcconfig` with `DEVELOPMENT_TEAM = YOUR_TEAM_ID`, using the team shown in Xcode's account settings. Both configurations optionally load that ignored file through `Config/Signing.xcconfig`; a fresh checkout needs no local file for unsigned builds. Keep automatic signing enabled and do not commit your team or certificate settings. CI provides signing settings explicitly.
 
-Finder and Open With verification requires an installed signed Release; see the [maintainer procedure](docs/RELEASING.md#installed-app-checks).
+Finder and Open With verification requires an installed signed Release. Building in Xcode does not update the installed copy; preserve unsaved work when replacing or relaunching it.
+
+## Code organization
+
+- `NanoMD/App` composes scenes and commands; `Documents` owns source text, encoding metadata, and the file read/write contract.
+- `NanoMD/Markdown` parses immutable source snapshots into semantic content, independently of SwiftUI, AppKit, file access, and networking.
+- `NanoMD/Features/Document`, `Editor`, and `Reader` own window composition, native source editing, and read-only presentation respectively.
+
+Keep the original Markdown source authoritative and serialize its exact UTF-8 representation, retaining a loaded BOM, whitespace, Unicode representation, and line endings. Rendering must never become the saved source. Reject invalid UTF-8 rather than using lossy decoding.
+
+The system document lifecycle owns saves, autosave, conflicts, and recovery. Keep the native editor alive across mode changes and let NSTextView own typing undo. Accepted reloads must clear stale undo targets. Parsing belongs off the main actor, obsolete results must be discarded, and reader state must stay document-scoped.
+
+Treat document content as untrusted. Keep HTML literal and resources unloaded; document navigation allows only explicitly activated HTTP/HTTPS links. See [Security](SECURITY.md) for private reporting and the content policy.
 
 ## App-size measurements
 
@@ -41,16 +53,14 @@ This command updates local website metadata for development measurements. Deploy
 ## Change standards
 
 - Follow Swift naming conventions, four-space indentation, narrow access control, and explicit state ownership.
-- Keep code, project settings, and architecture documentation consistent. Distinguish proposed behavior from implemented behavior.
+- Keep code, project settings, and contributor guidance consistent. Distinguish proposed behavior from implemented behavior.
 - Explain important constraints in code comments. Keep change history and implementation narration in the pull request.
 - Justify new dependencies with their functional benefit, maintenance, license, transitive cost, and effect on build/app size.
 - Preserve unrelated changes. Do not include build output, credentials, or personal Xcode state.
 
-[AGENTS.md](AGENTS.md) is the shared instruction source for AI-assisted contributions.
-
 ## Validation
 
-For code changes, build the affected configuration, run the regression suite below, and review the changed code. Test additions or updates require explicit maintainer agreement. AI-assisted validation follows [AGENTS.md](AGENTS.md), including its requirements for visual testing.
+For code changes, build the affected configuration, run the regression suite below, and review the changed code. Test additions or updates require explicit maintainer agreement. AI-assisted visual testing requires explicit maintainer authorization.
 
 ### Automated tests
 
@@ -72,7 +82,7 @@ xcodebuild \
 
 `NanoMDTests/` is a separate Swift Testing target that imports the app's production code. It uses synthetic, in-memory inputs to cover exact UTF-8/BOM/line-ending preservation, invalid files, reload identities, front-matter recognition, link restrictions, Markdown semantics, and formatting-limit boundaries. Tests and fixtures are not shipped in the app. No additional package dependency is required.
 
-The same suite runs in GitHub Actions for pull requests and pushes to `main`. Build/test logs and the `.xcresult` bundle are retained for seven days. These unit tests do not establish autosave, native undo, input-method composition, external-conflict handling, accessibility, or minimum-OS compatibility; continue to track those runtime checks in the roadmap.
+The same suite runs in GitHub Actions for pull requests and pushes to `main`. Build/test logs and the `.xcresult` bundle are retained for seven days. These unit tests do not establish autosave, native undo, input-method composition, external-conflict handling, accessibility, or minimum-OS compatibility; continue to track those runtime checks in [GitHub Issues](https://github.com/SiavashB/nano.md/issues).
 
 When manual validation is requested for document and reader changes, choose the relevant checks from this list:
 
@@ -96,4 +106,25 @@ For documentation changes, verify local links, commands, current project facts, 
 
 The [PR template](.github/pull_request_template.md) asks for the problem, resulting behavior, validation, and meaningful limitations. Include the build/configuration used and any focused manual checks. Screenshots help for visible changes. Keep claims proportional to the evidence; do not claim compatibility, performance, security, or coverage that was not checked.
 
-The Build workflow compiles Debug and Release and runs regression tests for pull requests and `main`. Runtime acceptance checks are performed locally before release. Follow [Releasing](docs/RELEASING.md) for package verification and publication. The [roadmap](docs/ROADMAP.md) tracks outstanding work.
+The [Build workflow](.github/workflows/ci.yml) compiles Debug and Release and runs regression tests for pull requests and `main`. Runtime acceptance checks are performed locally before release. Track outstanding work in [GitHub Issues](https://github.com/SiavashB/nano.md/issues).
+
+## Releases
+
+Confirm regression tests passed for the release commit before tagging. Maintainers prepare a versioned `v*` tag on a commit included in `main`. The [release workflow](.github/workflows/release.yml) uses repository Actions secrets for Developer ID signing and notarization, then creates a draft with an arm64 ZIP and SHA-256 checksum. The tag's numeric version must match `MARKETING_VERSION`; increment `CURRENT_PROJECT_VERSION` for each release.
+
+Verify the downloaded package's checksum, signature, notarization, entitlements, metadata, and relevant runtime behavior before publishing the draft. Keep README, website, and release notes consistent with the shipped package and the OS versions actually checked. Never move a published tag or replace a published binary. Publishing triggers the website workflow; confirm deployment succeeded.
+
+## Website
+
+The static site lives in `website/`. Its asset allowlist is `website/.assetsignore`; keep source files and deployment tooling out of published assets. Deployment uses the pinned Wrangler dependency and requires macOS, Node.js 22 or newer, and an authenticated GitHub CLI to verify the latest published app package.
+
+```sh
+npm --prefix website ci --cache ./Temp/npm-cache --logs-dir ./Temp/npm-logs
+npm --prefix website run check
+```
+
+`check` synchronizes release metadata and validates packaging without publishing. Maintainers can authorize a local Cloudflare session with `npm --prefix website run login` and publish with `npm --prefix website run deploy`. Both check and deploy synchronize from the exact checksum-verified published ZIP; review generated changes before committing. Output stays under `Temp/`.
+
+The [website workflow](.github/workflows/website.yml) uses the `CLOUDFLARE_API_TOKEN` repository Actions secret, separately from local login. Scope replacement tokens to the deployment account and the site's zone, rotate them before expiration, and verify a successful deployment after replacement. Keep credential values out of source, chat, and logs.
+
+Website analytics are separate from the Mac app: `website/analytics.js` records page views and download clicks with an anonymous browser ID, referrer hostname, device category, and timezone. Its public Supabase key depends on database policies that permit anonymous inserts and restrict reads to administrators. Feedback messages are sent through the visitor's own email account.

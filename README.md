@@ -30,7 +30,7 @@ Build 20 · **2.23 MB ZIP download** · **4.0 MB uncompressed app** (decimal MB)
 
 Unzip and move `NanoMD.app` to Applications. The app is Developer ID signed and notarized; verify the ZIP with the release's `SHA256SUMS.txt`.
 
-Requires Apple Silicon and macOS 15.0 or later. **Beta compatibility:** runtime checks on macOS 15 remain pending; see the [roadmap](docs/ROADMAP.md#2-minimum-os-compatibility).
+Requires Apple Silicon and macOS 15.0 or later. **Beta compatibility:** runtime checks on macOS 15 remain pending; see [issue #12](https://github.com/SiavashB/nano.md/issues/12).
 
 ## Why nano.md
 
@@ -48,7 +48,11 @@ Requires Apple Silicon and macOS 15.0 or later. **Beta compatibility:** runtime 
 
 Open `.md` or `.markdown` files with Command-O or Finder's **Open With** menu. Existing files start in Read; new documents (Command-N) start in Edit. Saving and undo use the macOS document system.
 
-The reader supports headings, lists, quotes, code blocks, tables, and web links. See the [user guide](docs/USAGE.md) for editing, appearance, file preservation, and the full Markdown support details.
+Switch Read/Edit with Control-R, the toolbar, the footer button, or View > Edit/Read. Choose System, Light (Linen Light), or Dark (Nano Dark) from View > Appearance or the toolbar. Appearance applies to all windows and persists across launches.
+
+The reader supports headings, paragraphs, emphasis, lists, quotes, code blocks, pipe tables, HTTP/HTTPS links, and a selectable panel for leading YAML front matter. Metadata values stay literal; the app does not interpret YAML.
+
+Files must be valid UTF-8. Saving preserves the loaded BOM and existing line endings; new files use UTF-8 without a BOM and LF. Inserted line breaks follow the file's first existing line ending, while pasted text keeps its own. Smart quotes, autocorrect, and automatic substitutions are disabled.
 
 ## Current limitations
 
@@ -58,7 +62,7 @@ The reader supports headings, lists, quotes, code blocks, tables, and web links.
 - Documents over 1 MiB or beyond complexity limits fall back to selectable source.
 - Apple Silicon only; no Intel build or Quick Look extension.
 
-Remaining save-error, input-method, external-conflict, and recovery checks are tracked in the [roadmap](docs/ROADMAP.md#1-document-reliability). Use the [bug report form](https://github.com/SiavashB/nano.md/issues/new?template=bug_report.yml) or [Feedback](https://nano.thirdeyeds.com/feedback) for ordinary problems. Report security vulnerabilities [privately](SECURITY.md).
+Remaining save-error, input-method, external-conflict, and recovery checks are tracked in [issue #11](https://github.com/SiavashB/nano.md/issues/11); broader interaction and accessibility checks are in [issue #13](https://github.com/SiavashB/nano.md/issues/13). Use the [bug report form](https://github.com/SiavashB/nano.md/issues/new?template=bug_report.yml) or [Feedback](https://nano.thirdeyeds.com/feedback) for ordinary problems. Feedback opens email options in your browser; you review and send the message through your own account. Report security vulnerabilities [privately](SECURITY.md).
 
 ## Build
 
@@ -80,14 +84,9 @@ xcodebuild \
 
 CI compiles Debug and Release and runs the `NanoMDTests` regression suite. The tests cover file-byte preservation, front matter, Markdown parsing and limits, and allowed link destinations. See [Contributing](CONTRIBUTING.md#automated-tests) to run them locally. These checks do not establish signing, UI behavior, or minimum-OS runtime compatibility.
 
-## Project documentation
+## Contributing
 
-- [User guide](docs/USAGE.md)
-- [Contributing](CONTRIBUTING.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Roadmap](docs/ROADMAP.md)
-- [Releasing](docs/RELEASING.md)
-- [Website](website/README.md)
+See [Contributing](CONTRIBUTING.md) for development and validation, [GitHub Issues](https://github.com/SiavashB/nano.md/issues) for open work, and [GitHub Releases](https://github.com/SiavashB/nano.md/releases) for release notes.
 
 ## License
 

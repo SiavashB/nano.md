@@ -4,5 +4,5 @@ contact_links:
     url: https://github.com/SiavashB/nano.md/security/advisories/new
     about: Send a private report to the repository maintainers.
   - name: Usage and Markdown support
-    url: https://github.com/SiavashB/nano.md/blob/main/docs/USAGE.md
+    url: https://github.com/SiavashB/nano.md/blob/main/README.md#reading-and-editing
     about: Read the user guide and current limitations.

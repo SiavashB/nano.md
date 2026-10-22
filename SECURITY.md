@@ -12,4 +12,6 @@ Include:
 
 Use disposable files for reproduction and omit private documents, credentials, and unrelated personal information. Coordinate public disclosure through the private report.
 
-For ordinary bugs, use the [bug report form](https://github.com/SiavashB/nano.md/issues/new?template=bug_report.yml). See the [architecture](docs/ARCHITECTURE.md#content-and-resource-policy) for the app's document-content and resource policy.
+The app treats document content as untrusted: HTML stays literal, images and remote resources are not loaded, and only explicitly activated HTTP/HTTPS document links open in the browser. The sandbox limits file access to user-selected resources. The Mac app has no telemetry or network entitlement.
+
+For ordinary bugs, use the [bug report form](https://github.com/SiavashB/nano.md/issues/new?template=bug_report.yml).

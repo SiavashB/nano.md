@@ -1,5 +1,7 @@
 .DS_Store
 /Temp/
+/.local-docs/
+/AGENTS.md
 /Config/Local.xcconfig
 /website/node_modules/
 /website/.wrangler/

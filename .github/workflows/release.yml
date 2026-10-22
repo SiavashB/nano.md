@@ -45,7 +45,7 @@ jobs:
         run: |
           for name in CERTIFICATE_P12_BASE64 CERTIFICATE_PASSWORD APPLE_TEAM_ID APPLE_ID APPLE_APP_PASSWORD; do
             if [[ -z "${!name}" ]]; then
-              echo "Missing GitHub Actions secret: $name. See docs/RELEASING.md." >&2
+              echo "Missing GitHub Actions secret: $name. See CONTRIBUTING.md#releases." >&2
               exit 1
             fi
           done

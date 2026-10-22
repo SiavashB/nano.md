@@ -3,6 +3,7 @@ nonisolated struct MarkdownContent: Sendable {
 }
 
 nonisolated indirect enum MarkdownBlock: Sendable {
+    case located(MarkdownBlock, MarkdownSourceSpan)
     case frontMatter(String)
     case paragraph([MarkdownRun])
     case heading(level: Int, runs: [MarkdownRun])
@@ -27,7 +28,12 @@ nonisolated struct MarkdownTable: Sendable {
     }
 
     struct Row: Sendable {
-        let cells: [[MarkdownRun]]
+        let cells: [Cell]
+    }
+
+    struct Cell: Sendable {
+        let runs: [MarkdownRun]
+        let sourceSpan: MarkdownSourceSpan?
     }
 
     let columnAlignments: [Alignment]
@@ -39,6 +45,8 @@ nonisolated struct MarkdownRun: Sendable {
     let text: String
     var style: Style = []
     var destination: String?
+    var sourceSpan: MarkdownSourceSpan?
+    var linkSpan: MarkdownSourceSpan?
 
     struct Style: OptionSet, Sendable {
         let rawValue: Int

@@ -4,6 +4,8 @@ import Foundation
 nonisolated struct MarkdownFrontMatter {
     let metadata: String
     let body: String
+    let metadataSpan: MarkdownSourceSpan
+    let bodyOffset: Int
 
     init?(_ source: String) {
         var lines = source.split(omittingEmptySubsequences: false, whereSeparator: \.isNewline)
@@ -18,8 +20,15 @@ nonisolated struct MarkdownFrontMatter {
         guard header.contains(where: Self.isMappingField) else { return nil }
 
         metadata = header.joined(separator: "\n")
+        let metadataStart = header.first?.startIndex ?? lines[closingIndex].startIndex
+        let metadataEnd = lines[closingIndex].startIndex
+        metadataSpan = MarkdownSourceSpan(
+            range: metadataStart.utf16Offset(in: source)..<metadataEnd.utf16Offset(in: source),
+            text: String(source[metadataStart..<metadataEnd])
+        )
         let bodyIndex = lines.index(after: closingIndex)
         body = bodyIndex < lines.endIndex ? String(source[lines[bodyIndex].startIndex...]) : ""
+        bodyOffset = source.utf16.count - body.utf16.count
     }
 
     private static func isMappingField(_ line: Substring) -> Bool {

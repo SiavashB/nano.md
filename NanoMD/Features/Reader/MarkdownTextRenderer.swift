@@ -16,13 +16,39 @@ struct MarkdownTextRenderer {
         to output: NSMutableAttributedString,
         indent: CGFloat = 0,
         quoteDepth: Int = 0,
-        marker: String = ""
+        marker: String = "",
+        sourceSpan: MarkdownSourceSpan? = nil
     ) async throws {
         try Task.checkCancellation()
         await Task.yield()
+        let start = output.length
+        defer {
+            if let sourceSpan {
+                let range = NSRange(location: start, length: output.length - start)
+                var gaps: [NSRange] = []
+                output.enumerateAttribute(.markdownSourceAnchor, in: range) { value, range, _ in
+                    if value == nil { gaps.append(range) }
+                }
+                let string = output.string as NSString
+                var end = output.length
+                while end > start, CharacterSet.newlines.contains(Unicode.Scalar(string.character(at: end - 1)) ?? " ") {
+                    end -= 1
+                }
+                for gap in gaps {
+                    output.addAttribute(.markdownSourceAnchor, value: sourceSpan.range.lowerBound, range: gap)
+                    let trailing = NSIntersectionRange(gap, NSRange(location: end, length: output.length - end))
+                    if trailing.length > 0 {
+                        output.addAttribute(.markdownSourceAnchor, value: sourceSpan.range.upperBound, range: trailing)
+                    }
+                }
+            }
+        }
         switch block {
+        case let .located(content, span):
+            try await append(content, to: output, indent: indent, quoteDepth: quoteDepth,
+                             marker: marker, sourceSpan: span)
         case let .frontMatter(metadata):
-            appendFrontMatter(metadata, to: output)
+            appendFrontMatter(metadata, sourceSpan: sourceSpan, to: output)
         case let .paragraph(runs):
             appendParagraph(runs, to: output, indent: indent, quoteDepth: quoteDepth, marker: marker)
         case let .heading(level, runs):
@@ -32,7 +58,7 @@ struct MarkdownTextRenderer {
                             indent: indent, quoteDepth: quoteDepth, marker: marker)
         case let .code(text), let .literal(text):
             appendParagraph(
-                [MarkdownRun(text: text, style: .code)], to: output,
+                [MarkdownRun(text: text, style: .code, sourceSpan: sourceSpan)], to: output,
                 indent: indent, quoteDepth: quoteDepth, marker: marker, isLiteralBlock: true
             )
         case let .quote(blocks):
@@ -66,7 +92,7 @@ struct MarkdownTextRenderer {
         }
     }
 
-    private func appendFrontMatter(_ metadata: String, to output: NSMutableAttributedString) {
+    private func appendFrontMatter(_ metadata: String, sourceSpan: MarkdownSourceSpan?, to output: NSMutableAttributedString) {
         let table = NSTextTable()
         table.numberOfColumns = 1
         table.layoutAlgorithm = .fixedLayoutAlgorithm
@@ -86,11 +112,19 @@ struct MarkdownTextRenderer {
             .foregroundColor: theme.primary,
             .paragraphStyle: paragraph
         ]))
-        output.append(NSAttributedString(string: metadata + "\n", attributes: [
+        var attributes: [NSAttributedString.Key: Any] = [
             .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .regular),
             .foregroundColor: theme.secondary,
             .paragraphStyle: paragraph
-        ]))
+        ]
+        if let sourceSpan {
+            attributes[.markdownSourceMapping] = ReaderSourceMapping(
+                span: sourceSpan, rendered: metadata, renderedStart: output.length
+            )
+        }
+        output.append(NSAttributedString(string: metadata, attributes: attributes))
+        attributes.removeValue(forKey: .markdownSourceMapping)
+        output.append(NSAttributedString(string: "\n", attributes: attributes))
         let spacing = NSMutableParagraphStyle()
         spacing.minimumLineHeight = 16
         spacing.maximumLineHeight = 16
@@ -149,10 +183,15 @@ struct MarkdownTextRenderer {
                     .foregroundColor: isHeader ? theme.primary : theme.secondary,
                     .paragraphStyle: paragraph
                 ]
-                let runs = columnIndex < row.cells.count ? row.cells[columnIndex] : []
+                let contentCell = columnIndex < row.cells.count ? row.cells[columnIndex] : nil
+                let runs = contentCell?.runs ?? []
                 appendRuns(runs, to: output, font: font, base: base)
                 // Even an empty cell needs a paragraph carrying its table block.
-                output.append(NSAttributedString(string: "\n", attributes: base))
+                var separatorAttributes = base
+                if let span = contentCell?.sourceSpan {
+                    separatorAttributes[.markdownSourceAnchor] = runs.isEmpty ? span.range.lowerBound : span.range.upperBound
+                }
+                output.append(NSAttributedString(string: "\n", attributes: separatorAttributes))
             }
         }
 
@@ -225,6 +264,11 @@ struct MarkdownTextRenderer {
     ) {
         for (index, run) in runs.enumerated() {
             var attributes = base
+            if let span = run.sourceSpan {
+                attributes[.markdownSourceMapping] = ReaderSourceMapping(
+                    span: span, rendered: run.text, renderedStart: output.length
+                )
+            }
             var runFont = run.style.contains(.code)
                 ? NSFont.monospacedSystemFont(ofSize: 13, weight: .regular) : font
             if run.style.contains(.strong) {
@@ -251,7 +295,14 @@ struct MarkdownTextRenderer {
                 } else {
                     output.append(NSAttributedString(string: run.text, attributes: attributes))
                     if index + 1 == runs.count || runs[index + 1].destination != destination {
-                        output.append(NSAttributedString(string: " (\(destination))", attributes: base))
+                        let label = " (\(destination))"
+                        var destinationAttributes = base
+                        if let span = run.linkSpan {
+                            destinationAttributes[.markdownSourceMapping] = ReaderSourceMapping(
+                                span: span, rendered: label, renderedStart: output.length
+                            )
+                        }
+                        output.append(NSAttributedString(string: label, attributes: destinationAttributes))
                     }
                     continue
                 }

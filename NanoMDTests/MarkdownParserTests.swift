@@ -12,7 +12,7 @@ struct MarkdownParserTests {
     func preservesHeadingInlineStylesAndLinkDestination() async throws {
         let content = try await MarkdownParser().parse("# **Strong** *soft* `code` [web](https://example.com)\n")
         #expect(content.blocks.count == 1)
-        guard case let .heading(level, runs) = try #require(content.blocks.first) else {
+        guard case let .heading(level, runs) = semanticContent(of: try #require(content.blocks.first)) else {
             Issue.record("Expected a heading")
             return
         }
@@ -28,7 +28,7 @@ struct MarkdownParserTests {
     @Test
     func distinguishesSoftAndHardLineBreaks() async throws {
         let content = try await MarkdownParser().parse("soft\nwrap  \nhard\n")
-        guard case let .paragraph(runs) = try #require(content.blocks.first) else {
+        guard case let .paragraph(runs) = semanticContent(of: try #require(content.blocks.first)) else {
             Issue.record("Expected a paragraph with soft and hard breaks")
             return
         }
@@ -40,8 +40,8 @@ struct MarkdownParserTests {
         let content = try await MarkdownParser().parse("3. first\n4. second\n\n- [x] done\n- [ ] todo\n")
         #expect(content.blocks.count == 2)
         guard content.blocks.count == 2,
-              case let .list(start, ordered) = content.blocks[0],
-              case let .list(taskStart, tasks) = content.blocks[1] else {
+              case let .list(start, ordered) = semanticContent(of: content.blocks[0]),
+              case let .list(taskStart, tasks) = semanticContent(of: content.blocks[1]) else {
             Issue.record("Expected ordered and task lists")
             return
         }
@@ -57,10 +57,10 @@ struct MarkdownParserTests {
             "> quoted\n\n```swift\n\tlet x = \"<tag>\"  \n```\n\n---\n"
         )
         guard content.blocks.count == 3,
-              case let .quote(children) = content.blocks[0],
-              case let .paragraph(runs) = try #require(children.first),
-              case let .code(code) = content.blocks[1],
-              case .thematicBreak = content.blocks[2] else {
+              case let .quote(children) = semanticContent(of: content.blocks[0]),
+              case let .paragraph(runs) = semanticContent(of: try #require(children.first)),
+              case let .code(code) = semanticContent(of: content.blocks[1]),
+              case .thematicBreak = semanticContent(of: content.blocks[2]) else {
             Issue.record("Expected a quote, literal code, and thematic break")
             return
         }
@@ -73,29 +73,29 @@ struct MarkdownParserTests {
         let content = try await MarkdownParser().parse(
             "| Left | Center | Right |\n| :--- | :---: | ---: |\n| **bold** | middle | |\n"
         )
-        guard case let .table(table) = try #require(content.blocks.first) else {
+        guard case let .table(table) = semanticContent(of: try #require(content.blocks.first)) else {
             Issue.record("Expected a table")
             return
         }
         #expect(table.columnAlignments == [.left, .center, .right])
-        #expect(table.header.cells.map { $0.map(\.text).joined() } == ["Left", "Center", "Right"])
+        #expect(table.header.cells.map { $0.runs.map(\.text).joined() } == ["Left", "Center", "Right"])
         let row = try #require(table.rows.first)
-        #expect(row.cells.map { $0.map(\.text).joined() } == ["bold", "middle", ""])
-        #expect(try #require(row.cells.first?.first).style.contains(.strong))
+        #expect(row.cells.map { $0.runs.map(\.text).joined() } == ["bold", "middle", ""])
+        #expect(try #require(row.cells.first?.runs.first).style.contains(.strong))
     }
 
     @Test
     func htmlRemainsLiteralAndImagesBecomeUnlinkedPlaceholders() async throws {
         let html = "<script>\nalert('example')\n</script>\n"
         let block = try await MarkdownParser().parse(html)
-        guard case let .literal(text) = try #require(block.blocks.first) else {
+        guard case let .literal(text) = semanticContent(of: try #require(block.blocks.first)) else {
             Issue.record("Expected literal HTML")
             return
         }
         #expect(text == html)
 
         let inline = try await MarkdownParser().parse("<span>text</span> ![Alt](https://example.com/image.png)\n")
-        guard case let .paragraph(runs) = try #require(inline.blocks.first) else {
+        guard case let .paragraph(runs) = semanticContent(of: try #require(inline.blocks.first)) else {
             Issue.record("Expected inline literal text and image placeholder")
             return
         }
@@ -108,8 +108,8 @@ struct MarkdownParserTests {
     func separatesFrontMatterFromBodyWithoutPromotingMetadataToHeadings() async throws {
         let content = try await MarkdownParser().parse("---\nname: skill\n---\n# Body\n")
         guard content.blocks.count == 2,
-              case let .frontMatter(metadata) = content.blocks[0],
-              case let .heading(level, runs) = content.blocks[1] else {
+              case let .frontMatter(metadata) = semanticContent(of: content.blocks[0]),
+              case let .heading(level, runs) = semanticContent(of: content.blocks[1]) else {
             Issue.record("Expected metadata followed by the body heading")
             return
         }
@@ -148,5 +148,13 @@ struct MarkdownParserTests {
         await #expect(throws: MarkdownRenderingError.tooComplex) {
             try await parser.parse(String(repeating: "p\n\n", count: 25_000))
         }
+    }
+
+    // Source locations are orthogonal to these semantic-content assertions.
+    private func semanticContent(of block: MarkdownBlock) -> MarkdownBlock {
+        if case let .located(content, _) = block {
+            return semanticContent(of: content)
+        }
+        return block
     }
 }
