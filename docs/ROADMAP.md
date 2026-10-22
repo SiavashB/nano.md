@@ -39,9 +39,9 @@ Known limitations remain: returning to Read resets reader selection and scroll; 
 
 ## 4. Release presentation and deployment
 
-Configure the website workflow's Cloudflare credential and verify a release-triggered deployment. Local deployment remains available.
+The website workflow's Cloudflare credential is configured, and the release-triggered deployment has passed. Local deployment remains available.
 
-Track acceptance in [#14: Configure and verify release-triggered website deployment](https://github.com/SiavashB/nano.md/issues/14).
+Deployment verification is recorded in [#14: Configure and verify release-triggered website deployment](https://github.com/SiavashB/nano.md/issues/14).
 
 Keep the README, website, and release notes consistent with the shipped package. Follow the [release checklist](RELEASING.md#each-release) for every release; do not infer compatibility or functional verification from a successful build.
 
