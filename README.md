@@ -78,7 +78,7 @@ xcodebuild \
   build
 ```
 
-CI compiles Debug and Release; there are no automated test targets. Compilation does not verify signing, functionality, or runtime compatibility. See [Contributing](CONTRIBUTING.md) for signing, validation, and app-size measurements.
+CI compiles Debug and Release and runs the `NanoMDTests` regression suite. The tests cover file-byte preservation, front matter, Markdown parsing and limits, and allowed link destinations. See [Contributing](CONTRIBUTING.md#automated-tests) to run them locally. These checks do not establish signing, UI behavior, or minimum-OS runtime compatibility.
 
 ## Project documentation
 

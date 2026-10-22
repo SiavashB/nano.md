@@ -50,7 +50,29 @@ This command updates local website metadata for development measurements. Deploy
 
 ## Validation
 
-For code changes, build the affected configuration and review the changed code. Run relevant existing tests if they become available. Test additions or updates require explicit maintainer agreement; the repository currently has no test targets. AI-assisted validation follows [AGENTS.md](AGENTS.md), including its requirements for visual testing.
+For code changes, build the affected configuration, run the regression suite below, and review the changed code. Test additions or updates require explicit maintainer agreement. AI-assisted validation follows [AGENTS.md](AGENTS.md), including its requirements for visual testing.
+
+### Automated tests
+
+Select **Product > Test** in Xcode with the shared `NanoMD` scheme, or run this command from the repository root:
+
+```sh
+xcodebuild \
+  -project NanoMD.xcodeproj \
+  -scheme NanoMD \
+  -configuration Debug \
+  -destination 'platform=macOS,arch=arm64' \
+  -derivedDataPath "$PWD/Temp/DerivedData" \
+  -clonedSourcePackagesDirPath "$PWD/Temp/SourcePackages" \
+  -packageCachePath "$PWD/Temp/PackageCache" \
+  -onlyUsePackageVersionsFromResolvedFile \
+  ARCHS=arm64 CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM= \
+  test
+```
+
+`NanoMDTests/` is a separate Swift Testing target that imports the app's production code. It uses synthetic, in-memory inputs to cover exact UTF-8/BOM/line-ending preservation, invalid files, reload identities, front-matter recognition, link restrictions, Markdown semantics, and formatting-limit boundaries. Tests and fixtures are not shipped in the app. No additional package dependency is required.
+
+The same suite runs in GitHub Actions for pull requests and pushes to `main`. Build/test logs and the `.xcresult` bundle are retained for seven days. These unit tests do not establish autosave, native undo, input-method composition, external-conflict handling, accessibility, or minimum-OS compatibility; continue to track those runtime checks in the roadmap.
 
 When manual validation is requested for document and reader changes, choose the relevant checks from this list:
 
@@ -74,4 +96,4 @@ For documentation changes, verify local links, commands, current project facts, 
 
 The [PR template](.github/pull_request_template.md) asks for the problem, resulting behavior, validation, and meaningful limitations. Include the build/configuration used and any focused manual checks. Screenshots help for visible changes. Keep claims proportional to the evidence; do not claim compatibility, performance, security, or coverage that was not checked.
 
-The Build workflow compiles Debug and Release for pull requests and `main`; it does not run automated tests. Functional checks are performed locally before release. Follow [Releasing](docs/RELEASING.md) for package verification and publication. The [roadmap](docs/ROADMAP.md) tracks outstanding work.
+The Build workflow compiles Debug and Release and runs regression tests for pull requests and `main`. Runtime acceptance checks are performed locally before release. Follow [Releasing](docs/RELEASING.md) for package verification and publication. The [roadmap](docs/ROADMAP.md) tracks outstanding work.

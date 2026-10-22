@@ -17,7 +17,7 @@ Accounts, synchronization, plugins, and a global document store are outside the 
 
 ## Structure and ownership
 
-All app code lives in the synchronized `NanoMD/` Xcode folder. Documentation and development tools stay outside that folder so they do not become app resources.
+All app code lives in the synchronized `NanoMD/` Xcode folder. The separate `NanoMDTests/` target imports production code for regression tests and is not included in app releases. Documentation and development tools stay outside the app folder so they do not become app resources.
 
 | Directory | Responsibility |
 | --- | --- |
@@ -38,6 +38,8 @@ All app code lives in the synchronized `NanoMD/` Xcode folder. Documentation and
 `NanoMDDocument.source` is authoritative. Loading accepts regular files containing valid UTF-8, with or without a BOM, and rejects invalid bytes with an actionable error. Whitespace, Unicode representation, line endings, and trailing newlines are preserved.
 
 Saving constructs a `FileWrapper` directly from `source.utf8`, prepending the loaded BOM when present. New documents use UTF-8 without a BOM and default to LF. The first existing CRLF, CR, or LF determines inserted line breaks; pasted text retains its own line endings. Derived parser or rendering output never reaches serialization.
+
+The `FileDocument` read/write callbacks delegate to internal `FileWrapper` operations, allowing byte-level tests to exercise the same decoding and serialization used by the system adapter without constructing SwiftUI-owned configuration values.
 
 The app imports the Markdown content type and registers `.md` and `.markdown`. `DocumentGroup` owns file access and supplies document bindings and filename metadata. Views do not reopen document URLs, add file watchers, or implement conflict arbitration. See Apple's [document ownership API](https://developer.apple.com/documentation/swiftui/documentgroup).
 

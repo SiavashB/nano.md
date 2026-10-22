@@ -11,7 +11,18 @@
 		A79D185C736A4E499BA32EE1 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = A79D185C736A4E499BA32EE2 /* LICENSE */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		6E414E4F4D44544553540008 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7C6A33043050BD8100EFCD32 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7C6A330B3050BD8100EFCD32;
+			remoteInfo = NanoMD;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		6E414E4F4D44544553540002 /* NanoMDTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NanoMDTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C6A330C3050BD8100EFCD32 /* NanoMD.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NanoMD.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A79D185C736A4E499BA32EE2 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		BD7DE698C62A4BE3943116DD /* Config/Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Signing.xcconfig; sourceTree = "<group>"; };
@@ -28,6 +39,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		6E414E4F4D44544553540003 /* NanoMDTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = NanoMDTests;
+			sourceTree = "<group>";
+		};
 		7C6A330E3050BD8100EFCD32 /* NanoMD */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -39,6 +55,12 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6E414E4F4D44544553540005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7C6A33093050BD8100EFCD32 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -57,6 +79,7 @@
 				BD7DE698C62A4BE3943116DD /* Config/Signing.xcconfig */,
 				7C6A330E3050BD8100EFCD32 /* NanoMD */,
 				7C6A330D3050BD8100EFCD32 /* Products */,
+				6E414E4F4D44544553540003 /* NanoMDTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -64,6 +87,7 @@
 			isa = PBXGroup;
 			children = (
 				7C6A330C3050BD8100EFCD32 /* NanoMD.app */,
+				6E414E4F4D44544553540002 /* NanoMDTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -71,6 +95,22 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		6E414E4F4D44544553540001 /* NanoMDTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6E414E4F4D44544553540009 /* Build configuration list for PBXNativeTarget "NanoMDTests" */;
+			buildPhases = (
+				6E414E4F4D44544553540004 /* Sources */,
+				6E414E4F4D44544553540005 /* Frameworks */,
+				6E414E4F4D44544553540006 /* Resources */,
+			);
+			buildRules = ();
+			dependencies = (6E414E4F4D44544553540007 /* PBXTargetDependency */,);
+			fileSystemSynchronizedGroups = (6E414E4F4D44544553540003 /* NanoMDTests */,);
+			name = NanoMDTests;
+			productName = NanoMDTests;
+			productReference = 6E414E4F4D44544553540002 /* NanoMDTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		7C6A330B3050BD8100EFCD32 /* NanoMD */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7C6A33193050BD8200EFCD32 /* Build configuration list for PBXNativeTarget "NanoMD" */;
@@ -104,6 +144,10 @@
 				LastSwiftUpdateCheck = 2660;
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
+					6E414E4F4D44544553540001 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = 7C6A330B3050BD8100EFCD32;
+					};
 					7C6A330B3050BD8100EFCD32 = {
 						CreatedOnToolsVersion = 26.6;
 					};
@@ -127,11 +171,18 @@
 			projectRoot = "";
 			targets = (
 				7C6A330B3050BD8100EFCD32 /* NanoMD */,
+				6E414E4F4D44544553540001 /* NanoMDTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		6E414E4F4D44544553540006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7C6A330A3050BD8100EFCD32 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -143,6 +194,12 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6E414E4F4D44544553540004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7C6A33083050BD8100EFCD32 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -152,7 +209,45 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		6E414E4F4D44544553540007 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7C6A330B3050BD8100EFCD32 /* NanoMD */;
+			targetProxy = 6E414E4F4D44544553540008 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		6E414E4F4D4454455354000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BD7DE698C62A4BE3943116DD /* Config/Signing.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@loader_path/../Frameworks",);
+				PRODUCT_BUNDLE_IDENTIFIER = com.thirdeyeds.NanoMDTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NanoMD.app/Contents/MacOS/NanoMD";
+			};
+			name = Debug;
+		};
+		6E414E4F4D4454455354000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BD7DE698C62A4BE3943116DD /* Config/Signing.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@loader_path/../Frameworks",);
+				PRODUCT_BUNDLE_IDENTIFIER = com.thirdeyeds.NanoMDTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NanoMD.app/Contents/MacOS/NanoMD";
+			};
+			name = Release;
+		};
 		7C6A331A3050BD8200EFCD32 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BD7DE698C62A4BE3943116DD /* Config/Signing.xcconfig */;
@@ -346,6 +441,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6E414E4F4D44544553540009 /* Build configuration list for PBXNativeTarget "NanoMDTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6E414E4F4D4454455354000A /* Debug */,
+				6E414E4F4D4454455354000B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		7C6A33073050BD8100EFCD32 /* Build configuration list for PBXProject "NanoMD" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

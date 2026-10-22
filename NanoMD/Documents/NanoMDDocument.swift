@@ -19,8 +19,12 @@ nonisolated struct NanoMDDocument: FileDocument {
     }
 
     init(configuration: ReadConfiguration) throws {
-        guard configuration.file.isRegularFile,
-              let data = configuration.file.regularFileContents else {
+        try self.init(file: configuration.file)
+    }
+
+    init(file: FileWrapper) throws {
+        guard file.isRegularFile,
+              let data = file.regularFileContents else {
             throw MarkdownDocumentError.notRegularFile
         }
 
@@ -37,6 +41,10 @@ nonisolated struct NanoMDDocument: FileDocument {
     }
 
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        fileWrapper()
+    }
+
+    func fileWrapper() -> FileWrapper {
         var data = Data()
         if hasUTF8ByteOrderMark {
             data.append(contentsOf: [0xEF, 0xBB, 0xBF])

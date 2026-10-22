@@ -10,7 +10,7 @@ This guide covers release preparation, package verification, and publication. Us
 | [Draft release](../.github/workflows/release.yml) | A `v*` tag on a commit included in `main` | Developer ID-signed, notarized, stapled arm64 app; draft release with ZIP and SHA-256 checksum |
 | [Deploy website](../.github/workflows/website.yml) | Release publication or manual dispatch | Website metadata synchronized from the newest published release, then deployed |
 
-App builds use the `macos-26` runner, Xcode 26.6, and a macOS 15.0 deployment target. CI compiles the app but has no automated test targets. Minimum-OS runtime compatibility must be verified separately.
+App builds use the `macos-26` runner, Xcode 26.6, and a macOS 15.0 deployment target. The Build workflow compiles Debug and Release and runs the [regression suite](../CONTRIBUTING.md#automated-tests). The tag-triggered release workflow performs packaging checks; confirm regression tests passed for the release commit before tagging. Minimum-OS runtime compatibility must be verified separately.
 
 Build output, caches, logs, and staging stay under `Temp/`. Distribution uses [explicit entitlements](../Config/Distribution.entitlements) with base entitlement injection disabled. The workflow checks sandboxing, user-selected file read/write access, and absence of debugger access before notarization. Local Debug signing remains unchanged.
 
