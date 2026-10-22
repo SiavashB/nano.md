@@ -60,7 +60,29 @@ This command updates local website metadata for development measurements. Deploy
 
 ## Validation
 
-For code changes, build the affected configuration and review the changed code. Run relevant existing tests if available. Test additions or updates require explicit maintainer agreement. AI-assisted visual testing requires explicit maintainer authorization.
+For code changes, build the affected configuration, run the regression suite below, and review the changed code. Test additions or updates require explicit maintainer agreement. AI-assisted visual testing requires explicit maintainer authorization.
+
+### Automated tests
+
+Select **Product > Test** in Xcode with the shared `NanoMD` scheme, or run this command from the repository root:
+
+```sh
+xcodebuild \
+  -project NanoMD.xcodeproj \
+  -scheme NanoMD \
+  -configuration Debug \
+  -destination 'platform=macOS,arch=arm64' \
+  -derivedDataPath "$PWD/Temp/DerivedData" \
+  -clonedSourcePackagesDirPath "$PWD/Temp/SourcePackages" \
+  -packageCachePath "$PWD/Temp/PackageCache" \
+  -onlyUsePackageVersionsFromResolvedFile \
+  ARCHS=arm64 CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM= \
+  test
+```
+
+`NanoMDTests/` is a separate Swift Testing target that imports the app's production code. It uses synthetic, in-memory inputs to cover exact UTF-8/BOM/line-ending preservation, invalid files, reload identities, front-matter recognition, link restrictions, Markdown semantics, and formatting-limit boundaries. Tests and fixtures are not shipped in the app. No additional package dependency is required.
+
+The same suite runs in GitHub Actions for pull requests and pushes to `main`. Build/test logs and the `.xcresult` bundle are retained for seven days. These unit tests do not establish autosave, native undo, input-method composition, external-conflict handling, accessibility, or minimum-OS compatibility; continue to track those runtime checks in [GitHub Issues](https://github.com/SiavashB/nano.md/issues).
 
 When manual validation is requested for document and reader changes, choose the relevant checks from this list:
 
@@ -84,11 +106,11 @@ For documentation changes, verify local links, commands, current project facts, 
 
 The [PR template](.github/pull_request_template.md) asks for the problem, resulting behavior, validation, and meaningful limitations. Include the build/configuration used and any focused manual checks. Screenshots help for visible changes. Keep claims proportional to the evidence; do not claim compatibility, performance, security, or coverage that was not checked.
 
-The [Build workflow](.github/workflows/ci.yml) compiles Debug and Release for pull requests and `main`. Functional checks are performed locally before release. Track outstanding work in [GitHub Issues](https://github.com/SiavashB/nano.md/issues).
+The [Build workflow](.github/workflows/ci.yml) compiles Debug and Release and runs regression tests for pull requests and `main`. Runtime acceptance checks are performed locally before release. Track outstanding work in [GitHub Issues](https://github.com/SiavashB/nano.md/issues).
 
 ## Releases
 
-Maintainers prepare a versioned `v*` tag on a commit included in `main`. The [release workflow](.github/workflows/release.yml) uses repository Actions secrets for Developer ID signing and notarization, then creates a draft with an arm64 ZIP and SHA-256 checksum. The tag's numeric version must match `MARKETING_VERSION`; increment `CURRENT_PROJECT_VERSION` for each release.
+Confirm regression tests passed for the release commit before tagging. Maintainers prepare a versioned `v*` tag on a commit included in `main`. The [release workflow](.github/workflows/release.yml) uses repository Actions secrets for Developer ID signing and notarization, then creates a draft with an arm64 ZIP and SHA-256 checksum. The tag's numeric version must match `MARKETING_VERSION`; increment `CURRENT_PROJECT_VERSION` for each release.
 
 Verify the downloaded package's checksum, signature, notarization, entitlements, metadata, and relevant runtime behavior before publishing the draft. Keep README, website, and release notes consistent with the shipped package and the OS versions actually checked. Never move a published tag or replace a published binary. Publishing triggers the website workflow; confirm deployment succeeded.
 

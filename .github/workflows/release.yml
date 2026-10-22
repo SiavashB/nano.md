@@ -148,7 +148,7 @@ jobs:
             printf 'nano.md %s (build %s)\n\n' "$RELEASE_TAG" "$build"
             printf 'Requires macOS %s or later on Apple Silicon.\n\n' "$minimum"
             printf 'Unzip and move NanoMD.app to Applications. The app is Developer ID signed and notarized.\n\n'
-            printf 'Validation: build, signing, and notarization checks. Functional testing is handled locally; there is no automated test suite.\n\n'
+            printf 'Validation: build, signing, and notarization checks. Automated regression tests run separately in the Build workflow; runtime and UI acceptance require local verification.\n\n'
             printf 'ZIP size: %s bytes.\n' "$(stat -f%z "Temp/Release/$archive")"
             printf 'Commit: %s\n' "$(git rev-parse HEAD)"
           } > Temp/Release/notes.md

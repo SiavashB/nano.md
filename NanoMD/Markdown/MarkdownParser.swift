@@ -147,7 +147,7 @@ actor MarkdownParser {
     }
 }
 
-nonisolated enum MarkdownRenderingError: LocalizedError {
+nonisolated enum MarkdownRenderingError: LocalizedError, Equatable {
     case tooLarge
     case tooComplex
 
