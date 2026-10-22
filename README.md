@@ -24,9 +24,9 @@
 
 ## Download
 
-**[Download nano.md 0.1.0 beta 5 for Apple Silicon](https://github.com/SiavashB/nano.md/releases/download/v0.1.0-beta.5/nano.md-v0.1.0-beta.5-arm64.zip)** · [Release notes and checksum](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.5) · [Website](https://nano.thirdeyeds.com/)
+**[Download nano.md 0.1.0 beta 6 for Apple Silicon](https://github.com/SiavashB/nano.md/releases/download/v0.1.0-beta.6/nano.md-v0.1.0-beta.6-arm64.zip)** · [Release notes and checksum](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.6) · [Website](https://nano.thirdeyeds.com/)
 
-Build 20 · **2.23 MB ZIP download** · **4.0 MB uncompressed app** (decimal MB).
+Build 21 · **2.86 MB ZIP download** · **6.6 MB uncompressed app** (decimal MB).
 
 Unzip and move `NanoMD.app` to Applications. The app is Developer ID signed and notarized; verify the ZIP with the release's `SHA256SUMS.txt`.
 
@@ -34,7 +34,7 @@ Requires Apple Silicon and macOS 15.0 or later. **Beta compatibility:** runtime 
 
 ## Why nano.md
 
-- **Small and native.** Built with SwiftUI and AppKit, with a 4.0 MB app bundle.
+- **Small and native.** Built with SwiftUI and AppKit, with a 6.6 MB app bundle.
 - **Read and edit ordinary Markdown.** Open README files, notes, `AGENTS.md`, and `SKILL.md`. Switch between formatted reading and source editing with Control-R.
 - **Readable front matter.** Leading YAML metadata appears in a compact panel, while Edit keeps the original text.
 - **Local and free.** No account, subscription, or paid tier. The Mac app has no telemetry or network entitlement and does not load remote resources.
@@ -50,6 +50,8 @@ Open `.md` or `.markdown` files with Command-O or Finder's **Open With** menu. E
 
 Switch Read/Edit with Control-R, the toolbar, the footer button, or View > Edit/Read. Choose System, Light (Linen Light), or Dark (Nano Dark) from View > Appearance or the toolbar. Appearance applies to all windows and persists across launches.
 
+Switching to Edit places the caret near the selected reader text, or near the top of the visible content when scrolled, and focuses the editor. On a supported trackpad, force-click text in Read to start editing near that location.
+
 The reader supports headings, paragraphs, emphasis, lists, quotes, code blocks, pipe tables, HTTP/HTTPS links, and a selectable panel for leading YAML front matter. Metadata values stay literal; the app does not interpret YAML.
 
 Files must be valid UTF-8. Saving preserves the loaded BOM and existing line endings; new files use UTF-8 without a BOM and LF. Inserted line breaks follow the file's first existing line ending, while pasted text keeps its own. Smart quotes, autocorrect, and automatic substitutions are disabled.
@@ -58,7 +60,7 @@ Files must be valid UTF-8. Saving preserves the loaded BOM and existing line end
 
 - Images appear as text placeholders; code blocks have no syntax highlighting.
 - CommonMark/GFM support is partial: HTML stays literal, task lists are noninteractive, and relative links, anchors, and non-web URL schemes do not navigate.
-- Returning to Read resets reader selection and scroll. Undo/redo requires editor focus.
+- Reader-to-editor positioning is approximate where rendered text or layouts differ. Returning to Read resets reader selection and scroll. Undo/redo requires editor focus.
 - Documents over 1 MiB or beyond complexity limits fall back to selectable source.
 - Apple Silicon only; no Intel build or Quick Look extension.
 
