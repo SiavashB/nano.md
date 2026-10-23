@@ -32,6 +32,8 @@ Unzip and move `NanoMD.app` to Applications. The app is Developer ID signed and 
 
 Requires Apple Silicon and macOS 15.0 or later. **Beta compatibility:** runtime checks on macOS 15 remain pending; see [issue #12](https://github.com/SiavashB/nano.md/issues/12).
 
+**Upcoming beta 8 (build 23):** removes code-coverage instrumentation from the distributed app while retaining all features and automated tests. The download above remains beta 7 until publication.
+
 ## Why nano.md
 
 - **Small and native.** Built with SwiftUI and AppKit, with a 6.7 MB app bundle.
@@ -86,6 +88,8 @@ xcodebuild \
   ARCHS=arm64 CODE_SIGNING_ALLOWED=NO \
   build
 ```
+
+For a Release build, use `-configuration Release` and add `ENABLE_CODE_COVERAGE=NO` to apply the setting to app and package targets.
 
 CI compiles Debug and Release and runs the `NanoMDTests` regression suite. The tests cover file-byte preservation, front matter, Markdown parsing and limits, and allowed link destinations. See [Contributing](CONTRIBUTING.md#automated-tests) to run them locally. These checks do not establish signing, UI behavior, or minimum-OS runtime compatibility.
 

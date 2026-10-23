@@ -18,7 +18,7 @@ Keep temporary files, sample documents, logs, and build output in the repository
 
 Open `NanoMD.xcodeproj` and select the macOS `NanoMD` scheme. Use Xcode 26.6, Swift 6, and Apple Silicon. The deployment target is macOS 15.0; runtime verification on that OS remains pending. The project uses Xcode's synchronized groups: place app source under `NanoMD/` and keep tooling/documentation outside it.
 
-Use the unsigned Debug build command in [README.md](README.md) for local compilation. Change `-configuration Debug` to `-configuration Release` when validating dependency changes, compiler settings, or performance-sensitive code. Unsigned compilation does not validate sandbox permissions, signing, notarization, or UI behavior.
+Use the unsigned Debug build command in [README.md](README.md) for local compilation. Change `-configuration Debug` to `-configuration Release` when validating dependency changes, compiler settings, or performance-sensitive code. Unsigned compilation does not validate sandbox permissions, signing, notarization, or UI behavior. Release builds must also pass `ENABLE_CODE_COVERAGE=NO` so the setting applies to Swift package dependencies as well as app targets. Debug tests can retain coverage support; the CI and release workflows reject Release binaries containing coverage sections.
 
 For a signed local run, create `Config/Local.xcconfig` with `DEVELOPMENT_TEAM = YOUR_TEAM_ID`, using the team shown in Xcode's account settings. Both configurations optionally load that ignored file through `Config/Signing.xcconfig`; a fresh checkout needs no local file for unsigned builds. Keep automatic signing enabled and do not commit your team or certificate settings. CI provides signing settings explicitly.
 
