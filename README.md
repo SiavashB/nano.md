@@ -24,19 +24,17 @@
 
 ## Download
 
-**[Download nano.md 0.1.0 beta 7 for Apple Silicon](https://github.com/SiavashB/nano.md/releases/download/v0.1.0-beta.7/nano.md-v0.1.0-beta.7-arm64.zip)** · [Release notes and checksum](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.7) · [Website](https://nano.thirdeyeds.com/)
+**[Download nano.md 0.1.0 beta 8 for Apple Silicon](https://github.com/SiavashB/nano.md/releases/download/v0.1.0-beta.8/nano.md-v0.1.0-beta.8-arm64.zip)** · [Release notes and checksum](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.8) · [Website](https://nano.thirdeyeds.com/)
 
-Build 22 · **2.89 MB ZIP download** · **6.7 MB uncompressed app** (decimal MB).
+Build 23 · **2.29 MB ZIP download** · **4.2 MB uncompressed app** (decimal MB).
 
 Unzip and move `NanoMD.app` to Applications. The app is Developer ID signed and notarized; verify the ZIP with the release's `SHA256SUMS.txt`.
 
 Requires Apple Silicon and macOS 15.0 or later. **Beta compatibility:** runtime checks on macOS 15 remain pending; see [issue #12](https://github.com/SiavashB/nano.md/issues/12).
 
-**Upcoming beta 8 (build 23):** removes code-coverage instrumentation from the distributed app while retaining all features and automated tests. The download above remains beta 7 until publication.
-
 ## Why nano.md
 
-- **Small and native.** Built with SwiftUI and AppKit, with a 6.7 MB app bundle.
+- **Small and native.** Built with SwiftUI and AppKit, with a 4.2 MB app bundle.
 - **Read and edit ordinary Markdown.** Open README files, notes, `AGENTS.md`, and `SKILL.md`. Switch between formatted reading and source editing with Control-R.
 - **Native Find.** Search in Read or Edit with Command-F, then move between matches with Command-G.
 - **Readable front matter.** Leading YAML metadata appears in a compact panel, while Edit keeps the original text.
