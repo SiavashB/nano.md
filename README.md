@@ -32,6 +32,8 @@ Unzip and move `NanoMD.app` to Applications. The app is Developer ID signed and 
 
 Requires Apple Silicon and macOS 15.0 or later. **Beta compatibility:** runtime checks on macOS 15 remain pending; see [issue #12](https://github.com/SiavashB/nano.md/issues/12).
 
+**Upcoming beta 7 (build 22):** native Find in Read and Edit with Command-F, next/previous matches, and Use Selection for Find. The download above remains beta 6 until publication.
+
 ## Why nano.md
 
 - **Small and native.** Built with SwiftUI and AppKit, with a 6.6 MB app bundle.
