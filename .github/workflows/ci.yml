@@ -30,15 +30,23 @@ jobs:
           mkdir -p Temp/Logs
           xcodebuild -version
           for configuration in Debug Release; do
+            coverage_setting=YES
+            if [[ "$configuration" == Release ]]; then coverage_setting=NO; fi
             xcodebuild -project NanoMD.xcodeproj -scheme NanoMD \
               -configuration "$configuration" -destination 'platform=macOS,arch=arm64' \
               -derivedDataPath "$PWD/Temp/DerivedData" \
               -clonedSourcePackagesDirPath "$PWD/Temp/SourcePackages" \
               -packageCachePath "$PWD/Temp/PackageCache" \
               -onlyUsePackageVersionsFromResolvedFile \
+              ENABLE_CODE_COVERAGE="$coverage_setting" \
               ARCHS=arm64 CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM= build \
               2>&1 | tee "Temp/Logs/$configuration.log"
           done
+          xcrun size -m Temp/DerivedData/Build/Products/Release/NanoMD.app/Contents/MacOS/NanoMD > Temp/Logs/Release-sections.txt
+          if /usr/bin/grep -Eq '__LLVM_COV|__llvm_prf_' Temp/Logs/Release-sections.txt; then
+            echo 'Release app contains code-coverage instrumentation.' >&2
+            exit 1
+          fi
       - name: Run regression tests
         run: |
           xcodebuild -project NanoMD.xcodeproj -scheme NanoMD \
@@ -56,7 +64,7 @@ jobs:
         with:
           name: build-and-test-results
           path: |
-            Temp/Logs/*.log
+            Temp/Logs/*
             Temp/TestResults/*.xcresult
           retention-days: 7
           if-no-files-found: ignore
