@@ -1,12 +1,12 @@
 {
-  "tag": "v0.1.0-beta.6",
-  "publishedAt": "2026-10-22T21:00:36Z",
+  "tag": "v0.1.0-beta.7",
+  "publishedAt": "2026-10-23T05:46:30Z",
   "version": "0.1.0",
-  "build": "21",
+  "build": "22",
   "minimumMacOS": "15.0",
-  "bytes": 6570159,
-  "zipBytes": 2864904,
-  "downloadUrl": "https://github.com/SiavashB/nano.md/releases/download/v0.1.0-beta.6/nano.md-v0.1.0-beta.6-arm64.zip",
-  "releaseUrl": "https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.6",
-  "sha256": "3c63e8d668c4c606037fa20408afcd31ed6f7bb1a79865182c49aa8d540409c9"
+  "bytes": 6682655,
+  "zipBytes": 2889664,
+  "downloadUrl": "https://github.com/SiavashB/nano.md/releases/download/v0.1.0-beta.7/nano.md-v0.1.0-beta.7-arm64.zip",
+  "releaseUrl": "https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.7",
+  "sha256": "7497e157d5282292077c6c9643e0f26bfc23cea7ef2f15cc9028ed8693512adf"
 }
