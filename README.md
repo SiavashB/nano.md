@@ -38,7 +38,7 @@ Requires Apple Silicon and macOS 15.0 or later. **Beta compatibility:** runtime 
 - **Read and edit ordinary Markdown.** Open README files, notes, `AGENTS.md`, and `SKILL.md`. Switch between formatted reading and source editing with Control-R.
 - **Native Find.** Search in Read or Edit with Command-F, then move between matches with Command-G.
 - **Readable front matter.** Leading YAML metadata appears in a compact panel, while Edit keeps the original text.
-- **Local and free.** No account, subscription, or paid tier. The Mac app has no telemetry or network entitlement and does not load remote resources.
+- **Local and free.** No account, subscription, or paid tier. The Mac app has no telemetry or network entitlement and does not load remote resources. See the [privacy policy](https://nano.thirdeyeds.com/privacy).
 - **Your preferred appearance.** Choose Nano Dark, Linen Light, or follow the system setting.
 
 <a id="reading-and-editing"></a>
