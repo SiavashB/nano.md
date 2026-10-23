@@ -8,7 +8,7 @@ struct MarkdownSourceView: NSViewRepresentable {
     let onEdit: (EditorEntryPoint) -> Void
 
     func makeNSView(context: Context) -> NSScrollView {
-        let scrollView = NSScrollView()
+        let scrollView = DocumentScrollView(navigation: navigation)
 
         let textView = ReaderInteractionTextView(usingTextLayoutManager: true)
         textView.isEditable = false

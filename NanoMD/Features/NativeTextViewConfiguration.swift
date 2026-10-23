@@ -7,6 +7,9 @@ enum NativeTextViewConfiguration {
         scrollView.autohidesScrollers = true
         scrollView.borderType = .noBorder
 
+        textView.usesFindBar = true
+        textView.isIncrementalSearchingEnabled = true
+
         textView.isVerticallyResizable = true
         textView.isHorizontallyResizable = false
         textView.autoresizingMask = [.width]

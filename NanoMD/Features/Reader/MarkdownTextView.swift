@@ -13,7 +13,7 @@ struct MarkdownTextView: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSScrollView {
-        let scrollView = NSScrollView()
+        let scrollView = DocumentScrollView(navigation: navigation)
 
         // Native text tables use the TextKit 1 layout path.
         let textView = ReaderTextView(usingTextLayoutManager: false)

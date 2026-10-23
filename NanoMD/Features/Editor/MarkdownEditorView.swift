@@ -6,6 +6,7 @@ struct MarkdownEditorView: NSViewRepresentable {
     let isActive: Bool
     let theme: AppTheme
     let entryRequest: EditorEntryRequest?
+    let navigation: DocumentNavigation
     @Environment(\.undoManager) private var undoManager
 
     func makeCoordinator() -> Coordinator {
@@ -13,7 +14,7 @@ struct MarkdownEditorView: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSScrollView {
-        let scrollView = NSScrollView()
+        let scrollView = DocumentScrollView(navigation: navigation)
 
         let textView = SourceTextView(usingTextLayoutManager: true)
         textView.delegate = context.coordinator
@@ -44,6 +45,7 @@ struct MarkdownEditorView: NSViewRepresentable {
             }
         }
         scrollView.documentView = textView
+        navigation.editor = textView
         theme.apply(to: scrollView)
         textView.theme = theme
         textView.applyTextTheme()

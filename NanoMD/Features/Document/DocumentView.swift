@@ -44,34 +44,27 @@ struct DocumentView: View {
         if destination == .edit {
             beginEditing(at: navigation.entryPoint(for: document.source))
         } else {
+            navigation.dismissFindInterface(inEditor: true)
             mode = .read
         }
     }
 
     private func beginEditing(at point: EditorEntryPoint?) {
         guard mode == .read else { return }
+        navigation.dismissFindInterface(inEditor: false)
         editorEntry = point.map { EditorEntryRequest(loadIdentity: document.loadIdentity, point: $0) }
         mode = .edit
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 16) {
-                Text("nano.md").bold()
-                Spacer(minLength: 0)
-                Text(filename).truncationMode(.middle)
-            }
-            .font(.system(size: 12, design: .monospaced))
-            .lineLimit(1)
-            .padding(.horizontal, 17)
-            .padding(.vertical, 8)
-            .foregroundStyle(Color(nsColor: theme.headerText))
-            .background(Color(nsColor: theme.header))
+            header
 
             rule
             ZStack {
                 // Keep the native editor and its undo targets alive while reading.
-                MarkdownEditorView(document: $document, isActive: mode == .edit, theme: theme, entryRequest: editorEntry)
+                MarkdownEditorView(document: $document, isActive: mode == .edit, theme: theme,
+                                   entryRequest: editorEntry, navigation: navigation)
                     .allowsHitTesting(mode == .edit)
                     .accessibilityHidden(mode != .edit)
 
@@ -93,6 +86,9 @@ struct DocumentView: View {
         .preferredColorScheme(appearance.colorScheme)
         .tint(Color(nsColor: theme.accent))
         .focusedSceneValue(\.documentModeAction, modeAction)
+        .focusedSceneValue(\.documentFindAction, DocumentFindAction { action in
+            navigation.performFindAction(action, inEditor: mode == .edit)
+        })
         .toolbar(removing: .title)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -109,6 +105,33 @@ struct DocumentView: View {
             }
             appearanceToolbarItem
         }
+    }
+
+    private var header: some View {
+        ZStack {
+            HStack(spacing: 16) {
+                Text("nano.md").bold()
+                Spacer(minLength: 0)
+                Text(filename).truncationMode(.middle)
+            }
+            .font(.system(size: 12, design: .monospaced))
+            .lineLimit(1)
+            .padding(.horizontal, 17)
+            .padding(.vertical, 8)
+            .foregroundStyle(Color(nsColor: theme.headerText))
+            .opacity(navigation.findBarView == nil ? 1 : 0)
+            .accessibilityHidden(navigation.findBarView != nil)
+
+            if let findBar = navigation.findBarView {
+                FindBarView(findBar: findBar) {
+                    guard navigation.findBarView === findBar else { return }
+                    navigation.performFindAction(.showFindInterface, inEditor: mode == .edit)
+                }
+                .frame(height: navigation.findBarHeight)
+            }
+        }
+        .frame(minHeight: 32)
+        .background(Color(nsColor: theme.header))
     }
 
     private var footer: some View {

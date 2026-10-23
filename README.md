@@ -52,6 +52,8 @@ Switch Read/Edit with Control-R, the toolbar, the footer button, or View > Edit/
 
 Switching to Edit places the caret near the selected reader text, or near the top of the visible content when scrolled, and focuses the editor. On a supported trackpad, force-click text in Read to start editing near that location.
 
+Find text in either mode with Command-F. Read searches displayed text; Edit searches Markdown source. Find appears over the document header, below the system toolbar, and highlights matches as you type. Command-G moves to the next match, Shift-Command-G to the previous match, and Escape closes the bar.
+
 The reader supports headings, paragraphs, emphasis, lists, quotes, code blocks, pipe tables, HTTP/HTTPS links, and a selectable panel for leading YAML front matter. Metadata values stay literal; the app does not interpret YAML.
 
 Files must be valid UTF-8. Saving preserves the loaded BOM and existing line endings; new files use UTF-8 without a BOM and LF. Inserted line breaks follow the file's first existing line ending, while pasted text keeps its own. Smart quotes, autocorrect, and automatic substitutions are disabled.
