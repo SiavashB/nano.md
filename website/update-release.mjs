@@ -18,7 +18,8 @@ try {
   const releases = JSON.parse(gh(["api", `repos/${repository}/releases?per_page=100`, "--paginate", "--slurp"]))
     .flat().filter(release => !release.draft && release.published_at && tagPattern.test(release.tag_name))
     .sort((a, b) => Date.parse(b.published_at) - Date.parse(a.published_at));
-  const release = releases[0];
+  // Once a stable release exists, keep public downloads off the prerelease channel.
+  const release = releases.find(item => !item.prerelease && !item.tag_name.includes("-")) || releases[0];
   if (!release) throw new Error("No published versioned release is available.");
   const [, version, channel, sequence] = release.tag_name.match(tagPattern);
   const label = `${version}${channel ? ` ${channel} ${sequence}` : ""}`;
