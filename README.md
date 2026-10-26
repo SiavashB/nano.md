@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/SiavashB/nano.md/releases"><img alt="Latest release, including betas" src="https://img.shields.io/github/v/release/SiavashB/nano.md?include_prereleases&amp;label=release"></a>
+  <a href="https://github.com/SiavashB/nano.md/releases/latest"><img alt="Latest stable release" src="https://img.shields.io/github/v/release/SiavashB/nano.md?label=release"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/SiavashB/nano.md"></a>
   <a href="https://github.com/SiavashB/nano.md/actions/workflows/ci.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/SiavashB/nano.md/ci.yml?branch=main&amp;label=build"></a>
 </p>
@@ -24,13 +24,13 @@
 
 ## Download
 
-**[Download nano.md 0.1.0 beta 8 for Apple Silicon](https://github.com/SiavashB/nano.md/releases/download/v0.1.0-beta.8/nano.md-v0.1.0-beta.8-arm64.zip)** · [Release notes and checksum](https://github.com/SiavashB/nano.md/releases/tag/v0.1.0-beta.8) · [Website](https://nano.thirdeyeds.com/)
+**[Download nano.md 1.0.0 for Apple Silicon](https://github.com/SiavashB/nano.md/releases/download/v1.0.0/nano.md-v1.0.0-arm64.zip)** · [Release notes and checksum](https://github.com/SiavashB/nano.md/releases/tag/v1.0.0) · [Website](https://nano.thirdeyeds.com/)
 
-Build 23 · **2.29 MB ZIP download** · **4.2 MB uncompressed app** (decimal MB).
+Build 25 · **2.29 MB ZIP download** · **4.2 MB uncompressed app** (decimal MB).
 
 Unzip and move `NanoMD.app` to Applications. The app is Developer ID signed and notarized; verify the ZIP with the release's `SHA256SUMS.txt`.
 
-Requires Apple Silicon and macOS 15.0 or later. **Beta compatibility:** runtime checks on macOS 15 remain pending; see [issue #12](https://github.com/SiavashB/nano.md/issues/12).
+Requires Apple Silicon and macOS 15.0 or later. **Compatibility:** runtime checks on macOS 15 remain pending; see [issue #12](https://github.com/SiavashB/nano.md/issues/12).
 
 ## Why nano.md
 
