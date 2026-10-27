@@ -16,7 +16,7 @@ Use the [feature request form](https://github.com/SiavashB/nano.md/issues/new?te
 
 Keep temporary files, sample documents, logs, and build output in the repository-root `Temp/` folder, which is ignored by Git.
 
-Open `NanoMD.xcodeproj` and select the macOS `NanoMD` scheme. Use Xcode 26.6, Swift 6, and Apple Silicon. The deployment target is macOS 15.0; runtime verification on that OS remains pending. The project uses Xcode's synchronized groups: place app source under `NanoMD/` and keep tooling/documentation outside it.
+Open `NanoMD.xcodeproj` and select the macOS `NanoMD` scheme. Use Xcode 27.1 locally, Swift 6, and Apple Silicon. Local builds use the active developer directory reported by `xcode-select -p`; confirm the toolchain with `xcodebuild -version`. CI and release builds remain pinned to Xcode 26.6, which is available on GitHub’s `macos-26` runner. The deployment target is macOS 15.0; runtime verification on that OS remains pending. The project uses Xcode's synchronized groups: place app source under `NanoMD/` and keep tooling/documentation outside it.
 
 Use the unsigned Debug build command in [README.md](README.md) for local compilation. Change `-configuration Debug` to `-configuration Release` when validating dependency changes, compiler settings, or performance-sensitive code. Unsigned compilation does not validate sandbox permissions, signing, notarization, or UI behavior. Release builds must also pass `ENABLE_CODE_COVERAGE=NO` so the setting applies to Swift package dependencies as well as app targets. Debug tests can retain coverage support; the CI and release workflows reject Release binaries containing coverage sections.
 
@@ -38,7 +38,7 @@ Treat document content as untrusted. Keep HTML literal and resources unloaded; d
 
 ## App-size measurements
 
-Use Apple Silicon (`ARCHS=arm64`), the Release configuration, Xcode 26.6, and the committed package versions for size measurements, matching the release workflow. For local before/after comparisons, run the README command with `-configuration Release` and `CODE_SIGNING_ALLOWED=NO` for both builds; keep the toolchain, architecture, signing mode, and measurement method identical. Record those settings with the results. Do not compare Debug, universal, or differently signed bundles as evidence of code growth.
+Use Apple Silicon (`ARCHS=arm64`), the Release configuration, and the committed package versions for size measurements. Use Xcode 27.1 for local comparisons and the workflow’s pinned Xcode 26.6 when reproducing distribution builds. Do not attribute size differences between toolchains to app changes. For local before/after comparisons, run the README command with `-configuration Release` and `CODE_SIGNING_ALLOWED=NO` for both builds; keep the toolchain, architecture, signing mode, and measurement method identical. Record those settings with the results. Do not compare Debug, universal, or differently signed bundles as evidence of code growth.
 
 Measure the complete `.app` by summing regular-file bytes without following symbolic links; report decimal MB (1 MB = 1,000,000 bytes). Exclude adjacent dSYMs, build caches, and ZIPs. Published download metadata must come from the exact signed release bundle; signing can change its size slightly from a local unsigned build. `website/update-app-size.mjs` checks the executable's architecture and the build configuration recorded in `Info.plist` before updating the page. Older bundles without that configuration metadata must be rebuilt.
 

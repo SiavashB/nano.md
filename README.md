@@ -71,7 +71,7 @@ Remaining save-error, input-method, external-conflict, and recovery checks are t
 
 ## Build
 
-Requires Xcode 26.6, Swift 6 language mode, and Apple Silicon. Open `NanoMD.xcodeproj`, select the `NanoMD` scheme, and run. For unsigned compilation from the repository root:
+For local development, use Xcode 27.1, Swift 6 language mode, and Apple Silicon. CI and release builds currently use Xcode 26.6 on GitHub’s `macos-26` runner. Open `NanoMD.xcodeproj`, select the `NanoMD` scheme, and run. For unsigned compilation from the repository root:
 
 ```sh
 xcodebuild \
