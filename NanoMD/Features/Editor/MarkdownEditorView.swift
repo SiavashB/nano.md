@@ -17,6 +17,7 @@ struct MarkdownEditorView: NSViewRepresentable {
         let scrollView = DocumentScrollView(navigation: navigation)
 
         let textView = SourceTextView(usingTextLayoutManager: true)
+        context.coordinator.textView = textView
         textView.delegate = context.coordinator
         textView.isRichText = false
         textView.importsGraphics = false
@@ -81,22 +82,47 @@ struct MarkdownEditorView: NSViewRepresentable {
         // The manager is document-scoped; its native text targets must not outlive the window.
         coordinator.undoManager?.removeAllActions()
         coordinator.cancelActivation()
+        coordinator.undoManager = nil
         (scrollView.documentView as? NSTextView)?.delegate = nil
     }
 
     final class Coordinator: NSObject, NSTextViewDelegate {
         var document: Binding<NanoMDDocument>
-        weak var undoManager: UndoManager?
+        weak var textView: SourceTextView?
+        weak var undoManager: UndoManager? {
+            didSet {
+                guard oldValue !== undoManager else { return }
+                let center = NotificationCenter.default
+                if let oldValue {
+                    center.removeObserver(self, name: .NSUndoManagerDidUndoChange, object: oldValue)
+                    center.removeObserver(self, name: .NSUndoManagerDidRedoChange, object: oldValue)
+                }
+                if let undoManager {
+                    center.addObserver(self, selector: #selector(undoOrRedoDidChange),
+                                       name: .NSUndoManagerDidUndoChange, object: undoManager)
+                    center.addObserver(self, selector: #selector(undoOrRedoDidChange),
+                                       name: .NSUndoManagerDidRedoChange, object: undoManager)
+                }
+            }
+        }
         private var loadIdentity: UUID
         private var isApplyingReload = false
         private var isActive = false
         private var entryRequest: EditorEntryRequest?
         private var needsActivation = false
-        private var activationTask: Task<Void, Never>?
+        private(set) var activationTask: Task<Void, Never>?
 
         init(document: Binding<NanoMDDocument>) {
             self.document = document
             loadIdentity = document.wrappedValue.loadIdentity
+        }
+
+        @objc private func undoOrRedoDidChange(_ notification: Notification) {
+            // Native undo can change text storage without a textDidChange delegate callback.
+            // Publish after the manager finishes; the source comparison also deduplicates
+            // AppKit paths that do deliver the callback.
+            guard let textView else { return }
+            textDidChange(Notification(name: NSText.didChangeNotification, object: textView))
         }
 
         func undoManager(for view: NSTextView) -> UndoManager? {
