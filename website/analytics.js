@@ -88,7 +88,10 @@
       if (url.origin !== "https://github.com" || url.username || url.password) return;
       if (!/^\/SiavashB\/nano\.md\/releases\/download\/[^/]+\/[^/]+$/.test(url.pathname)) return;
       const downloadUrl = `${url.origin}${url.pathname}`;
-      if (downloadUrl.length <= 1000) track("download", downloadUrl);
+      if (downloadUrl.length <= 1000) {
+        track("download", downloadUrl);
+        if (typeof gtag === "function") gtag("event", "conversion", { send_to: "AW-18539154873/gUciCN2BgKsdELmblIhF", transport_type: "beacon" });
+      }
     } catch {
       // Ignore links that are not valid release asset URLs.
     }
