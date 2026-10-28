@@ -58,7 +58,8 @@
 		6E414E4F4D44544553540005 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
-			files = ();
+			files = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		7C6A33093050BD8100EFCD32 /* Frameworks */ = {
@@ -103,9 +104,14 @@
 				6E414E4F4D44544553540005 /* Frameworks */,
 				6E414E4F4D44544553540006 /* Resources */,
 			);
-			buildRules = ();
-			dependencies = (6E414E4F4D44544553540007 /* PBXTargetDependency */,);
-			fileSystemSynchronizedGroups = (6E414E4F4D44544553540003 /* NanoMDTests */,);
+			buildRules = (
+			);
+			dependencies = (
+				6E414E4F4D44544553540007 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6E414E4F4D44544553540003 /* NanoMDTests */,
+			);
 			name = NanoMDTests;
 			productName = NanoMDTests;
 			productReference = 6E414E4F4D44544553540002 /* NanoMDTests.xctest */;
@@ -180,7 +186,8 @@
 		6E414E4F4D44544553540006 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
-			files = ();
+			files = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		7C6A330A3050BD8100EFCD32 /* Resources */ = {
@@ -197,7 +204,8 @@
 		6E414E4F4D44544553540004 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
-			files = ();
+			files = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		7C6A33083050BD8100EFCD32 /* Sources */ = {
@@ -225,7 +233,11 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@loader_path/../Frameworks",);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.thirdeyeds.NanoMDTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 6.0;
@@ -240,7 +252,11 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@loader_path/../Frameworks",);
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.thirdeyeds.NanoMDTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 6.0;

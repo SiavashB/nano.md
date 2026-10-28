@@ -172,7 +172,7 @@ struct DocumentView: View {
             shortcutLabel("^R", title: modeAction.title)
         }
         .accessibilityLabel("Switch to \(modeAction.title) mode")
-        .help("Switch to \(modeAction.title) mode (Control+R)")
+        .help("Switch to \(modeAction.title) mode (Control+R or Command+R)")
         .font(.system(size: 12, design: .monospaced))
         .buttonStyle(.plain)
         .buttonRepeatBehavior(.disabled)

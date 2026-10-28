@@ -35,7 +35,7 @@ Requires Apple Silicon and macOS 15.0 or later. **Compatibility:** runtime check
 ## Why nano.md
 
 - **Small and native.** Built with SwiftUI and AppKit, with a 4.2 MB app bundle.
-- **Read and edit ordinary Markdown.** Open README files, notes, `AGENTS.md`, and `SKILL.md`. Switch between formatted reading and source editing with Control-R.
+- **Read and edit ordinary Markdown.** Open README files, notes, `AGENTS.md`, and `SKILL.md`. Switch between formatted reading and source editing with Control-R or Command-R.
 - **Native Find.** Search in Read or Edit with Command-F, then move between matches with Command-G.
 - **Readable front matter.** Leading YAML metadata appears in a compact panel, while Edit keeps the original text.
 - **Local and free.** No account, subscription, or paid tier. The Mac app has no telemetry or network entitlement and does not load remote resources. See the [privacy policy](https://nano.thirdeyeds.com/privacy).
@@ -49,7 +49,7 @@ Requires Apple Silicon and macOS 15.0 or later. **Compatibility:** runtime check
 
 Open `.md` or `.markdown` files with Command-O or Finder's **Open With** menu. Existing files start in Read; new documents (Command-N) start in Edit. Saving and undo use the macOS document system.
 
-Switch Read/Edit with Control-R, the toolbar, the footer button, or View > Edit/Read. Choose System, Light (Linen Light), or Dark (Nano Dark) from View > Appearance or the toolbar. Appearance applies to all windows and persists across launches.
+Switch Read/Edit with Control-R or Command-R, the toolbar, the footer button, or View > Edit/Read. Choose System, Light (Linen Light), or Dark (Nano Dark) from View > Appearance or the toolbar. Appearance applies to all windows and persists across launches.
 
 Switching to Edit places the caret near the selected reader text, or near the top of the visible content when scrolled, and focuses the editor. On a supported trackpad, force-click text in Read to start editing near that location.
 

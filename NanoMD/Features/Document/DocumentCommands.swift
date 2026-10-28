@@ -21,7 +21,7 @@ struct DocumentCommands: Commands {
             .disabled(documentFindAction == nil)
         }
         CommandGroup(after: .toolbar) {
-            // Register the shortcut only here, so native menu dispatch consumes it
+            // Register shortcuts only here, so native menu dispatch consumes them
             // before text input, even when the editor is the first responder.
             Button(documentModeAction?.title ?? "Toggle Read/Edit") {
                 documentModeAction?.perform()
@@ -29,6 +29,14 @@ struct DocumentCommands: Commands {
             .keyboardShortcut("r", modifiers: .control)
             .buttonRepeatBehavior(.disabled)
             .disabled(documentModeAction == nil)
+            .modifierKeyAlternate(.command) {
+                Button(documentModeAction?.title ?? "Toggle Read/Edit") {
+                    documentModeAction?.perform()
+                }
+                .keyboardShortcut("r", modifiers: .command)
+                .buttonRepeatBehavior(.disabled)
+                .disabled(documentModeAction == nil)
+            }
 
             Menu("Appearance") {
                 AppearancePicker(preference: $appearancePreference)
