@@ -17,6 +17,7 @@ struct MarkdownTextView: NSViewRepresentable {
 
         // Native text tables use the TextKit 1 layout path.
         let textView = ReaderTextView(usingTextLayoutManager: false)
+        textView.textContainer?.replaceLayoutManager(ReaderLayoutManager())
         textView.delegate = context.coordinator
         textView.isEditable = false
         textView.isSelectable = true
@@ -25,7 +26,7 @@ struct MarkdownTextView: NSViewRepresentable {
         textView.allowsUndo = false
         textView.isAutomaticLinkDetectionEnabled = false
         textView.isAutomaticDataDetectionEnabled = false
-        textView.textContainerInset = NSSize(width: 28, height: 24)
+        textView.textContainerInset = NSSize(width: 30, height: 35)
         NativeTextViewConfiguration.apply(to: textView, in: scrollView)
         textView.setAccessibilityLabel(String(localized: "Markdown document"))
         textView.textStorage?.setAttributedString(text)

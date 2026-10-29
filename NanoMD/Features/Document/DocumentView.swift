@@ -79,7 +79,8 @@ struct DocumentView: View {
             footer
         }
         .background(Color(nsColor: theme.document))
-        .overlay(Rectangle().strokeBorder(Color(nsColor: theme.border), lineWidth: 1))
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(Color(nsColor: theme.border), lineWidth: 1))
         .padding(EdgeInsets(top: 2, leading: 12, bottom: 12, trailing: 12))
         .background(Color(nsColor: theme.surrounding))
         .frame(minWidth: 360, minHeight: 240)
@@ -117,7 +118,7 @@ struct DocumentView: View {
             .font(.system(size: 12, design: .monospaced))
             .lineLimit(1)
             .padding(.horizontal, 17)
-            .padding(.vertical, 8)
+            .padding(.vertical, 12)
             .foregroundStyle(Color(nsColor: theme.headerText))
             .opacity(navigation.findBarView == nil ? 1 : 0)
             .accessibilityHidden(navigation.findBarView != nil)
@@ -130,7 +131,7 @@ struct DocumentView: View {
                 .frame(height: navigation.findBarHeight)
             }
         }
-        .frame(minHeight: 32)
+        .frame(minHeight: 44)
         .background(Color(nsColor: theme.header))
     }
 
@@ -145,6 +146,7 @@ struct DocumentView: View {
         .foregroundStyle(Color(nsColor: theme.secondary))
         .padding(.horizontal, 17)
         .padding(.vertical, 4)
+        .frame(minHeight: 34)
         .background(Color(nsColor: theme.surrounding))
     }
 
