@@ -3,6 +3,7 @@ import SwiftUI
 
 @main
 struct NanoMDApp: App {
+    @NSApplicationDelegateAdaptor(DefaultMarkdownApplication.self) private var defaultMarkdownApplication
     @AppStorage(AppearanceMode.preferenceKey) private var themePreference = AppearanceMode.system.rawValue
     @State private var systemAppearance = SystemAppearance()
 
@@ -21,6 +22,12 @@ struct NanoMDApp: App {
         }
         .defaultSize(width: 800, height: 600)
         .commands {
+            CommandGroup(after: .appInfo) {
+                Button("Make Default for Markdown…") {
+                    defaultMarkdownApplication.makeDefault()
+                }
+                .disabled(defaultMarkdownApplication.isChangingDefault)
+            }
             DocumentCommands(appearancePreference: $themePreference)
         }
     }
