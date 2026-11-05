@@ -8,6 +8,9 @@ final class DefaultMarkdownApplication: NSObject, NSApplicationDelegate, Observa
     @Published private(set) var isChangingDefault = false
 
     private static let offerHandledPreferenceKey = "hasHandledDefaultMarkdownAppOffer"
+    let shouldSuppressAutomaticDocumentLaunch = !UserDefaults.standard.bool(
+        forKey: DefaultMarkdownApplication.offerHandledPreferenceKey
+    )
     private var hasFinishedLaunching = false
     private var hasConsideredLaunchOffer = false
 
@@ -16,11 +19,15 @@ final class DefaultMarkdownApplication: NSObject, NSApplicationDelegate, Observa
         considerLaunchOffer()
     }
 
+    func applicationDidBecomeActive(_ notification: Notification) {
+        considerLaunchOffer()
+    }
+
     func applicationDidUpdate(_ notification: Notification) {
         considerLaunchOffer()
     }
 
-    func makeDefault() {
+    func makeDefault(openDocumentAfterSuccess: Bool = false) {
         guard !isChangingDefault else { return }
         rememberOfferHandled()
         if isDefaultApplication {
@@ -36,6 +43,10 @@ final class DefaultMarkdownApplication: NSObject, NSApplicationDelegate, Observa
                 if !isDefaultApplication {
                     showMessage("The default Markdown app wasn’t changed.",
                                 detail: "You can try again from the nano.md menu or choose nano.md in Finder’s Get Info → Open with → Change All.")
+                    return
+                }
+                if openDocumentAfterSuccess, NSDocumentController.shared.documents.isEmpty {
+                    NSDocumentController.shared.openDocument(nil)
                 }
             } catch {
                 let error = error as NSError
@@ -59,7 +70,10 @@ final class DefaultMarkdownApplication: NSObject, NSApplicationDelegate, Observa
     private var isDefaultApplication: Bool {
         guard let identifier = Bundle.main.bundleIdentifier,
               let applicationURL = NSWorkspace.shared.urlForApplication(toOpen: UTType.markdown) else { return false }
-        return Bundle(url: applicationURL)?.bundleIdentifier == identifier
+        // Launch Services can select another copy whose bundle is outside our sandbox access.
+        return NSWorkspace.shared.urlsForApplications(withBundleIdentifier: identifier).contains {
+            $0.standardizedFileURL == applicationURL.standardizedFileURL
+        }
     }
 
     private var canPresentLaunchOffer: Bool {
@@ -101,7 +115,7 @@ final class DefaultMarkdownApplication: NSObject, NSApplicationDelegate, Observa
         alert.addButton(withTitle: "Make Default")
         alert.addButton(withTitle: "Not Now").keyEquivalent = "\u{1b}"
         if alert.runModal() == .alertFirstButtonReturn {
-            makeDefault()
+            makeDefault(openDocumentAfterSuccess: true)
         }
     }
 

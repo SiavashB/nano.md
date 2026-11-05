@@ -21,6 +21,7 @@ struct NanoMDApp: App {
                          systemColorScheme: systemAppearance.colorScheme)
         }
         .defaultSize(width: 800, height: 600)
+        .defaultLaunchBehavior(defaultMarkdownApplication.shouldSuppressAutomaticDocumentLaunch ? .suppressed : .automatic)
         .commands {
             CommandGroup(after: .appInfo) {
                 Button("Make Default for Markdown…") {
