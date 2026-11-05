@@ -10,7 +10,7 @@ final class DefaultMarkdownApplication: NSObject, NSApplicationDelegate, Observa
     private static let offerHandledPreferenceKey = "hasHandledDefaultMarkdownAppOffer"
     let shouldSuppressAutomaticDocumentLaunch = !UserDefaults.standard.bool(
         forKey: DefaultMarkdownApplication.offerHandledPreferenceKey
-    )
+    ) && !DefaultMarkdownApplication.isDefaultApplication
     private var hasFinishedLaunching = false
     private var hasConsideredLaunchOffer = false
 
@@ -30,7 +30,7 @@ final class DefaultMarkdownApplication: NSObject, NSApplicationDelegate, Observa
     func makeDefault(openDocumentAfterSuccess: Bool = false) {
         guard !isChangingDefault else { return }
         rememberOfferHandled()
-        if isDefaultApplication {
+        if Self.isDefaultApplication {
             showMessage("nano.md is already your default Markdown app.")
             return
         }
@@ -40,7 +40,7 @@ final class DefaultMarkdownApplication: NSObject, NSApplicationDelegate, Observa
             defer { isChangingDefault = false }
             do {
                 try await NSWorkspace.shared.setDefaultApplication(at: Bundle.main.bundleURL, toOpen: .markdown)
-                if !isDefaultApplication {
+                if !Self.isDefaultApplication {
                     showMessage("The default Markdown app wasn’t changed.",
                                 detail: "You can try again from the nano.md menu or choose nano.md in Finder’s Get Info → Open with → Change All.")
                     return
@@ -67,7 +67,7 @@ final class DefaultMarkdownApplication: NSObject, NSApplicationDelegate, Observa
         return isUserCancellation(underlyingError)
     }
 
-    private var isDefaultApplication: Bool {
+    private static var isDefaultApplication: Bool {
         guard let identifier = Bundle.main.bundleIdentifier,
               let applicationURL = NSWorkspace.shared.urlForApplication(toOpen: UTType.markdown) else { return false }
         // Launch Services can select another copy whose bundle is outside our sandbox access.
@@ -106,7 +106,7 @@ final class DefaultMarkdownApplication: NSObject, NSApplicationDelegate, Observa
     private func offerIfNeeded() {
         guard !UserDefaults.standard.bool(forKey: Self.offerHandledPreferenceKey) else { return }
         rememberOfferHandled()
-        guard !isDefaultApplication else { return }
+        guard !Self.isDefaultApplication else { return }
 
         let alert = NSAlert()
         alert.alertStyle = .informational
