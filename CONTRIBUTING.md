@@ -116,15 +116,18 @@ Verify the downloaded package's checksum, signature, notarization, entitlements,
 
 ## Website
 
-The static site lives in `website/`. Its asset allowlist is `website/.assetsignore`; keep source files and deployment tooling out of published assets. Deployment uses the pinned Wrangler dependency and requires macOS, Node.js 22 or newer, and an authenticated GitHub CLI to verify the latest published app package.
+The static site lives in `website/`. `website/stage-assets.mjs` stages only public site files and the verified release ZIP under `Temp/WebsiteAssets/`. Deployment uses the pinned Wrangler dependency and requires macOS, Node.js 22 or newer, and an authenticated GitHub CLI to verify the latest published app package.
 
 ```sh
 npm --prefix website ci --cache ./Temp/npm-cache --logs-dir ./Temp/npm-logs
 npm --prefix website run check
+npm --prefix website run dev
 ```
+
+The local server watches the website source files, copies edits into `Temp/WebsiteAssets/`, and reloads the browser. Preview download analytics are disabled. Run `update-release` first if the verified release ZIP has not been staged yet.
 
 `check` synchronizes release metadata and validates packaging without publishing. Maintainers can authorize a local Cloudflare session with `npm --prefix website run login` and publish with `npm --prefix website run deploy`. Both check and deploy synchronize from the exact checksum-verified published ZIP; review generated changes before committing. Output stays under `Temp/`.
 
 The [website workflow](.github/workflows/website.yml) uses the `CLOUDFLARE_API_TOKEN` repository Actions secret, separately from local login. Scope replacement tokens to the deployment account and the site's zone, rotate them before expiration, and verify a successful deployment after replacement. Keep credential values out of source, chat, and logs.
 
-Website analytics are separate from the Mac app: `website/analytics.js` records page views and download clicks with an anonymous browser ID, referrer hostname, device category, and timezone. Its public Supabase key depends on database policies that permit anonymous inserts and restrict reads to administrators. Feedback messages are sent through the visitor's own email account.
+Website analytics are separate from the Mac app. The browser records page views, and the Worker records eligible direct download requests. The public Supabase key depends on database policies that permit anonymous inserts and restrict reads to administrators. Feedback messages are sent through the visitor's own email account.

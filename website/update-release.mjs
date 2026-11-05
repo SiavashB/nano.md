@@ -1,9 +1,10 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { applyAppMetadata, readAppMetadata } from "./app-metadata.mjs";
+import { stageWebsiteAssets } from "./stage-assets.mjs";
 
 const websiteDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryDirectory = dirname(websiteDirectory);
@@ -36,10 +37,11 @@ try {
   const staging = mkdtempSync(join(stagingRoot, `${release.tag_name}-`));
   gh(["release", "download", release.tag_name, "--repo", repository, "--pattern", archive, "--pattern", "SHA256SUMS.txt", "--dir", staging]);
   const archivePath = join(staging, archive);
-  if (statSync(archivePath).size !== asset.size) throw new Error("Downloaded ZIP size does not match GitHub.");
+  const archiveBytes = readFileSync(archivePath);
+  if (archiveBytes.length !== asset.size) throw new Error("Downloaded ZIP size does not match GitHub.");
   const checksum = readFileSync(join(staging, "SHA256SUMS.txt"), "utf8").split(/\r?\n/)
     .map(line => line.match(/^([a-f0-9]{64})\s+\*?(.+)$/i)).find(match => match && match[2] === archive)?.[1].toLowerCase();
-  const digest = createHash("sha256").update(readFileSync(archivePath)).digest("hex");
+  const digest = createHash("sha256").update(archiveBytes).digest("hex");
   if (checksum !== digest || (asset.digest && asset.digest !== `sha256:${digest}`)) throw new Error("Release ZIP checksum mismatch.");
   execFileSync("/usr/bin/ditto", ["-x", "-k", archivePath, staging]);
   const appPath = join(staging, "NanoMD.app");
@@ -54,14 +56,11 @@ try {
   }
   const downloadPattern = /(<a\b[^>]*\bdata-release-download\b[^>]*\bhref=")[^"]+("[^>]*>)[^<]*(<\/a>)/g;
   const links = [...html.matchAll(downloadPattern)];
-  if (links.length !== 2) throw new Error("Expected two marked release download links.");
-  html = html.replace(downloadPattern, (_, open, middle, close, offset) =>
-    `${open}${downloadUrl}${middle}${offset === links[0].index ? `Download${channel ? ` ${channel}` : ""} for Mac` : `Download ${label}`}${close}`);
+  if (links.length !== 1) throw new Error("Expected one marked direct download link.");
+  html = html.replace(downloadPattern, (_, open, middle, close) =>
+    `${open}/download${middle}Direct download${channel ? ` (${label})` : ""}${close}`);
   for (const [id, value] of [
     ["download-size", `${(asset.size / 1_000_000).toFixed(2)} MB`],
-    ["release-label", label],
-    ["release-title", channel ? `Free. Try the ${channel}.` : "Free. Download for Mac."],
-    ["release-requirement", `Requires macOS ${metadata.minimumMacOS} or newer on Apple Silicon.`],
   ]) {
     replaceOne(new RegExp(`(<(?:span|strong|h2)\\b[^>]*\\bid="${id}"[^>]*>)[^<]*(</(?:span|strong|h2)>)`, "g"),
       (_, open, close) => `${open}${value}${close}`, id);
@@ -74,12 +73,13 @@ try {
     const app = data["@graph"].find(item => item["@type"] === "SoftwareApplication");
     if (!app) throw new Error("Missing SoftwareApplication structured data.");
     Object.assign(app, { softwareVersion: release.tag_name.slice(1), operatingSystem: `macOS ${metadata.minimumMacOS} or later`,
-      fileSize: `${(metadata.bytes / 1_000_000).toFixed(1)} MB`, downloadUrl, releaseNotes: releaseUrl });
+      fileSize: `${(metadata.bytes / 1_000_000).toFixed(1)} MB`, downloadUrl: "https://nano.thirdeyeds.com/download", releaseNotes: releaseUrl });
     return `<script type="application/ld+json">\n${JSON.stringify(data, null, 2).split("\n").map(line => `      ${line}`).join("\n")}\n    </script>`;
   }, "structured data");
   writeFileSync(pagePath, html);
   writeFileSync(join(websiteDirectory, "release.json"), `${JSON.stringify({ tag: release.tag_name, publishedAt: release.published_at,
     ...metadata, zipBytes: asset.size, downloadUrl, releaseUrl, sha256: digest }, null, 2)}\n`);
+  stageWebsiteAssets(archiveBytes);
   console.log(`Website updated to ${release.tag_name}, build ${metadata.build}: ${(metadata.bytes / 1_000_000).toFixed(1)} MB app, ${(asset.size / 1_000_000).toFixed(2)} MB ZIP; macOS ${metadata.minimumMacOS}+.`);
 } catch (error) {
   console.error(`Cannot synchronize the published release: ${error.message}`);
