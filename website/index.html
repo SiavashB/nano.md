@@ -65,7 +65,7 @@
             },
             "softwareVersion": "1.0.0",
             "fileSize": "4.2 MB",
-            "downloadUrl": "https://github.com/SiavashB/nano.md/releases/download/v1.0.0/nano.md-v1.0.0-arm64.zip",
+            "downloadUrl": "https://nano.thirdeyeds.com/download",
             "releaseNotes": "https://github.com/SiavashB/nano.md/releases/tag/v1.0.0"
           },
           {
@@ -131,7 +131,8 @@
       .studio-credit span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 12px; }
       .studio-credit a { color: var(--accent); font-family: "Manrope", sans-serif; font-size: 16px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; text-decoration-thickness: 1px; text-underline-offset: 4px; }
       .studio-credit a:hover { color: var(--ink); }
-      .hero-icon { display: block; width: 88px; height: 88px; margin-bottom: 28px; }
+      .hero-heading { display: flex; align-items: flex-start; gap: 18px; }
+      .hero-icon { display: block; flex-shrink: 0; width: 56px; height: 56px; }
       .toplink {
         font-size: 13px;
         font-weight: 700;
@@ -142,24 +143,13 @@
         display: grid;
         grid-template-columns: minmax(0, 1.05fr) minmax(300px, .95fr);
         align-items: center;
-        gap: clamp(42px, 7vw, 96px);
-        padding-block: clamp(74px, 10vw, 138px);
+        gap: 40px;
+        padding-block: 28px;
       }
-      .eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        margin: 0 0 28px;
-        color: var(--accent);
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: .03em;
-      }
-      .eyebrow::before { content: ">"; }
       h1 {
         max-width: 760px;
         margin: 0;
-        font-size: clamp(30px, 3.4vw, 44px);
+        font-size: clamp(28px, 3vw, 40px);
         line-height: 1.15;
         font-weight: 750;
         letter-spacing: -.055em;
@@ -168,16 +158,24 @@
       .headline-accent { color: var(--accent); }
       .hero-copy {
         max-width: 540px;
-        margin: 30px 0 0;
+        margin: 20px 0 0;
         color: var(--muted);
-        font-size: clamp(15px, 1.6vw, 17px);
-        line-height: 1.65;
+        font-size: 15px;
+        line-height: 1.55;
       }
-      .hero-links { display: flex; flex-wrap: wrap; align-items: center; gap: 22px; margin-top: 38px; }
-      .app-facts { display: flex; flex-wrap: wrap; gap: 24px 36px; margin: 30px 0 0; }
+      .downloads { padding-block: 28px 40px; border-top: 1px solid var(--line); scroll-margin-top: 24px; }
+      .download-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+      .download-option { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 4px; }
+      .download-option-direct { background: var(--panel); box-shadow: inset 0 3px 0 var(--accent); }
+      .download-option .button { width: 100%; padding-inline: 14px; line-height: 1.45; }
+      .source-code { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+      .source-code h3 { margin: 0; font-size: 18px; letter-spacing: -.035em; }
+      .app-store-badge { display: inline-flex; flex-shrink: 0; border-radius: 8px; }
+      .app-store-badge img { display: block; height: 52px; width: auto; }
+      .app-facts { display: flex; flex-wrap: wrap; gap: 16px 24px; margin: 20px 0 0; }
       .app-facts dt { color: var(--muted); font-size: 12px; }
-      .app-facts dd { margin: 5px 0 0; color: var(--accent); font-size: 20px; font-weight: 750; }
-      .build-note { margin: 16px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+      .app-facts dd { margin: 5px 0 0; color: var(--accent); font-size: 18px; font-weight: 750; }
+      .build-note { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
       .button {
         display: inline-flex;
         align-items: center;
@@ -194,14 +192,17 @@
         transition: background .18s ease;
       }
       .button:hover { background: #a4e3b6; color: var(--paper); }
-      .quiet-link { font-size: 14px; font-weight: 700; text-underline-offset: 5px; }
+      .button-github { max-width: 100%; gap: 10px; border-color: var(--line); background: var(--panel); color: var(--ink); text-align: left; line-height: 1.45; }
+      .button-github:hover { border-color: var(--accent); background: var(--panel); color: var(--accent); }
+      .button-github svg { flex-shrink: 0; }
+      .download-details { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+      .download-requirements { margin-top: 8px; }
       .sample {
         position: relative;
         min-width: 0;
       }
       .window {
         overflow: hidden;
-        min-height: 450px;
         border: 1px solid var(--line);
         border-radius: 4px;
         background: var(--panel);
@@ -218,24 +219,26 @@
         font-size: 12px;
       }
       .window-bar span { flex: 1; text-align: right; }
-      .document { max-width: 420px; margin: 0 auto; padding: 35px 30px 40px; }
+      .document { max-width: 420px; margin: 0 auto; padding: 24px 26px; }
       .document small { color: var(--accent); font-size: 11px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
-      .document h2 { margin: 18px 0 15px; font-size: 24px; line-height: 1.25; letter-spacing: -.035em; }
-      .document p, .document li { color: var(--muted); font-size: 13px; line-height: 1.8; }
+      .document h2 { margin: 12px 0 10px; font-size: 22px; line-height: 1.25; letter-spacing: -.035em; }
+      .document p, .document li { color: var(--muted); font-size: 13px; line-height: 1.6; }
+      .document p, .document ul { margin-block: 12px; }
       .document ul { padding-left: 20px; }
       .document li { margin-bottom: 4px; }
       .document li::marker { color: var(--accent); }
       .document code { padding: 3px 6px; border-radius: 2px; background: #26332b; color: var(--accent); font-family: var(--mono); font-size: .9em; }
-      .document pre { margin: 18px 0; padding: 14px; border: 1px solid var(--line); border-radius: 2px; background: #111914; overflow-x: auto; }
+      .document pre { margin: 12px 0; padding: 12px; border: 1px solid var(--line); border-radius: 2px; background: #111914; overflow-x: auto; }
       .document pre code { padding: 0; background: none; font-size: 12px; line-height: 1.7; }
       .window-status { display: flex; justify-content: space-between; gap: 12px; padding: 10px 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
       .window-status-key { padding: 1px 3px; background: var(--accent); color: var(--paper); }
       .window-status-feedback { color: var(--accent); }
-      .sample-label { margin: 15px 3px 1px; color: var(--muted); font-size: 11px; text-align: right; }
+      .sample-label { margin: 10px 3px 1px; color: var(--muted); font-size: 11px; text-align: right; }
       .features { border-top: 1px solid var(--line); padding-block: 77px 88px; }
       .section-kicker { margin: 0 0 18px; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
       .section-kicker::before { content: "# "; }
-      .features h2, .release h2 { max-width: 700px; margin: 0; font-size: clamp(28px, 3.3vw, 42px); line-height: 1.2; letter-spacing: -.045em; }
+      .features h2, .downloads h2 { max-width: 700px; margin: 0; font-size: clamp(28px, 3.3vw, 42px); line-height: 1.2; letter-spacing: -.045em; }
+      .downloads h2 { font-size: clamp(26px, 2.7vw, 34px); }
       .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; margin-top: 62px; }
       .feature { border-top: 1px solid var(--line); padding-top: 21px; }
       .feature-number { color: var(--accent); font-size: 12px; font-weight: 700; }
@@ -243,42 +246,33 @@
       .feature-number::after { content: "]"; }
       .feature h3 { margin: 27px 0 9px; font-size: 20px; letter-spacing: -.035em; }
       .feature p { max-width: 320px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.75; }
-      .release {
-        display: grid;
-        grid-template-columns: 1fr minmax(260px, .7fr);
-        gap: 48px;
-        align-items: end;
-        padding: clamp(40px, 6vw, 78px);
-        border: 1px solid var(--line);
-        border-top: 3px solid var(--accent);
-        border-radius: 4px;
-        background: var(--panel);
-        color: var(--ink);
+      footer { display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; gap: 18px; padding-block: 32px 44px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; line-height: 1.7; }
+      .footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+      @media (min-width: 801px) and (max-height: 900px) {
+        .hero { padding-block: 20px; }
+        .document { padding: 18px 24px; }
+        .document h2 { font-size: 20px; }
       }
-      .release .section-kicker { color: var(--accent); }
-      .release p { max-width: 520px; margin: 20px 0 0; color: var(--muted); font-size: 14px; line-height: 1.75; }
-      .status { padding: 22px 25px; border: 1px solid var(--line); border-radius: 2px; }
-      .status strong { display: flex; align-items: center; gap: 10px; font-size: 15px; }
-      .status strong::before { content: ""; width: 8px; height: 12px; background: var(--accent); }
-      .status > span { display: block; margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-      footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 18px; padding-block: 44px 56px; color: var(--muted); font-size: 13px; }
+      @media (max-width: 960px) {
+        .download-grid { grid-template-columns: 1fr; }
+        .download-option .button { width: auto; max-width: 100%; }
+      }
       @media (max-width: 800px) {
         .hero { grid-template-columns: 1fr; }
         .sample { width: min(100%, 580px); }
         .feature-grid { grid-template-columns: 1fr; gap: 30px; margin-top: 42px; }
         .feature h3 { margin-top: 16px; }
-        .release { grid-template-columns: 1fr; gap: 30px; }
       }
       @media (max-width: 520px) {
         .shell { width: min(100% - 36px, 1120px); }
         .topbar { min-height: 74px; }
         .topbar-actions { width: 100%; gap: 16px; }
         .brand { font-size: 25px; }
-        .hero { padding-block: 65px 72px; }
-        .window { min-height: 390px; }
-        .document { padding: 30px 24px 36px; }
+        .hero { padding-block: 28px; }
+        .hero-heading { gap: 12px; }
+        .hero-icon { width: 40px; height: 40px; }
+        .document { padding: 24px; }
         .features { padding-block: 62px; }
-        .release { padding: 32px 25px; }
       }
       @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
@@ -302,32 +296,31 @@
           <span>Made by</span>
           <a href="https://thirdeyeds.com/">Third Eye Digital Studio</a>
         </p>
-        <a class="toplink" href="#release">Download &amp; source ↗</a>
+        <a class="toplink" href="#downloads">Downloads ↓</a>
+        <a class="toplink" href="#sourcecode">Source Code ↓</a>
       </div>
     </header>
 
     <main id="top">
       <section class="hero shell" aria-labelledby="hero-title">
         <div>
-          <img class="hero-icon" src="./nano-md-icon.png" width="1254" height="1254" alt="" />
-          <p class="eyebrow">nano.md for macOS</p>
-          <h1 id="hero-title">
-            <span class="headline-line">A free, lightweight</span>
-            <span class="headline-line"><span class="headline-accent">.md</span> file viewer</span>
-            <span class="headline-line">for macOS</span>
-          </h1>
-          <p class="hero-copy">A free, lightweight, native Markdown viewer and editor for macOS on Apple Silicon. Double-click any .md file in Finder to open it instantly (must set as default app), with no Xcode or IDE needed. Read and edit SKILL.md, AGENTS.md, CLAUDE.md, and the Markdown instructions you give your AI tools.</p>
+          <div class="hero-heading">
+            <img class="hero-icon" src="./nano-md-icon.png" width="1254" height="1254" alt="" />
+            <h1 id="hero-title">
+              <span class="headline-line">A lightweight, free</span>
+              <span class="headline-line"><span class="headline-accent">.md</span> file viewer/editor</span>
+              <span class="headline-line">for macOS</span>
+            </h1>
+          </div>
+          <p class="hero-copy">Tired of opening a heavy IDE just to view a .md file? Here's a lightweight native Markdown viewer and editor for macOS.
+
+          <br />Just double-click any .md file in Finder to open it instantly (must set it as your default app for .md files). Read and edit SKILL.md, AGENTS.md, CLAUDE.md, and the Markdown instructions you give your AI tools.</p>
           <p class="build-note">Opens formatted. Press <strong>Control-R</strong> to edit the raw Markdown.</p>
           <dl class="app-facts">
             <div><dt>Price</dt><dd>Free</dd></div>
-            <div><dt>App size</dt><dd id="app-size" data-bytes="4220882">4.2 MB</dd></div>
+            <div><dt>App size (unpacked)</dt><dd id="app-size" data-bytes="4220882">4.2 MB</dd></div>
             <div><dt>Platform</dt><dd>Native macOS</dd></div>
           </dl>
-          <p class="build-note">Released build: <span id="app-version">1.0.0</span> (<span id="app-build">25</span>), targeting macOS <span id="app-minimum-macos">15.0</span> or newer on Apple Silicon. Uncompressed app size.</p>
-          <div class="hero-links">
-            <a class="button" data-release-download href="https://github.com/SiavashB/nano.md/releases/download/v1.0.0/nano.md-v1.0.0-arm64.zip">Download for Mac</a>
-            <a class="quiet-link" href="#features">Features</a>
-          </div>
         </div>
         <div class="sample" aria-label="Illustrative AGENTS.md document">
           <div class="window">
@@ -348,6 +341,44 @@
           </div>
           <p class="sample-label">Example AGENTS.md document</p>
         </div>
+      </section>
+
+      <section class="downloads shell" id="downloads" aria-labelledby="downloads-title">
+        <h2 id="downloads-title">Download nano.md</h2>
+        <p class="download-details download-requirements">macOS <span id="app-minimum-macos">15.0</span> or newer · Apple Silicon</p>
+        <div class="download-grid">
+          <div class="download-option">
+            <a class="app-store-badge" href="https://apps.apple.com/us/app/nano-md/id6826107962">
+              <img src="./mac-app-store-badge.svg" alt="Download on the Mac App Store" width="203" height="52" />
+            </a>
+            <p class="download-details">Install and update through the Mac App Store.</p>
+          </div>
+          <div class="download-option">
+            <a class="button button-github" href="https://github.com/SiavashB/nano.md/releases">
+              <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
+                <path d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656" />
+              </svg>
+              <span>Download from GitHub release page</span>
+            </a>
+            <p class="download-details">Choose from current and earlier versions.</p>
+          </div>
+          <div class="download-option download-option-direct">
+            <a class="button" data-release-download href="/download" aria-describedby="direct-download-details">Direct download</a>
+            <div id="direct-download-details">
+              <p class="download-details">v<span id="app-version">1.0.0</span> · build <span id="app-build">25</span> · <span id="download-size">2.29 MB</span> ZIP</p>
+              <p class="download-details">Signed and notarized. Unzip and move NanoMD.app to Applications.</p>
+            </div>
+          </div>
+        </div>
+        <section class="source-code" id="sourcecode" aria-labelledby="source-code-title">
+          <h3 id="source-code-title">Source code</h3>
+          <a class="button button-github" href="https://github.com/SiavashB/nano.md">
+            <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" focusable="false">
+                <path d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656" />
+              </svg>
+            <span>View source code on GitHub</span>
+          </a>
+        </section>
       </section>
 
       <section class="features shell" id="features" aria-labelledby="features-title">
@@ -372,28 +403,15 @@
         </div>
       </section>
 
-      <section class="release shell" id="release" aria-labelledby="release-title">
-        <div>
-          <p class="section-kicker">Download &amp; source</p>
-          <h2 id="release-title">Free. Download for Mac.</h2>
-          <p>Nano Dark and Linen Light themes, with Dark, Light, or System appearance. Compact SKILL.md metadata panels and direct Markdown source editing.</p>
-          <p>Switch to Edit near selected text or your scrolled reading position, with the editor ready for typing. On a supported trackpad, force-click text in Read to edit near that location. Positioning is approximate where rendered text or layouts differ; returning to Read resets reader selection and scroll. The Feedback footer link opens email options in your browser.</p>
-          <p>Find text with Command-F in Read or Edit. Read searches displayed text; Edit searches Markdown source. Command-G and Shift-Command-G move between matches, Command-E uses selected text for Find, and Escape closes the Find bar.</p>
-          <p>Signed and notarized for Apple Silicon. Unzip the download and move NanoMD.app to Applications.</p>
-          <p><a data-release-download href="https://github.com/SiavashB/nano.md/releases/download/v1.0.0/nano.md-v1.0.0-arm64.zip">Download 1.0.0</a> (<span id="download-size">2.29 MB</span> ZIP). <a id="release-notes" href="https://github.com/SiavashB/nano.md/releases/tag/v1.0.0">Release notes &amp; checksum ↗</a></p>
-          <p><a href="https://github.com/SiavashB/nano.md">View source on GitHub ↗</a>. MIT-licensed.</p>
-        </div>
-        <div class="status" role="status">
-          <strong id="release-label">1.0.0</strong>
-          <span id="release-requirement">Requires macOS 15.0 or newer on Apple Silicon.</span>
-        </div>
-      </section>
     </main>
 
     <footer class="shell">
-      <a href="/privacy">Privacy</a>
       <span>© <span id="year">2026</span> nano.md</span>
-      <a href="/feedback">Send feedback</a>
+      <nav class="footer-links" aria-label="More information">
+        <a id="release-notes" href="https://github.com/SiavashB/nano.md/releases/tag/v1.0.0">Release notes &amp; checksum ↗</a>
+        <a href="/privacy">Privacy</a>
+        <a href="/feedback">Send feedback</a>
+      </nav>
     </footer>
     <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
     <script src="./analytics.js" defer></script>

@@ -7,26 +7,47 @@
   const publishableKey = "sb_publishable_Za8_AYxM2gtYp0aHCuzIlg_bxRsYbUO";
   const visitorKey = "nano_md_visitor_id";
 
+  function readCookie(name) {
+    try {
+      return document.cookie.split(";").map(part => part.trim())
+        .find(part => part.startsWith(`${name}=`))?.slice(name.length + 1);
+    } catch {
+      return undefined;
+    }
+  }
+
+  function writeCookie(name, value, maxAge = 31536000) {
+    try {
+      document.cookie = `${name}=${value}; Path=/; Max-Age=${maxAge}; SameSite=Lax; Secure`;
+    } catch {
+      // Downloads still work when storage is blocked; unique counts may be higher.
+    }
+  }
+
   function isExcluded() {
     try {
-      return localStorage.getItem("te_analytics_excluded") === "true";
+      const stored = localStorage.getItem("te_analytics_excluded");
+      if (stored !== null) {
+        writeCookie("nano_md_analytics_excluded", "true", stored === "true" ? 31536000 : 0);
+        return stored === "true";
+      }
     } catch {
-      return false;
+      // The server and page-view tracker share the exclusion cookie when available.
     }
+    return readCookie("nano_md_analytics_excluded") === "true";
   }
 
   if (isExcluded()) return;
 
   function getVisitorId() {
-    const fallback = crypto.randomUUID();
-    try {
-      const stored = localStorage.getItem(visitorKey);
-      if (stored && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(stored)) return stored;
-      localStorage.setItem(visitorKey, fallback);
-    } catch {
-      // Without storage, page views and clicks share an ID for this page load only.
-    }
-    return fallback;
+    const validId = value => value && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+    let stored;
+    try { stored = localStorage.getItem(visitorKey); } catch { /* Cookies may still be available. */ }
+    const cookieId = readCookie(visitorKey);
+    const id = validId(stored) ? stored : validId(cookieId) ? cookieId : crypto.randomUUID();
+    try { localStorage.setItem(visitorKey, id); } catch { /* Use the cookie or this page's ID. */ }
+    writeCookie(visitorKey, id);
+    return id;
   }
 
   function getReferrer() {
@@ -85,15 +106,11 @@
     if (!anchor) return;
     try {
       const url = new URL(anchor.href);
-      if (url.origin !== "https://github.com" || url.username || url.password) return;
-      if (!/^\/SiavashB\/nano\.md\/releases\/download\/[^/]+\/[^/]+$/.test(url.pathname)) return;
-      const downloadUrl = `${url.origin}${url.pathname}`;
-      if (downloadUrl.length <= 1000) {
-        track("download", downloadUrl);
-        if (typeof gtag === "function") gtag("event", "conversion", { send_to: "AW-18539154873/gUciCN2BgKsdELmblIhF", transport_type: "beacon" });
-      }
+      if (url.origin !== location.origin || url.pathname !== "/download" || isExcluded()) return;
+      // Only Google Ads stays client-side; the Worker records the Supabase download event.
+      if (typeof gtag === "function") gtag("event", "conversion", { send_to: "AW-18539154873/gUciCN2BgKsdELmblIhF", transport_type: "beacon" });
     } catch {
-      // Ignore links that are not valid release asset URLs.
+      // Ignore links that are not download routes.
     }
   }
 

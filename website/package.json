@@ -2,6 +2,7 @@
   "name": "nano-md-website",
   "private": true,
   "scripts": {
+    "dev": "WRANGLER_SEND_METRICS=false WRANGLER_LOG_PATH=../Temp/WebsiteDeploy/logs/ wrangler dev --local --ip 127.0.0.1 --port 4173 --persist-to ../Temp/WebsiteDev/state --var DISABLE_DOWNLOAD_ANALYTICS:true --live-reload",
     "update-app-size": "node update-app-size.mjs",
     "update-release": "node update-release.mjs",
     "predeploy": "npm run update-release",
