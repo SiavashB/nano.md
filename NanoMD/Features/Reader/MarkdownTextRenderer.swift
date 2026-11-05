@@ -52,13 +52,14 @@ struct MarkdownTextRenderer {
         case let .paragraph(runs):
             appendParagraph(runs, to: output, indent: indent, quoteDepth: quoteDepth, marker: marker)
         case let .heading(level, runs):
-            let sizes: [CGFloat] = [30, 25, 21, 18, 16, 15]
+            let sizes: [CGFloat] = [28, 24, 20, 17, 15, 13]
             let font = NSFont.monospacedSystemFont(ofSize: sizes[min(max(level, 1), 6) - 1], weight: .bold)
             appendParagraph(runs, to: output, font: font, color: theme.primary,
-                            indent: indent, quoteDepth: quoteDepth, marker: marker)
+                            indent: indent, quoteDepth: quoteDepth, marker: marker, isHeading: true)
         case let .code(text), let .literal(text):
             appendParagraph(
                 [MarkdownRun(text: text, style: .code, sourceSpan: sourceSpan)], to: output,
+                font: .monospacedSystemFont(ofSize: 12, weight: .regular),
                 indent: indent, quoteDepth: quoteDepth, marker: marker, isLiteralBlock: true
             )
         case let .quote(blocks):
@@ -66,20 +67,29 @@ struct MarkdownTextRenderer {
                 try await append(child, to: output, indent: indent + 20, quoteDepth: quoteDepth + 1,
                                  marker: index == 0 ? marker : "")
             }
-        case let .list(start, items):
+        case let .list(startNumber, items):
             if !marker.isEmpty {
                 appendParagraph([], to: output, indent: indent, quoteDepth: quoteDepth, marker: marker)
             }
             for (index, item) in items.enumerated() {
-                let bullet = start.map { "\($0 + UInt(index))." } ?? "•"
+                let bullet = startNumber.map { "\($0 + UInt(index))." } ?? "•"
                 let prefix = item.checkbox.map { "\(bullet) \($0)\t" } ?? "\(bullet)\t"
                 if item.blocks.isEmpty {
-                    appendParagraph([], to: output, indent: indent + 24, quoteDepth: quoteDepth, marker: prefix)
+                    appendParagraph([], to: output, indent: indent + 20, quoteDepth: quoteDepth, marker: prefix)
                 }
                 for (blockIndex, child) in item.blocks.enumerated() {
-                    try await append(child, to: output, indent: indent + 24, quoteDepth: quoteDepth,
+                    try await append(child, to: output, indent: indent + 20, quoteDepth: quoteDepth,
                                      marker: blockIndex == 0 ? prefix : "")
                 }
+            }
+            if output.length > start,
+               let style = output.attribute(.paragraphStyle, at: output.length - 1, effectiveRange: nil)
+                    as? NSParagraphStyle,
+               let spacing = style.mutableCopy() as? NSMutableParagraphStyle {
+                spacing.paragraphSpacing = max(spacing.paragraphSpacing, 13)
+                output.addAttribute(.paragraphStyle, value: spacing,
+                                    range: (output.string as NSString).paragraphRange(
+                                        for: NSRange(location: output.length - 1, length: 1)))
             }
         case let .table(table):
             if !marker.isEmpty {
@@ -153,7 +163,7 @@ struct MarkdownTextRenderer {
             try Task.checkCancellation()
             await Task.yield()
             let isHeader = rowIndex == 0
-            let font = NSFont.monospacedSystemFont(ofSize: 15, weight: isHeader ? .bold : .regular)
+            let font = NSFont.monospacedSystemFont(ofSize: 13, weight: isHeader ? .bold : .regular)
 
             for (columnIndex, alignment) in content.columnAlignments.enumerated() {
                 let cell = NSTextTableBlock(
@@ -172,7 +182,7 @@ struct MarkdownTextRenderer {
 
                 let paragraph = NSMutableParagraphStyle()
                 paragraph.textBlocks = [cell]
-                paragraph.lineSpacing = 4
+                paragraph.minimumLineHeight = font.pointSize * 1.8
                 paragraph.alignment = switch alignment {
                 case .left: .left
                 case .center: .center
@@ -185,6 +195,9 @@ struct MarkdownTextRenderer {
                 ]
                 let contentCell = columnIndex < row.cells.count ? row.cells[columnIndex] : nil
                 let runs = contentCell?.runs ?? []
+                if runs.first?.style.contains(.code) == true {
+                    paragraph.firstLineHeadIndent = 6
+                }
                 appendRuns(runs, to: output, font: font, base: base)
                 // Even an empty cell needs a paragraph carrying its table block.
                 var separatorAttributes = base
@@ -208,35 +221,59 @@ struct MarkdownTextRenderer {
     private func appendParagraph(
         _ runs: [MarkdownRun],
         to output: NSMutableAttributedString,
-        font: NSFont = .monospacedSystemFont(ofSize: 15, weight: .regular),
+        font: NSFont = .monospacedSystemFont(ofSize: 13, weight: .regular),
         color: NSColor? = nil,
         indent: CGFloat,
         quoteDepth: Int,
         marker: String,
-        isLiteralBlock: Bool = false
+        isLiteralBlock: Bool = false,
+        isHeading: Bool = false
     ) {
         let paragraph = NSMutableParagraphStyle()
-        paragraph.paragraphSpacing = isLiteralBlock ? 0 : 12
-        paragraph.lineSpacing = isLiteralBlock ? 2 : 4
+        if isHeading {
+            paragraph.paragraphSpacing = 15
+            paragraph.paragraphSpacingBefore = output.length > 0 ? 18 : 0
+            paragraph.minimumLineHeight = font.pointSize * 1.25
+        } else if isLiteralBlock {
+            paragraph.minimumLineHeight = font.pointSize * 1.7
+        } else {
+            paragraph.paragraphSpacing = marker.isEmpty ? 13 : 4
+            paragraph.minimumLineHeight = font.pointSize * 1.8
+        }
         paragraph.headIndent = indent
-        paragraph.firstLineHeadIndent = marker.isEmpty ? indent : max(0, indent - 24)
+        let markerWidth = (marker.trimmingCharacters(in: .whitespacesAndNewlines) as NSString)
+            .size(withAttributes: [.font: font]).width
+        paragraph.firstLineHeadIndent = marker.isEmpty ? indent : indent - max(20, markerWidth + 4)
         paragraph.tabStops = [NSTextTab(textAlignment: .left, location: indent)]
         paragraph.defaultTabInterval = 32
+        if !isLiteralBlock, quoteDepth == 0, runs.first?.style.contains(.code) == true {
+            if marker.isEmpty {
+                paragraph.firstLineHeadIndent += 6
+            } else {
+                paragraph.tabStops = [NSTextTab(textAlignment: .left, location: indent + 6)]
+            }
+        }
         if isLiteralBlock {
-            let block = NSTextBlock()
+            let block = ReaderCodeBlock()
             block.setContentWidth(100, type: .percentageValueType)
             block.backgroundColor = theme.codeBlock
-            block.setWidth(12, type: .absoluteValueType, for: .padding)
+            block.setWidth(14, type: .absoluteValueType, for: .padding)
             block.setWidth(1, type: .absoluteValueType, for: .border)
             block.setBorderColor(theme.border)
             paragraph.textBlocks = [block]
         }
 
-        let base: [NSAttributedString.Key: Any] = [
+        var base: [NSAttributedString.Key: Any] = [
             .font: font,
             .foregroundColor: color ?? theme.secondary,
             .paragraphStyle: paragraph
         ]
+        if isLiteralBlock {
+            base[.readerCodeBlock] = true
+        }
+        if isHeading {
+            base[.kern] = -0.035 * font.pointSize
+        }
         let prefix = marker + (quoteDepth > 0 ? "│ " : "")
         var prefixAttributes = base
         prefixAttributes[.foregroundColor] = theme.accent
@@ -247,7 +284,8 @@ struct MarkdownTextRenderer {
         }
         if isLiteralBlock {
             let spacing = NSMutableParagraphStyle()
-            spacing.lineSpacing = paragraph.lineSpacing
+            spacing.minimumLineHeight = 18
+            spacing.maximumLineHeight = 18
             output.append(NSAttributedString(string: "\n", attributes: [
                 .font: font,
                 .paragraphStyle: spacing
@@ -269,8 +307,11 @@ struct MarkdownTextRenderer {
                     span: span, rendered: run.text, renderedStart: output.length
                 )
             }
-            var runFont = run.style.contains(.code)
-                ? NSFont.monospacedSystemFont(ofSize: 13, weight: .regular) : font
+            var runFont = font
+            if run.style.contains(.code), usesInlineCodeBackground {
+                runFont = .monospacedSystemFont(ofSize: font.pointSize * 0.9, weight: .regular)
+                attributes[.kern] = 0
+            }
             if run.style.contains(.strong) {
                 runFont = NSFontManager.shared.convert(runFont, toHaveTrait: .boldFontMask)
             }
@@ -286,6 +327,7 @@ struct MarkdownTextRenderer {
             }
             if run.style.contains(.code), usesInlineCodeBackground {
                 attributes[.backgroundColor] = theme.inlineCode
+                attributes[.readerInlineCode] = theme.inlineCode
             }
             if let destination = run.destination {
                 if let url = ReaderLinkPolicy.allowedURL(destination) {
@@ -293,7 +335,7 @@ struct MarkdownTextRenderer {
                     attributes[.foregroundColor] = theme.accent
                     attributes[.toolTip] = destination
                 } else {
-                    output.append(NSAttributedString(string: run.text, attributes: attributes))
+                    appendText(run.text, attributes: attributes, to: output)
                     if index + 1 == runs.count || runs[index + 1].destination != destination {
                         let label = " (\(destination))"
                         var destinationAttributes = base
@@ -307,7 +349,30 @@ struct MarkdownTextRenderer {
                     continue
                 }
             }
-            output.append(NSAttributedString(string: run.text, attributes: attributes))
+            appendText(run.text, attributes: attributes, to: output)
+        }
+    }
+
+    private func appendText(_ text: String, attributes: [NSAttributedString.Key: Any],
+                            to output: NSMutableAttributedString) {
+        let isInlineCode = attributes[.readerInlineCode] != nil && !text.isEmpty
+        if isInlineCode, output.length > 0 {
+            let string = output.string as NSString
+            let previous = string.rangeOfComposedCharacterSequence(at: output.length - 1)
+            let character = string.substring(with: previous)
+            if !character.contains(where: { $0.isNewline || $0 == "\t" }) {
+                let continuesCode = output.attribute(.readerInlineCode, at: previous.location,
+                                                     effectiveRange: nil) != nil
+                let kern = (output.attribute(.kern, at: previous.location, effectiveRange: nil) as? NSNumber)?
+                    .doubleValue ?? 0
+                output.addAttribute(.kern, value: continuesCode ? 0 : kern + 6, range: previous)
+            }
+        }
+        output.append(NSAttributedString(string: text, attributes: attributes))
+        if isInlineCode {
+            // Reserve padding with text attributes so copying and source offsets stay exact.
+            let last = (output.string as NSString).rangeOfComposedCharacterSequence(at: output.length - 1)
+            output.addAttribute(.kern, value: 6, range: last)
         }
     }
 }
