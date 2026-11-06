@@ -16,9 +16,11 @@ final class ReaderModel {
     private var content: MarkdownContent?
     private var sourceSnapshot = ""
     private var theme: AppTheme
+    private var font: ReaderFont
 
-    init(theme: AppTheme) {
+    init(theme: AppTheme, font: ReaderFont = .defaultFont) {
         self.theme = theme
+        self.font = font
     }
 
     func load(_ source: String) async {
@@ -44,9 +46,10 @@ final class ReaderModel {
         }
     }
 
-    func restyle(_ theme: AppTheme) async {
+    func restyle(_ theme: AppTheme, font: ReaderFont) async {
         guard !Task.isCancelled else { return }
         self.theme = theme
+        self.font = font
         await renderCurrentContent()
     }
 
@@ -56,7 +59,7 @@ final class ReaderModel {
         let request = UUID()
         renderRevision = request
         do {
-            let text = try await MarkdownTextRenderer(theme: theme).render(content)
+            let text = try await MarkdownTextRenderer(theme: theme, fontFamily: font).render(content)
             try Task.checkCancellation()
             guard renderRevision == request else { return }
             state = .ready(text, source: source)

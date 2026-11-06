@@ -51,6 +51,8 @@ Open `.md` or `.markdown` files with Command-O or Finder's **Open With** menu. E
 
 The upcoming 1.1.0 update (build 26) offers to make nano.md the default Markdown app on first launch, before opening the automatic file chooser. Choose **Make Default**, or **Not Now** to dismiss the offer without being asked again. After a successful first-launch default-app change, the file chooser opens if no document is already open. Users who already have nano.md as their default, and later launches, use the usual file chooser. The same default-app action remains available from **nano.md > Make Default for Markdown…**. macOS may ask you to confirm the change. This feature is not included in the 1.0.0 download above.
 
+The local upcoming build also provides **View > Reader Font > Choose Font…** to choose any font face available through macOS's native font panel. Monaco is the default. The reading preference applies across windows and persists across launches; headings retain their hierarchy and code stays monospaced. **Use Default Font** restores Monaco. This changes presentation without changing Markdown source and is not included in the 1.0.0 download above.
+
 Switch Read/Edit with Control-R or Command-R, the toolbar, the footer button, or View > Edit/Read. Choose System, Light (Linen Light), or Dark (Nano Dark) from View > Appearance or the toolbar. Appearance applies to all windows and persists across launches.
 
 Switching to Edit places the caret near the selected reader text, or near the top of the visible content when scrolled, and focuses the editor. On a supported trackpad, force-click text in Read to start editing near that location.

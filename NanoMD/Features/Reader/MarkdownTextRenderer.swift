@@ -2,6 +2,7 @@ import AppKit
 
 struct MarkdownTextRenderer {
     let theme: AppTheme
+    let fontFamily: ReaderFont
 
     func render(_ content: MarkdownContent) async throws -> NSAttributedString {
         let output = NSMutableAttributedString(string: "")
@@ -52,14 +53,14 @@ struct MarkdownTextRenderer {
         case let .paragraph(runs):
             appendParagraph(runs, to: output, indent: indent, quoteDepth: quoteDepth, marker: marker)
         case let .heading(level, runs):
-            let sizes: [CGFloat] = [28, 24, 20, 17, 15, 13]
-            let font = NSFont.monospacedSystemFont(ofSize: sizes[min(max(level, 1), 6) - 1], weight: .bold)
+            let font = fontFamily.font(size: fontFamily.headingSize(level: level),
+                                       weight: fontFamily.headingWeight)
             appendParagraph(runs, to: output, font: font, color: theme.primary,
                             indent: indent, quoteDepth: quoteDepth, marker: marker, isHeading: true)
         case let .code(text), let .literal(text):
             appendParagraph(
                 [MarkdownRun(text: text, style: .code, sourceSpan: sourceSpan)], to: output,
-                font: .monospacedSystemFont(ofSize: 12, weight: .regular),
+                font: fontFamily.codeFont(size: 12),
                 indent: indent, quoteDepth: quoteDepth, marker: marker, isLiteralBlock: true
             )
         case let .quote(blocks):
@@ -106,7 +107,7 @@ struct MarkdownTextRenderer {
         let table = NSTextTable()
         table.numberOfColumns = 1
         table.layoutAlgorithm = .fixedLayoutAlgorithm
-        let panel = NSTextTableBlock(
+        let panel = ReaderTableCell(
             table: table, startingRow: 0, rowSpan: 1, startingColumn: 0, columnSpan: 1
         )
         panel.setWidth(12, type: .absoluteValueType, for: .padding)
@@ -118,12 +119,12 @@ struct MarkdownTextRenderer {
         paragraph.textBlocks = [panel]
         paragraph.lineSpacing = 3
         output.append(NSAttributedString(string: String(localized: "Metadata") + "\n", attributes: [
-            .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .bold),
+            .font: fontFamily.font(size: 11, weight: fontFamily.headingWeight),
             .foregroundColor: theme.primary,
             .paragraphStyle: paragraph
         ]))
         var attributes: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedSystemFont(ofSize: 12, weight: .regular),
+            .font: fontFamily.codeFont(size: 12),
             .foregroundColor: theme.secondary,
             .paragraphStyle: paragraph
         ]
@@ -155,7 +156,7 @@ struct MarkdownTextRenderer {
         let table = NSTextTable()
         table.numberOfColumns = content.columnAlignments.count
         table.layoutAlgorithm = .fixedLayoutAlgorithm
-        table.collapsesBorders = false
+        table.collapsesBorders = true
         table.hidesEmptyCells = false
         table.setWidth(indent, type: .absoluteValueType, for: .margin, edge: .minX)
 
@@ -163,10 +164,11 @@ struct MarkdownTextRenderer {
             try Task.checkCancellation()
             await Task.yield()
             let isHeader = rowIndex == 0
-            let font = NSFont.monospacedSystemFont(ofSize: 13, weight: isHeader ? .bold : .regular)
+            let font = fontFamily.font(size: fontFamily.tableSize,
+                                       weight: isHeader ? fontFamily.tableHeadingWeight : nil)
 
             for (columnIndex, alignment) in content.columnAlignments.enumerated() {
-                let cell = NSTextTableBlock(
+                let cell = ReaderTableCell(
                     table: table, startingRow: rowIndex, rowSpan: 1,
                     startingColumn: columnIndex, columnSpan: 1
                 )
@@ -221,7 +223,7 @@ struct MarkdownTextRenderer {
     private func appendParagraph(
         _ runs: [MarkdownRun],
         to output: NSMutableAttributedString,
-        font: NSFont = .monospacedSystemFont(ofSize: 13, weight: .regular),
+        font: NSFont? = nil,
         color: NSColor? = nil,
         indent: CGFloat,
         quoteDepth: Int,
@@ -229,6 +231,7 @@ struct MarkdownTextRenderer {
         isLiteralBlock: Bool = false,
         isHeading: Bool = false
     ) {
+        let font = font ?? fontFamily.font(size: fontFamily.bodySize)
         let paragraph = NSMutableParagraphStyle()
         if isHeading {
             paragraph.paragraphSpacing = 15
@@ -272,7 +275,7 @@ struct MarkdownTextRenderer {
             base[.readerCodeBlock] = true
         }
         if isHeading {
-            base[.kern] = -0.035 * font.pointSize
+            base[.kern] = (fontFamily.isProportional ? -0.015 : -0.035) * font.pointSize
         }
         let prefix = marker + (quoteDepth > 0 ? "│ " : "")
         var prefixAttributes = base
@@ -309,7 +312,7 @@ struct MarkdownTextRenderer {
             }
             var runFont = font
             if run.style.contains(.code), usesInlineCodeBackground {
-                runFont = .monospacedSystemFont(ofSize: font.pointSize * 0.9, weight: .regular)
+                runFont = fontFamily.codeFont(size: font.pointSize * 0.9)
                 attributes[.kern] = 0
             }
             if run.style.contains(.strong) {

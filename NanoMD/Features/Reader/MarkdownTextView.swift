@@ -86,4 +86,30 @@ private final class ReaderTextView: ReaderInteractionTextView {
         }
         super.draw(dirtyRect)
     }
+
+    override func drawBackground(in rect: NSRect) {
+        super.drawBackground(in: rect)
+        guard let storage = textStorage, let layoutManager else { return }
+        let origin = textContainerOrigin
+        var drawnCells = Set<ObjectIdentifier>()
+
+        // A scroll repaint can intersect cell padding without intersecting its glyphs.
+        // Paint complete native cell decorations before text and selection highlights.
+        storage.enumerateAttribute(.paragraphStyle, in: NSRange(location: 0, length: storage.length)) {
+            value, range, _ in
+            guard let paragraph = value as? NSParagraphStyle else { return }
+            for case let cell as ReaderTableCell in paragraph.textBlocks {
+                guard drawnCells.insert(ObjectIdentifier(cell)).inserted else { continue }
+                let glyphs = layoutManager.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
+                guard glyphs.length > 0 else { continue }
+                var cellGlyphs = NSRange()
+                let bounds = layoutManager.boundsRect(for: cell, at: glyphs.location, effectiveRange: &cellGlyphs)
+                let frame = bounds.offsetBy(dx: origin.x, dy: origin.y)
+                guard !frame.isEmpty, frame.intersects(rect), needsToDraw(frame) else { continue }
+                let characters = layoutManager.characterRange(forGlyphRange: cellGlyphs, actualGlyphRange: nil)
+                cell.drawCompleteBackground(withFrame: frame, in: self, characterRange: characters,
+                                            layoutManager: layoutManager)
+            }
+        }
+    }
 }

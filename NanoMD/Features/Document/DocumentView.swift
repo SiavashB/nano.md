@@ -5,6 +5,7 @@ struct DocumentView: View {
     @Binding var appearancePreference: String
     let filename: String
     let systemColorScheme: ColorScheme
+    let readerFont: ReaderFont
     @State private var mode: Mode
     @State private var isFeedbackHovered = false
     @State private var navigation = DocumentNavigation()
@@ -23,11 +24,13 @@ struct DocumentView: View {
     }
 
     init(document: Binding<NanoMDDocument>, isNewDocument: Bool, filename: String,
-         appearancePreference: Binding<String>, systemColorScheme: ColorScheme) {
+         appearancePreference: Binding<String>, systemColorScheme: ColorScheme,
+         readerFont: ReaderFont = .defaultFont) {
         _document = document
         _appearancePreference = appearancePreference
         self.filename = filename
         self.systemColorScheme = systemColorScheme
+        self.readerFont = readerFont
         _mode = State(initialValue: isNewDocument ? .edit : .read)
     }
 
@@ -69,7 +72,8 @@ struct DocumentView: View {
                     .accessibilityHidden(mode != .edit)
 
                 if mode == .read {
-                    ReaderView(source: document.source, theme: theme, navigation: navigation) { point in
+                    ReaderView(source: document.source, theme: theme, navigation: navigation,
+                               font: readerFont) { point in
                         guard navigation.matches(document.source) else { return }
                         beginEditing(at: point)
                     }
@@ -111,11 +115,12 @@ struct DocumentView: View {
     private var header: some View {
         ZStack {
             HStack(spacing: 16) {
-                Text("nano.md").bold()
+                Text("nano.md")
+                    .font(Font(readerFont.font(size: 12, weight: readerFont.headingWeight)))
                 Spacer(minLength: 0)
                 Text(filename).truncationMode(.middle)
             }
-            .font(.system(size: 12, design: .monospaced))
+            .font(Font(readerFont.font(size: 12)))
             .lineLimit(1)
             .padding(.horizontal, 17)
             .padding(.vertical, 12)
@@ -141,7 +146,7 @@ struct DocumentView: View {
             Spacer(minLength: 0)
             feedbackLink
         }
-        .font(.system(size: 11, design: .monospaced))
+        .font(Font(readerFont.font(size: 11)))
         .lineLimit(1)
         .foregroundStyle(Color(nsColor: theme.secondary))
         .padding(.horizontal, 17)
@@ -175,7 +180,7 @@ struct DocumentView: View {
         }
         .accessibilityLabel("Switch to \(modeAction.title) mode")
         .help("Switch to \(modeAction.title) mode (Control+R or Command+R)")
-        .font(.system(size: 12, design: .monospaced))
+        .font(Font(readerFont.font(size: 12)))
         .buttonStyle(.plain)
         .buttonRepeatBehavior(.disabled)
         .fixedSize()

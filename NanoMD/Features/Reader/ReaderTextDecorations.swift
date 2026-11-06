@@ -5,6 +5,20 @@ extension NSAttributedString.Key {
     nonisolated static let readerCodeBlock = Self("NanoMD.codeBlock")
 }
 
+nonisolated final class ReaderTableCell: NSTextTableBlock {
+    // The reader paints complete cell bounds in its view-background pass. Suppress
+    // the glyph-background pass so antialiased borders are not painted twice.
+    override func drawBackground(withFrame frameRect: NSRect, in controlView: NSView?,
+                                 characterRange charRange: NSRange, layoutManager: NSLayoutManager) {}
+
+    func drawCompleteBackground(withFrame frameRect: NSRect, in controlView: NSView,
+                                characterRange charRange: NSRange, layoutManager: NSLayoutManager) {
+        MainActor.preconditionIsolated()
+        super.drawBackground(withFrame: frameRect, in: controlView,
+                             characterRange: charRange, layoutManager: layoutManager)
+    }
+}
+
 // AppKit's drawing primitives are nonisolated. The main-actor reader owns these
 // instances; drawing checks that ownership without transferring layout objects.
 nonisolated final class ReaderCodeBlock: NSTextBlock {

@@ -6,6 +6,7 @@ struct NanoMDApp: App {
     @NSApplicationDelegateAdaptor(DefaultMarkdownApplication.self) private var defaultMarkdownApplication
     @AppStorage(AppearanceMode.preferenceKey) private var themePreference = AppearanceMode.system.rawValue
     @State private var systemAppearance = SystemAppearance()
+    @State private var readerFontSettings = ReaderFontSettings()
 
     init() {
         // Use AppKit's keep-changes confirmation for this app's documents,
@@ -18,7 +19,7 @@ struct NanoMDApp: App {
             DocumentView(document: file.$document, isNewDocument: file.fileURL == nil,
                          filename: file.fileURL?.lastPathComponent ?? "Untitled",
                          appearancePreference: $themePreference,
-                         systemColorScheme: systemAppearance.colorScheme)
+                         systemColorScheme: systemAppearance.colorScheme, readerFont: readerFontSettings.value)
         }
         .defaultSize(width: 800, height: 600)
         .defaultLaunchBehavior(defaultMarkdownApplication.shouldSuppressAutomaticDocumentLaunch ? .suppressed : .automatic)
@@ -30,6 +31,16 @@ struct NanoMDApp: App {
                 .disabled(defaultMarkdownApplication.isChangingDefault)
             }
             DocumentCommands(appearancePreference: $themePreference)
+            CommandGroup(after: .toolbar) {
+                Menu("Reader Font") {
+                    Button("Choose Font…") {
+                        readerFontSettings.showFontPanel()
+                    }
+                    Button("Use Default Font") {
+                        readerFontSettings.useDefaultFont()
+                    }
+                }
+            }
         }
     }
 }

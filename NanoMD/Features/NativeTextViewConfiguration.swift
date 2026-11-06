@@ -9,6 +9,8 @@ enum NativeTextViewConfiguration {
 
         textView.usesFindBar = true
         textView.isIncrementalSearchingEnabled = true
+        // The app's font panel owns a reading preference, not selected-text formatting.
+        textView.usesFontPanel = false
 
         textView.isVerticallyResizable = true
         textView.isHorizontallyResizable = false
