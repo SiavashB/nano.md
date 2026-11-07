@@ -24,7 +24,7 @@ final class ReaderFontSettings: NSObject, NSFontChanging, NSWindowDelegate {
         manager.setSelectedFont(value.font(size: value.bodySize), isMultiple: false)
         let panel = NSFontPanel.shared
         panel.delegate = self
-        panel.title = String(localized: "Reader Font")
+        panel.title = String(localized: "Font Settings")
         manager.orderFrontFontPanel(nil)
     }
 

@@ -25,14 +25,7 @@ struct NanoMDApp: App {
         .defaultLaunchBehavior(defaultMarkdownApplication.shouldSuppressAutomaticDocumentLaunch ? .suppressed : .automatic)
         .commands {
             CommandGroup(after: .appInfo) {
-                Button("Make Default for Markdown…") {
-                    defaultMarkdownApplication.makeDefault()
-                }
-                .disabled(defaultMarkdownApplication.isChangingDefault)
-            }
-            DocumentCommands(appearancePreference: $themePreference)
-            CommandGroup(after: .toolbar) {
-                Menu("Reader Font") {
+                Menu("Font Settings") {
                     Button("Choose Font…") {
                         readerFontSettings.showFontPanel()
                     }
@@ -40,7 +33,12 @@ struct NanoMDApp: App {
                         readerFontSettings.useDefaultFont()
                     }
                 }
+                Button("Make Default Handler of .md files…") {
+                    defaultMarkdownApplication.makeDefault()
+                }
+                .disabled(defaultMarkdownApplication.isChangingDefault)
             }
+            DocumentCommands(appearancePreference: $themePreference)
         }
     }
 }
