@@ -61,6 +61,8 @@ Find text in either mode with Command-F. Read searches displayed text; Edit sear
 
 The reader supports headings, paragraphs, emphasis, lists, quotes, code blocks, pipe tables, HTTP/HTTPS links, and a selectable panel for leading YAML front matter. Metadata values stay literal; the app does not interpret YAML.
 
+The local upcoming build also renders `~~strikethrough~~`, including text combined with bold, italics, inline code, or links. Strikethrough is not included in the 1.0.0 download above.
+
 Files must be valid UTF-8. Saving preserves the loaded BOM and existing line endings; new files use UTF-8 without a BOM and LF. Inserted line breaks follow the file's first existing line ending, while pasted text keeps its own. Smart quotes, autocorrect, and automatic substitutions are disabled.
 
 ## Current limitations

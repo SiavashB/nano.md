@@ -129,6 +129,8 @@ actor MarkdownParser {
             return try inlineChildren(node, sourceIndex: sourceIndex, style: style.union(.emphasis), destination: destination)
         case is Strong:
             return try inlineChildren(node, sourceIndex: sourceIndex, style: style.union(.strong), destination: destination)
+        case is Strikethrough:
+            return try inlineChildren(node, sourceIndex: sourceIndex, style: style.union(.strikethrough), destination: destination)
         case let code as InlineCode:
             return [MarkdownRun(text: code.code, style: style.union(.code), destination: destination)]
         case let link as Link:

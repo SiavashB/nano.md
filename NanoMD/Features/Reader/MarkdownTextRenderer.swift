@@ -322,6 +322,9 @@ struct MarkdownTextRenderer {
                 runFont = NSFontManager.shared.convert(runFont, toHaveTrait: .italicFontMask)
             }
             attributes[.font] = runFont
+            if run.style.contains(.strikethrough) {
+                attributes[.strikethroughStyle] = NSUnderlineStyle.single.rawValue
+            }
             if run.style.contains(.strong) {
                 attributes[.foregroundColor] = theme.primary
             }
