@@ -2,6 +2,8 @@
 
 Contributions should address a concrete behavior or maintenance problem. Start with an [open issue](https://github.com/SiavashB/nano.md/issues) and the [code organization](#code-organization) below.
 
+By submitting a contribution for inclusion in nano.md, you agree to license it under the project's [Sustainable Use License 1.0](LICENSE). You retain ownership of your contribution.
+
 ## Reporting bugs
 
 Search existing issues, then use the [bug report form](https://github.com/SiavashB/nano.md/issues/new?template=bug_report.yml). Include the app version/build, macOS version and hardware, steps to reproduce, and expected versus actual behavior. A small Markdown sample helps; remove private content, credentials, and personal paths before sharing it.

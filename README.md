@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/SiavashB/nano.md/releases/latest"><img alt="Latest stable release" src="https://img.shields.io/github/v/release/SiavashB/nano.md?label=release"></a>
-  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/SiavashB/nano.md"></a>
+  <a href="LICENSE"><img alt="License: SUL-1.0" src="https://img.shields.io/badge/license-SUL--1.0-blue"></a>
   <a href="https://github.com/SiavashB/nano.md/actions/workflows/ci.yml"><img alt="Build" src="https://img.shields.io/github/actions/workflow/status/SiavashB/nano.md/ci.yml?branch=main&amp;label=build"></a>
 </p>
 
@@ -103,4 +103,8 @@ See [Contributing](CONTRIBUTING.md) for development and validation, [GitHub Issu
 
 ## License
 
-[MIT](LICENSE). The app bundles its license and [third-party notices](NanoMD/Resources/ThirdPartyNotices.txt).
+nano.md is source-available under the [Sustainable Use License 1.0 (SUL-1.0)](LICENSE). You may use or modify it for your own internal business purposes or for non-commercial or personal use. Redistribution is permitted only free of charge for non-commercial purposes.
+
+The app bundles its license and [third-party notices](NanoMD/Resources/ThirdPartyNotices.txt). Third-party components retain their own licenses.
+
+Permissions already granted under MIT for earlier versions remain in effect.
