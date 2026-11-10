@@ -1,0 +1,10 @@
+Sustainable Use License 1.0
+
+Free for personal use and internal business use. You can fork, modify, and contribute improvements. You may share the app or code only for free, non-commercial purposes. You can’t sell it—even modified, rebranded, or bundled into another product.
+
+Read the full license in the accompanying LICENSE file or at:
+https://github.com/SiavashB/nano.md/blob/main/LICENSE
+
+This is a summary. Full terms apply.
+
+Separately licensed third-party components retain their own licenses; see ThirdPartyNotices.txt.

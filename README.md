@@ -103,7 +103,13 @@ See [Contributing](CONTRIBUTING.md) for development and validation, [GitHub Issu
 
 ## License
 
-nano.md is source-available under the [Sustainable Use License 1.0 (SUL-1.0)](LICENSE). You may use or modify it for your own internal business purposes or for non-commercial or personal use. Redistribution is permitted only free of charge for non-commercial purposes.
+**Sustainable Use License 1.0**
+
+Free for personal use and internal business use. You can fork, modify, and contribute improvements. You may share the app or code only for free, non-commercial purposes. You can’t sell it—even modified, rebranded, or bundled into another product.
+
+[Read the full license](LICENSE). *This is a summary. Full terms apply.*
+
+The current nano.md source is source-available under this license.
 
 The app bundles its license and [third-party notices](NanoMD/Resources/ThirdPartyNotices.txt). Third-party components retain their own licenses.
 
