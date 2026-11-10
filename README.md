@@ -26,7 +26,9 @@
 
 **[Download nano.md 1.2.0 for Apple Silicon](https://github.com/SiavashB/nano.md/releases/download/v1.2.0/nano.md-v1.2.0-arm64.zip)** · [Release notes and checksum](https://github.com/SiavashB/nano.md/releases/tag/v1.2.0) · [Website](https://nano.thirdeyeds.com/)
 
-Build 27 · **2.33 MB ZIP download** · **4.4 MB uncompressed app** (decimal MB).
+Build 28 · **2.33 MB ZIP download** · **4.4 MB uncompressed app** (decimal MB).
+
+This replaces the initial 1.2.0 build 27. If you downloaded that build, download the replacement above to get the rating menu and in-app license summary.
 
 Unzip and move `NanoMD.app` to Applications. The app is Developer ID signed and notarized; verify the ZIP with the release's `SHA256SUMS.txt`.
 
@@ -55,7 +57,7 @@ nano.md offers to become the default Markdown app on first launch, before openin
 
 Use **nano.md > Font Settings > Choose Font…** to choose any font face available through macOS's native font panel. Monaco is the default. The reading preference applies across windows and persists across launches; headings retain their hierarchy and code stays monospaced. **nano.md > Font Settings > Use Default Font** restores Monaco. This changes presentation without changing Markdown source.
 
-The replacement 1.2.0 build 28 will include **nano.md > Rate nano.md…**, an optional link to write an App Store review, and a plain-English license summary in About. The app opens Apple's review page only when you choose the rating menu item. Build 28 is being prepared; the download above currently provides build 27.
+Choose **nano.md > Rate nano.md…** to open the App Store review page. The app opens it only when you choose this menu item; there are no automatic rating prompts. About includes a plain-English license summary and a link to the full terms.
 
 Switch Read/Edit with Command-R, Control-R, the toolbar, the footer button, or View > Edit/Read. Choose System, Light (Linen Light), or Dark (Nano Dark) from View > Appearance or the toolbar. Appearance applies to all windows and persists across launches.
 
