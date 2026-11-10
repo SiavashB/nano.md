@@ -24,22 +24,24 @@
 
 ## Download
 
-**[Download nano.md 1.0.0 for Apple Silicon](https://github.com/SiavashB/nano.md/releases/download/v1.0.0/nano.md-v1.0.0-arm64.zip)** · [Release notes and checksum](https://github.com/SiavashB/nano.md/releases/tag/v1.0.0) · [Website](https://nano.thirdeyeds.com/)
+**[Download nano.md 1.2.0 for Apple Silicon](https://github.com/SiavashB/nano.md/releases/download/v1.2.0/nano.md-v1.2.0-arm64.zip)** · [Release notes and checksum](https://github.com/SiavashB/nano.md/releases/tag/v1.2.0) · [Website](https://nano.thirdeyeds.com/)
 
-Build 25 · **2.29 MB ZIP download** · **4.2 MB uncompressed app** (decimal MB).
+Build 27 · **2.33 MB ZIP download** · **4.4 MB uncompressed app** (decimal MB).
 
 Unzip and move `NanoMD.app` to Applications. The app is Developer ID signed and notarized; verify the ZIP with the release's `SHA256SUMS.txt`.
 
 Requires Apple Silicon and macOS 15.0 or later.
 
+The [Mac App Store](https://apps.apple.com/us/app/nano-md/id6826107962) update to 1.2.0 is awaiting Apple review. The direct download above is available now.
+
 ## Why nano.md
 
-- **Small and native.** Built with SwiftUI and AppKit, with a 4.2 MB app bundle.
-- **Read and edit ordinary Markdown.** Open README files, notes, `AGENTS.md`, and `SKILL.md`. Switch between formatted reading and source editing with Control-R.
+- **Small and native.** Built with SwiftUI and AppKit, with a 4.4 MB app bundle.
+- **Read and edit ordinary Markdown.** Open README files, notes, `AGENTS.md`, and `SKILL.md`. Switch between formatted reading and source editing with Command-R or Control-R.
 - **Native Find.** Search in Read or Edit with Command-F, then move between matches with Command-G.
 - **Readable front matter.** Leading YAML metadata appears in a compact panel, while Edit keeps the original text.
 - **Local and free.** No account, subscription, or paid tier. The Mac app has no telemetry or network entitlement and does not load remote resources. See the [privacy policy](https://nano.thirdeyeds.com/privacy).
-- **Your preferred appearance.** Choose Nano Dark, Linen Light, or follow the system setting.
+- **Your preferred appearance.** Choose Nano Dark, Linen Light, or follow the system setting. Pick a reading font with the native macOS font panel; Monaco is the default.
 
 <a id="reading-and-editing"></a>
 <a id="appearance"></a>
@@ -49,19 +51,17 @@ Requires Apple Silicon and macOS 15.0 or later.
 
 Open `.md` or `.markdown` files with Command-O or Finder's **Open With** menu. Existing files start in Read; new documents (Command-N) start in Edit. Saving and undo use the macOS document system.
 
-The upcoming 1.2.0 update (build 27) offers to make nano.md the default Markdown app on first launch, before opening the automatic file chooser. Choose **Make Default**, or **Not Now** to dismiss the offer without being asked again. After a successful first-launch default-app change, the file chooser opens if no document is already open. Users who already have nano.md as their default, and later launches, use the usual file chooser. The same default-app action remains available from **nano.md > Make Default Handler of .md files…**. macOS may ask you to confirm the change. This feature is not included in the 1.0.0 download above.
+nano.md offers to become the default Markdown app on first launch, before opening the automatic file chooser. Choose **Make Default**, or **Not Now** to dismiss the offer without being asked again. After a successful first-launch default-app change, the file chooser opens if no document is already open. Users who already have nano.md as their default, and later launches, use the usual file chooser. The same default-app action remains available from **nano.md > Make Default Handler of .md files…**. macOS may ask you to confirm the change.
 
-The upcoming 1.2.0 update also provides **nano.md > Font Settings > Choose Font…** to choose any font face available through macOS's native font panel. Monaco is the default. The reading preference applies across windows and persists across launches; headings retain their hierarchy and code stays monospaced. **nano.md > Font Settings > Use Default Font** restores Monaco. This changes presentation without changing Markdown source and is not included in the 1.0.0 download above.
+Use **nano.md > Font Settings > Choose Font…** to choose any font face available through macOS's native font panel. Monaco is the default. The reading preference applies across windows and persists across launches; headings retain their hierarchy and code stays monospaced. **nano.md > Font Settings > Use Default Font** restores Monaco. This changes presentation without changing Markdown source.
 
-Switch Read/Edit with Control-R, the toolbar, the footer button, or View > Edit/Read. The upcoming 1.2.0 update also adds Command-R and fixes synchronization between native undo/redo and document source. Choose System, Light (Linen Light), or Dark (Nano Dark) from View > Appearance or the toolbar. Appearance applies to all windows and persists across launches.
+Switch Read/Edit with Command-R, Control-R, the toolbar, the footer button, or View > Edit/Read. Choose System, Light (Linen Light), or Dark (Nano Dark) from View > Appearance or the toolbar. Appearance applies to all windows and persists across launches.
 
 Switching to Edit places the caret near the selected reader text, or near the top of the visible content when scrolled, and focuses the editor. On a supported trackpad, force-click text in Read to start editing near that location.
 
 Find text in either mode with Command-F. Read searches displayed text; Edit searches Markdown source. Find appears over the document header, below the system toolbar, and highlights matches as you type. Command-G moves to the next match, Shift-Command-G to the previous match, and Escape closes the bar.
 
-The reader supports headings, paragraphs, emphasis, lists, quotes, code blocks, pipe tables, HTTP/HTTPS links, and a selectable panel for leading YAML front matter. Metadata values stay literal; the app does not interpret YAML.
-
-The upcoming 1.2.0 update also renders `~~strikethrough~~`, including text combined with bold, italics, inline code, or links, and refines heading, list, table, and code spacing. These changes are not included in the 1.0.0 download above.
+The reader supports headings, paragraphs, emphasis, lists, quotes, code blocks, pipe tables, HTTP/HTTPS links, `~~strikethrough~~` (including combinations with bold, italics, inline code, or links), and a selectable panel for leading YAML front matter. Metadata values stay literal; the app does not interpret YAML.
 
 Files must be valid UTF-8. Saving preserves the loaded BOM and existing line endings; new files use UTF-8 without a BOM and LF. Inserted line breaks follow the file's first existing line ending, while pasted text keeps its own. Smart quotes, autocorrect, and automatic substitutions are disabled.
 
