@@ -25,6 +25,9 @@ struct NanoMDApp: App {
         .defaultLaunchBehavior(defaultMarkdownApplication.shouldSuppressAutomaticDocumentLaunch ? .suppressed : .automatic)
         .commands {
             CommandGroup(after: .appInfo) {
+                if let reviewURL = URL(string: "https://apps.apple.com/app/id6826107962?action=write-review") {
+                    Link("Rate nano.md…", destination: reviewURL)
+                }
                 Menu("Font Settings") {
                     Button("Choose Font…") {
                         readerFontSettings.showFontPanel()

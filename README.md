@@ -55,6 +55,8 @@ nano.md offers to become the default Markdown app on first launch, before openin
 
 Use **nano.md > Font Settings > Choose Font…** to choose any font face available through macOS's native font panel. Monaco is the default. The reading preference applies across windows and persists across launches; headings retain their hierarchy and code stays monospaced. **nano.md > Font Settings > Use Default Font** restores Monaco. This changes presentation without changing Markdown source.
 
+The replacement 1.2.0 build 28 will include **nano.md > Rate nano.md…**, an optional link to write an App Store review, and a plain-English license summary in About. The app opens Apple's review page only when you choose the rating menu item. Build 28 is being prepared; the download above currently provides build 27.
+
 Switch Read/Edit with Command-R, Control-R, the toolbar, the footer button, or View > Edit/Read. Choose System, Light (Linen Light), or Dark (Nano Dark) from View > Appearance or the toolbar. Appearance applies to all windows and persists across launches.
 
 Switching to Edit places the caret near the selected reader text, or near the top of the visible content when scrolled, and focuses the editor. On a supported trackpad, force-click text in Read to start editing near that location.
