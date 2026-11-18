@@ -329,7 +329,7 @@ struct MarkdownTextRenderer {
                 attributes[.foregroundColor] = theme.primary
             }
             if run.style.contains(.code) {
-                attributes[.foregroundColor] = theme.accent
+                attributes[.foregroundColor] = usesInlineCodeBackground ? theme.accent : theme.codeBlockText
             }
             if run.style.contains(.code), usesInlineCodeBackground {
                 attributes[.backgroundColor] = theme.inlineCode

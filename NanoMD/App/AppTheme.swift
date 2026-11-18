@@ -82,6 +82,7 @@ nonisolated enum AppTheme: Equatable, Sendable {
     var border: NSColor { color(0x43564A, 0xB8C5B8) }
     var inlineCode: NSColor { color(0x26332B, 0xE4EBE0) }
     var codeBlock: NSColor { color(0x111914, 0xEEF1E8) }
+    var codeBlockText: NSColor { color(0xFFFFFF, 0x326647) }
     var header: NSColor { color(0x86D89F, 0xD2E6D5) }
     var headerText: NSColor { color(0x202724, 0x25352C) }
 
