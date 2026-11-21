@@ -71,7 +71,7 @@ Files must be valid UTF-8. Saving preserves the loaded BOM and existing line end
 
 ## Current limitations
 
-- Images appear as text placeholders; code blocks have no syntax highlighting.
+- Images appear as text placeholders. The 1.2.0 download displays code blocks in a single text color. Builds from this source highlight common keywords, comments, symbols, and quoted text.
 - CommonMark/GFM support is partial: HTML stays literal, task lists are noninteractive, and relative links, anchors, and non-web URL schemes do not navigate.
 - Reader-to-editor positioning is approximate where rendered text or layouts differ. Returning to Read resets reader selection and scroll. Undo/redo requires editor focus.
 - Documents over 1 MiB or beyond complexity limits fall back to selectable source.

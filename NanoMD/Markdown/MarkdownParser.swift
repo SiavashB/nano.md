@@ -50,7 +50,7 @@ actor MarkdownParser {
         case let paragraph as Paragraph:
             return .paragraph(try inlineChildren(paragraph, sourceIndex: sourceIndex))
         case let code as CodeBlock:
-            return .code(code.code)
+            return .code(MarkdownCodeBlock(code.code, language: code.language))
         case let quote as BlockQuote:
             return .quote(try quote.children.map { try block($0, sourceIndex: sourceIndex) })
         case let list as OrderedList:

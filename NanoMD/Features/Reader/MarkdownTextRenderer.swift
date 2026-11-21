@@ -23,6 +23,13 @@ struct MarkdownTextRenderer {
         try Task.checkCancellation()
         await Task.yield()
         let start = output.length
+        func appendLiteralBlock(_ text: String) -> Int {
+            appendParagraph(
+                [MarkdownRun(text: text, style: .code, sourceSpan: sourceSpan)], to: output,
+                font: fontFamily.codeFont(size: 12),
+                indent: indent, quoteDepth: quoteDepth, marker: marker, isLiteralBlock: true
+            )
+        }
         defer {
             if let sourceSpan {
                 let range = NSRange(location: start, length: output.length - start)
@@ -57,12 +64,28 @@ struct MarkdownTextRenderer {
                                        weight: fontFamily.headingWeight)
             appendParagraph(runs, to: output, font: font, color: theme.primary,
                             indent: indent, quoteDepth: quoteDepth, marker: marker, isHeading: true)
-        case let .code(text), let .literal(text):
-            appendParagraph(
-                [MarkdownRun(text: text, style: .code, sourceSpan: sourceSpan)], to: output,
-                font: fontFamily.codeFont(size: 12),
-                indent: indent, quoteDepth: quoteDepth, marker: marker, isLiteralBlock: true
-            )
+        case let .code(code):
+            let textStart = appendLiteralBlock(code.text)
+            let keywordColor = theme.codeKeyword
+            let commentColor = theme.codeComment
+            let symbolColor = theme.codeSymbol
+            let quotedTextColor = theme.codeQuotedText
+            for (index, highlight) in code.highlights.enumerated() {
+                if index > 0 && index.isMultiple(of: 1_024) {
+                    await Task.yield()
+                    try Task.checkCancellation()
+                }
+                let color = switch highlight.kind {
+                case .keyword: keywordColor
+                case .comment: commentColor
+                case .symbol: symbolColor
+                case .quotedText: quotedTextColor
+                }
+                let range = NSRange(location: textStart + highlight.range.location, length: highlight.range.length)
+                output.addAttribute(.foregroundColor, value: color, range: range)
+            }
+        case let .literal(text):
+            _ = appendLiteralBlock(text)
         case let .quote(blocks):
             for (index, child) in blocks.enumerated() {
                 try await append(child, to: output, indent: indent + 20, quoteDepth: quoteDepth + 1,
@@ -220,6 +243,7 @@ struct MarkdownTextRenderer {
         ]))
     }
 
+    @discardableResult
     private func appendParagraph(
         _ runs: [MarkdownRun],
         to output: NSMutableAttributedString,
@@ -230,7 +254,7 @@ struct MarkdownTextRenderer {
         marker: String,
         isLiteralBlock: Bool = false,
         isHeading: Bool = false
-    ) {
+    ) -> Int {
         let font = font ?? fontFamily.font(size: fontFamily.bodySize)
         let paragraph = NSMutableParagraphStyle()
         if isHeading {
@@ -281,6 +305,7 @@ struct MarkdownTextRenderer {
         var prefixAttributes = base
         prefixAttributes[.foregroundColor] = theme.accent
         output.append(NSAttributedString(string: prefix, attributes: prefixAttributes))
+        let textStart = output.length
         appendRuns(runs, to: output, font: font, base: base, usesInlineCodeBackground: !isLiteralBlock)
         if runs.last?.text.hasSuffix("\n") != true || runs.last?.destination != nil {
             output.append(NSAttributedString(string: "\n", attributes: base))
@@ -294,6 +319,7 @@ struct MarkdownTextRenderer {
                 .paragraphStyle: spacing
             ]))
         }
+        return textStart
     }
 
     private func appendRuns(
@@ -329,7 +355,7 @@ struct MarkdownTextRenderer {
                 attributes[.foregroundColor] = theme.primary
             }
             if run.style.contains(.code) {
-                attributes[.foregroundColor] = theme.accent
+                attributes[.foregroundColor] = usesInlineCodeBackground ? theme.accent : theme.codeBlockText
             }
             if run.style.contains(.code), usesInlineCodeBackground {
                 attributes[.backgroundColor] = theme.inlineCode
