@@ -7,7 +7,7 @@ nonisolated indirect enum MarkdownBlock: Sendable {
     case frontMatter(String)
     case paragraph([MarkdownRun])
     case heading(level: Int, runs: [MarkdownRun])
-    case code(String)
+    case code(MarkdownCodeBlock)
     case quote([MarkdownBlock])
     case list(start: UInt?, items: [MarkdownListItem])
     case table(MarkdownTable)

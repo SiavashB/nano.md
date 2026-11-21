@@ -74,16 +74,22 @@ nonisolated enum AppTheme: Equatable, Sendable {
     case nanoDark
     case linenLight
 
+    private static let darkHeaderGreen: UInt32 = 0x86D89F
+
     var surrounding: NSColor { color(0x202724, 0xEAE8DE) }
     var document: NSColor { color(0x18201C, 0xF7F5EE) }
     var primary: NSColor { color(0xEDF3EE, 0x25352C) }
     var secondary: NSColor { color(0xB0C0B5, 0x536258) }
-    var accent: NSColor { color(0x86D89F, 0x326647) }
+    var accent: NSColor { color(Self.darkHeaderGreen, 0x326647) }
     var border: NSColor { color(0x43564A, 0xB8C5B8) }
     var inlineCode: NSColor { color(0x26332B, 0xE4EBE0) }
     var codeBlock: NSColor { color(0x111914, 0xEEF1E8) }
     var codeBlockText: NSColor { color(0xFFFFFF, 0x326647) }
-    var header: NSColor { color(0x86D89F, 0xD2E6D5) }
+    var codeKeyword: NSColor { color(0xD9AEFF, 0x713A83) }
+    var codeComment: NSColor { color(0x909090, 0x686868) }
+    var codeSymbol: NSColor { color(0x8EACBD, 0x4E667C) }
+    var codeQuotedText: NSColor { color(Self.darkHeaderGreen, 0x137331) }
+    var header: NSColor { color(Self.darkHeaderGreen, 0xD2E6D5) }
     var headerText: NSColor { color(0x202724, 0x25352C) }
 
     private func color(_ dark: UInt32, _ light: UInt32) -> NSColor {
