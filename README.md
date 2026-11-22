@@ -34,7 +34,7 @@ Unzip and move `NanoMD.app` to Applications. The app is Developer ID signed and 
 
 Requires Apple Silicon and macOS 15.0 or later.
 
-The [Mac App Store](https://apps.apple.com/us/app/nano-md/id6826107962) update to 1.2.0 is awaiting Apple review. The direct download above is available now.
+> [Mac App Store](https://apps.apple.com/us/app/nano-md/id6826107962) version 1.2.0 is live
 
 ## Why nano.md
 
