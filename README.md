@@ -53,6 +53,8 @@ Requires Apple Silicon and macOS 15.0 or later.
 
 Open `.md` or `.markdown` files with Command-O or Finder's **Open With** menu. Existing files start in Read; new documents (Command-N) start in Edit. Saving and undo use the macOS document system.
 
+Development builds also open source files and `.txt` in Read mode. Supported files include TypeScript (`.ts`, `.tsx`, `.mts`, `.cts`) and CSS (`.css`). Switch to Edit to make changes in place. Code up to 1 MiB uses the same syntax colors in both modes, updated as you type. TXT stays plain.
+
 nano.md offers to become the default Markdown app on first launch, before opening the automatic file chooser. Choose **Make Default**, or **Not Now** to dismiss the offer without being asked again. After a successful first-launch default-app change, the file chooser opens if no document is already open. Users who already have nano.md as their default, and later launches, use the usual file chooser. The same default-app action remains available from **nano.md > Make Default Handler of .md files…**. macOS may ask you to confirm the change.
 
 Use **nano.md > Font Settings > Choose Font…** to choose any font face available through macOS's native font panel. Monaco is the default. The reading preference applies across windows and persists across launches; headings retain their hierarchy and code stays monospaced. **nano.md > Font Settings > Use Default Font** restores Monaco. This changes presentation without changing Markdown source.
@@ -71,9 +73,9 @@ Files must be valid UTF-8. Saving preserves the loaded BOM and existing line end
 
 ## Current limitations
 
-- Images appear as text placeholders. The 1.2.0 download displays code blocks in a single text color. Builds from this source highlight common keywords, comments, symbols, and quoted text.
+- Images appear as text placeholders. The 1.2.0 download uses one text color for code blocks. Development builds highlight common programming keywords, comments, symbols, and strings. Use `html` or `xml` on a code fence to highlight tags, attributes, and values.
 - CommonMark/GFM support is partial: HTML stays literal, task lists are noninteractive, and relative links, anchors, and non-web URL schemes do not navigate.
-- Reader-to-editor positioning is approximate where rendered text or layouts differ. Returning to Read resets reader selection and scroll. Undo/redo requires editor focus.
+- In Markdown, reader-to-editor positioning is approximate where rendered text or layouts differ. Returning to Read resets the Markdown reader’s selection and scroll. Undo/redo requires editor focus.
 - Documents over 1 MiB or beyond complexity limits fall back to selectable source.
 - Apple Silicon only; no Intel build or Quick Look extension.
 

@@ -34,7 +34,7 @@ struct ReaderView: View {
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                     Color(nsColor: theme.border).frame(height: 1)
-                    MarkdownSourceView(source: source, theme: theme, navigation: navigation, onEdit: onEdit)
+                    SourceTextView(source: source, theme: theme, navigation: navigation, onEdit: onEdit)
                 }
             }
         }

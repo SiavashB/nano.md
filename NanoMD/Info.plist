@@ -20,6 +20,52 @@
 				<string>net.daringfireball.markdown</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Source and Plain Text</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.plain-text</string>
+				<string>public.swift-source</string>
+				<string>public.python-script</string>
+				<string>com.netscape.javascript-source</string>
+				<string>com.thirdeyeds.commonjs-source</string>
+				<string>com.microsoft.typescript</string>
+				<string>com.thirdeyeds.typescript-module</string>
+				<string>public.css</string>
+				<string>com.sun.java-source</string>
+				<string>com.thirdeyeds.kotlin-source</string>
+				<string>public.ruby-script</string>
+				<string>public.c-source</string>
+				<string>public.c-header</string>
+				<string>public.c-plus-plus-source</string>
+				<string>public.c-plus-plus-header</string>
+				<string>com.thirdeyeds.csharp-source</string>
+				<string>public.shell-script</string>
+				<string>public.bash-script</string>
+				<string>public.html</string>
+				<string>public.xml</string>
+				<string>public.xhtml</string>
+			</array>
+		</dict>
+		<!-- Finder also uses .ts and .mts for video. AppKit resolves these extensions to source when opened here. -->
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>com.microsoft.typescript</string>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>ts</string>
+				<string>mts</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+		</dict>
 	</array>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
@@ -41,6 +87,90 @@
 				</array>
 				<key>public.mime-type</key>
 				<string>text/markdown</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>com.thirdeyeds.commonjs-source</string>
+			<key>UTTypeDescription</key>
+			<string>CommonJS Source</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.netscape.javascript-source</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>cjs</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>com.microsoft.typescript</string>
+			<key>UTTypeDescription</key>
+			<string>TypeScript Source</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.source-code</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>ts</string>
+					<string>tsx</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>com.thirdeyeds.typescript-module</string>
+			<key>UTTypeDescription</key>
+			<string>TypeScript Module</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>com.microsoft.typescript</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>mts</string>
+					<string>cts</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>com.thirdeyeds.csharp-source</string>
+			<key>UTTypeDescription</key>
+			<string>C# Source</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.source-code</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>cs</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>com.thirdeyeds.kotlin-source</string>
+			<key>UTTypeDescription</key>
+			<string>Kotlin Source</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.source-code</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>kt</string>
+					<string>kts</string>
+				</array>
 			</dict>
 		</dict>
 	</array>

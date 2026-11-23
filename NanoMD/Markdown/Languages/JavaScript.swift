@@ -1,7 +1,12 @@
-nonisolated final class JavaScriptHighlighter: CodeBlockHighlighter {
+nonisolated class JavaScriptHighlighter: CodeBlockHighlighter {
     override class var fenceTags: [String] { ["js", "javascript"] }
 
     private var context = JavaScriptContext()
+    var expectsExpression: Bool { context.expectsExpression }
+
+    func finishEmbeddedExpression(with delimiter: Substring) {
+        context.record(delimiter, kind: .quotedText)
+    }
 
     override func advance(depth: Int) -> Kind? {
         let start = remaining.startIndex

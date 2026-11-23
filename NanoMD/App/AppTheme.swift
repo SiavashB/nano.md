@@ -113,6 +113,29 @@ nonisolated enum AppTheme: Equatable, Sendable {
     }
 }
 
+struct CodeHighlightColors {
+    private let keyword: NSColor
+    private let comment: NSColor
+    private let symbol: NSColor
+    private let quotedText: NSColor
+
+    init(_ theme: AppTheme) {
+        keyword = theme.codeKeyword
+        comment = theme.codeComment
+        symbol = theme.codeSymbol
+        quotedText = theme.codeQuotedText
+    }
+
+    subscript(kind: MarkdownCodeBlock.Highlight.Kind) -> NSColor {
+        switch kind {
+        case .keyword: keyword
+        case .comment: comment
+        case .symbol: symbol
+        case .quotedText: quotedText
+        }
+    }
+}
+
 struct AppearancePicker: View {
     @Binding var preference: String
 

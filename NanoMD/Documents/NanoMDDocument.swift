@@ -4,44 +4,58 @@ import UniformTypeIdentifiers
 
 nonisolated struct NanoMDDocument: FileDocument {
     var source: String
+    let contentType: UTType
     let hasUTF8ByteOrderMark: Bool
     let lineEnding: String
+    private let posixPermissions: Int?
     // A system reload/revert replaces this identity; ordinary edits and saves do not.
     let loadIdentity = UUID()
 
-    static let readableContentTypes: [UTType] = [.markdown]
-    static let writableContentTypes: [UTType] = [.markdown]
+    static let writableContentTypes = DocumentFormat.contentTypes
+    // The Open panel can classify .ts and .mts as transport streams even when they contain source.
+    static let readableContentTypes = writableContentTypes + [.mpeg2TransportStream]
 
     init() {
         source = ""
+        contentType = .markdown
         hasUTF8ByteOrderMark = false
         lineEnding = "\n"
+        posixPermissions = nil
     }
 
     init(configuration: ReadConfiguration) throws {
-        try self.init(file: configuration.file)
+        try self.init(file: configuration.file, contentType: configuration.contentType)
     }
 
-    init(file: FileWrapper) throws {
-        guard file.isRegularFile,
-              let data = file.regularFileContents else {
-            throw MarkdownDocumentError.notRegularFile
+    init(file: FileWrapper, contentType: UTType = .markdown) throws {
+        if contentType.conforms(to: .mpeg2TransportStream) {
+            let filename = file.preferredFilename ?? file.filename
+            let ext = filename.map { ($0 as NSString).pathExtension.lowercased() } ?? contentType.preferredFilenameExtension
+            guard let ext, ["ts", "mts"].contains(ext),
+                  let sourceType = UTType(filenameExtension: ext, conformingTo: .text) else {
+                throw CocoaError(.fileReadCorruptFile, userInfo: [
+                    NSLocalizedDescriptionKey: String(localized: "Choose a TypeScript source file with a .ts or .mts extension.")
+                ])
+            }
+            self.contentType = sourceType
+        } else {
+            self.contentType = contentType
         }
-
-        hasUTF8ByteOrderMark = data.starts(with: [0xEF, 0xBB, 0xBF])
-        let contents = hasUTF8ByteOrderMark ? data.dropFirst(3) : data[...]
-
-        guard let source = String(data: contents, encoding: .utf8) else {
-            throw MarkdownDocumentError.invalidUTF8
-        }
-
-        self.source = source
+        let text = try UTF8TextFile(file)
+        posixPermissions = file.fileAttributes[FileAttributeKey.posixPermissions.rawValue] as? Int
+        source = text.source
+        hasUTF8ByteOrderMark = text.hasByteOrderMark
         lineEnding = source.first { $0 == "\r\n" || $0 == "\r" || $0 == "\n" }
             .map(String.init) ?? "\n"
     }
 
     func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
-        fileWrapper()
+        let wrapper = fileWrapper()
+        let key = FileAttributeKey.posixPermissions.rawValue
+        if let mode = configuration.existingFile?.fileAttributes[key] as? Int ?? posixPermissions {
+            wrapper.fileAttributes[key] = mode
+        }
+        return wrapper
     }
 
     func fileWrapper() -> FileWrapper {
@@ -51,28 +65,5 @@ nonisolated struct NanoMDDocument: FileDocument {
         }
         data.append(contentsOf: source.utf8)
         return FileWrapper(regularFileWithContents: data)
-    }
-}
-
-private nonisolated enum MarkdownDocumentError: LocalizedError {
-    case notRegularFile
-    case invalidUTF8
-
-    var errorDescription: String? {
-        switch self {
-        case .notRegularFile:
-            String(localized: "The document is not a regular text file.")
-        case .invalidUTF8:
-            String(localized: "The document is not valid UTF-8 text.")
-        }
-    }
-
-    var recoverySuggestion: String? {
-        switch self {
-        case .notRegularFile:
-            String(localized: "Open a Markdown file with a .md or .markdown extension.")
-        case .invalidUTF8:
-            String(localized: "Save a copy of the document using UTF-8 encoding, then open that copy.")
-        }
     }
 }

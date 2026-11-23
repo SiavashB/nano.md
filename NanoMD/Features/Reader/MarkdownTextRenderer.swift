@@ -12,6 +12,23 @@ struct MarkdownTextRenderer {
         return NSAttributedString(attributedString: output)
     }
 
+    static func applyCodeHighlights(
+        _ highlights: [MarkdownCodeBlock.Highlight],
+        to output: NSMutableAttributedString,
+        offset: Int = 0,
+        theme: AppTheme
+    ) async throws {
+        let colors = CodeHighlightColors(theme)
+        for (index, highlight) in highlights.enumerated() {
+            if index > 0 && index.isMultiple(of: 1_024) {
+                await Task.yield()
+                try Task.checkCancellation()
+            }
+            let range = NSRange(location: offset + highlight.range.location, length: highlight.range.length)
+            output.addAttribute(.foregroundColor, value: colors[highlight.kind], range: range)
+        }
+    }
+
     private func append(
         _ block: MarkdownBlock,
         to output: NSMutableAttributedString,
@@ -66,24 +83,7 @@ struct MarkdownTextRenderer {
                             indent: indent, quoteDepth: quoteDepth, marker: marker, isHeading: true)
         case let .code(code):
             let textStart = appendLiteralBlock(code.text)
-            let keywordColor = theme.codeKeyword
-            let commentColor = theme.codeComment
-            let symbolColor = theme.codeSymbol
-            let quotedTextColor = theme.codeQuotedText
-            for (index, highlight) in code.highlights.enumerated() {
-                if index > 0 && index.isMultiple(of: 1_024) {
-                    await Task.yield()
-                    try Task.checkCancellation()
-                }
-                let color = switch highlight.kind {
-                case .keyword: keywordColor
-                case .comment: commentColor
-                case .symbol: symbolColor
-                case .quotedText: quotedTextColor
-                }
-                let range = NSRange(location: textStart + highlight.range.location, length: highlight.range.length)
-                output.addAttribute(.foregroundColor, value: color, range: range)
-            }
+            try await Self.applyCodeHighlights(code.highlights, to: output, offset: textStart, theme: theme)
         case let .literal(text):
             _ = appendLiteralBlock(text)
         case let .quote(blocks):

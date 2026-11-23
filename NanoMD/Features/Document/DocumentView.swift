@@ -4,6 +4,7 @@ struct DocumentView: View {
     @Binding var document: NanoMDDocument
     @Binding var appearancePreference: String
     let filename: String
+    let format: DocumentFormat
     let systemColorScheme: ColorScheme
     let readerFont: ReaderFont
     @State private var mode: Mode
@@ -23,12 +24,13 @@ struct DocumentView: View {
         }
     }
 
-    init(document: Binding<NanoMDDocument>, isNewDocument: Bool, filename: String,
+    init(document: Binding<NanoMDDocument>, isNewDocument: Bool, filename: String, format: DocumentFormat = .markdown,
          appearancePreference: Binding<String>, systemColorScheme: ColorScheme,
          readerFont: ReaderFont = .defaultFont) {
         _document = document
         _appearancePreference = appearancePreference
         self.filename = filename
+        self.format = format
         self.systemColorScheme = systemColorScheme
         self.readerFont = readerFont
         _mode = State(initialValue: isNewDocument ? .edit : .read)
@@ -45,7 +47,8 @@ struct DocumentView: View {
     private func switchMode(to destination: Mode) {
         guard destination != mode else { return }
         if destination == .edit {
-            beginEditing(at: navigation.entryPoint(for: document.source))
+            let point = format == .markdown ? navigation.entryPoint(for: document.source) : nil
+            beginEditing(at: point)
         } else {
             navigation.dismissFindInterface(inEditor: true)
             mode = .read
@@ -61,17 +64,19 @@ struct DocumentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            header
+            DocumentHeader(filename: filename, font: readerFont, theme: theme,
+                           navigation: navigation, inEditor: mode == .edit)
 
             rule
             ZStack {
-                // Keep the native editor and its undo targets alive while reading.
+                // Standalone source uses the same text view in both modes.
                 MarkdownEditorView(document: $document, isActive: mode == .edit, theme: theme,
-                                   entryRequest: editorEntry, navigation: navigation)
-                    .allowsHitTesting(mode == .edit)
-                    .accessibilityHidden(mode != .edit)
+                                   entryRequest: editorEntry, navigation: navigation, format: format,
+                                   onEdit: beginEditing)
+                    .allowsHitTesting(mode == .edit || format != .markdown)
+                    .accessibilityHidden(mode == .read && format == .markdown)
 
-                if mode == .read {
+                if mode == .read && format == .markdown {
                     ReaderView(source: document.source, theme: theme, navigation: navigation,
                                font: readerFont) { point in
                         guard navigation.matches(document.source) else { return }
@@ -110,34 +115,6 @@ struct DocumentView: View {
             }
             appearanceToolbarItem
         }
-    }
-
-    private var header: some View {
-        ZStack {
-            HStack(spacing: 16) {
-                Text("nano.md")
-                    .font(Font(readerFont.font(size: 12, weight: readerFont.headingWeight)))
-                Spacer(minLength: 0)
-                Text(filename).truncationMode(.middle)
-            }
-            .font(Font(readerFont.font(size: 12)))
-            .lineLimit(1)
-            .padding(.horizontal, 17)
-            .padding(.vertical, 12)
-            .foregroundStyle(Color(nsColor: theme.headerText))
-            .opacity(navigation.findBarView == nil ? 1 : 0)
-            .accessibilityHidden(navigation.findBarView != nil)
-
-            if let findBar = navigation.findBarView {
-                FindBarView(findBar: findBar) {
-                    guard navigation.findBarView === findBar else { return }
-                    navigation.performFindAction(.showFindInterface, inEditor: mode == .edit)
-                }
-                .frame(height: navigation.findBarHeight)
-            }
-        }
-        .frame(minHeight: 44)
-        .background(Color(nsColor: theme.header))
     }
 
     private var footer: some View {
