@@ -6,7 +6,8 @@ class ReaderInteractionTextView: DocumentTextView {
     var onEdit: ((EditorEntryPoint) -> Void)?
     private(set) var handledForceClick = false
 
-    func enableForceClick() {
+    @discardableResult
+    func enableForceClick() -> NSGestureRecognizer {
         // After recognition fails, ordinary selection needs only stage-one pressure.
         pressureConfiguration = NSPressureConfiguration(pressureBehavior: .primaryClick)
         let recognizer = ReaderForceClickRecognizer(target: self, action: #selector(forceClickRecognized(_:)))
@@ -16,6 +17,7 @@ class ReaderInteractionTextView: DocumentTextView {
         // this press becomes a normal click/drag, or consume the whole force-click sequence.
         recognizer.delaysPrimaryMouseButtonEvents = true
         addGestureRecognizer(recognizer)
+        return recognizer
     }
 
     func entryPoint(at point: NSPoint? = nil) -> EditorEntryPoint? {
@@ -55,7 +57,9 @@ class ReaderInteractionTextView: DocumentTextView {
         return EditorEntryPoint(sourceOffset: sourceOffset, viewportOffset: viewportOffset)
     }
 
-    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
+        isEditable ? super.acceptsFirstMouse(for: event) : true
+    }
 
     fileprivate func beginPrimaryClick() {
         handledForceClick = false

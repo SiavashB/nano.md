@@ -6,9 +6,10 @@ nonisolated class CodeBlockHighlighter {
 
     private static let languagesByFence: [String: CodeBlockHighlighter.Type] = {
         let languages: [CodeBlockHighlighter.Type] = [
-            JavaHighlighter.self, JavaScriptHighlighter.self, KotlinHighlighter.self, SwiftHighlighter.self,
+            JavaHighlighter.self, JavaScriptHighlighter.self, TypeScriptHighlighter.self, TSXHighlighter.self,
+            CSSHighlighter.self, KotlinHighlighter.self, SwiftHighlighter.self,
             PythonHighlighter.self, RubyHighlighter.self, CHighlighter.self, CPlusPlusHighlighter.self,
-            CSharpHighlighter.self, BashHighlighter.self
+            CSharpHighlighter.self, BashHighlighter.self, HTMLHighlighter.self, XMLHighlighter.self
         ]
         return Dictionary(uniqueKeysWithValues: languages.flatMap { language in
             language.fenceTags.map { ($0, language) }
@@ -21,7 +22,15 @@ nonisolated class CodeBlockHighlighter {
         let tag = fence?.split(whereSeparator: \.isWhitespace).first?.lowercased()
         if tag == "text" || tag == "plaintext" { return [] }
         let language = tag.flatMap { languagesByFence[$0] } ?? CodeBlockHighlighter.self
-        return language.init(source).scan()
+        let highlighter = language.init(source)
+        highlighter.scanTokens()
+        return highlighter.highlights
+    }
+
+    @concurrent
+    static func fileHighlights(in source: String, language: String) async -> [Highlight] {
+        guard !Task.isCancelled, source.utf8.count <= MarkdownParser.maximumSourceBytes else { return [] }
+        return highlights(in: source, fence: language)
     }
 
     struct Interpolation: Sendable {
@@ -45,33 +54,33 @@ nonisolated class CodeBlockHighlighter {
 
     let source: String
     var remaining: Substring
+    private var highlights: [Highlight] = []
+    private var utf16Offset = 0
 
     required init(_ source: String) {
         self.source = source
         remaining = source[...]
     }
 
-    private func scan() -> [Highlight] {
-        var highlights: [Highlight] = []
-        var offset = 0
-        while !remaining.isEmpty {
+    func scanTokens() {
+        while !remaining.isEmpty && !Task.isCancelled {
             let start = remaining.startIndex
             let kind = advance()
-            let length = source[start..<remaining.startIndex].utf16.count
-            if let kind {
-                let range = NSRange(location: offset, length: length)
-                if kind == .symbol, let previous = highlights.last,
-                   previous.kind == .symbol, NSMaxRange(previous.range) == offset {
-                    highlights[highlights.count - 1] = Highlight(
-                        kind: kind, range: NSUnionRange(previous.range, range)
-                    )
-                } else {
-                    highlights.append(Highlight(kind: kind, range: range))
-                }
-            }
-            offset += length
+            record(from: start, as: kind)
         }
-        return highlights
+    }
+
+    final func record(from start: String.Index, as kind: Kind?) {
+        let length = source[start..<remaining.startIndex].utf16.count
+        let range = NSRange(location: utf16Offset, length: length)
+        utf16Offset += length
+        guard let kind, length > 0 else { return }
+        if kind == .symbol, let previous = highlights.last,
+           previous.kind == .symbol, NSMaxRange(previous.range) == range.location {
+            highlights[highlights.count - 1] = Highlight(kind: kind, range: NSUnionRange(previous.range, range))
+        } else {
+            highlights.append(Highlight(kind: kind, range: range))
+        }
     }
 
     func advance(depth: Int = 0) -> Kind? {
@@ -86,10 +95,14 @@ nonisolated class CodeBlockHighlighter {
         if Self.isIdentifierCharacter(first) {
             let word = remaining.prefix(while: Self.isIdentifierCharacter)
             remaining = remaining[word.endIndex...]
-            return Self.keywords.contains(word) ? .keyword : nil
+            return Self.isKeyword(word) ? .keyword : nil
         }
         remaining.removeFirst()
         return Self.symbols.contains(first) ? .symbol : nil
+    }
+
+    class func isKeyword(_ word: Substring) -> Bool {
+        keywords.contains(word)
     }
 
     static func isIdentifierCharacter(_ character: Character) -> Bool {
@@ -125,6 +138,10 @@ nonisolated class CodeBlockHighlighter {
 
     final func slashComment(nested: Bool = false, continuedLines: Bool = false) -> Kind? {
         if take("//") { return lineComment(continuedLines: continuedLines) }
+        return blockComment(nested: nested)
+    }
+
+    final func blockComment(nested: Bool = false) -> Kind? {
         guard take("/*") else { return nil }
         var level = 1
         while !remaining.isEmpty && level > 0 {

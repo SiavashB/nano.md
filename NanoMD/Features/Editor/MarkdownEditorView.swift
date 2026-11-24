@@ -7,6 +7,8 @@ struct MarkdownEditorView: NSViewRepresentable {
     let theme: AppTheme
     let entryRequest: EditorEntryRequest?
     let navigation: DocumentNavigation
+    var format: DocumentFormat = .markdown
+    var onEdit: ((EditorEntryPoint) -> Void)?
     @Environment(\.undoManager) private var undoManager
 
     func makeCoordinator() -> Coordinator {
@@ -20,6 +22,7 @@ struct MarkdownEditorView: NSViewRepresentable {
         context.coordinator.textView = textView
         textView.delegate = context.coordinator
         textView.isRichText = false
+        textView.isSelectable = true
         textView.importsGraphics = false
         textView.allowsUndo = true
         textView.isAutomaticQuoteSubstitutionEnabled = false
@@ -33,7 +36,6 @@ struct MarkdownEditorView: NSViewRepresentable {
         textView.font = .monospacedSystemFont(ofSize: 14, weight: .regular)
         textView.textContainerInset = NSSize(width: 20, height: 20)
         NativeTextViewConfiguration.apply(to: textView, in: scrollView)
-        textView.setAccessibilityLabel(String(localized: "Markdown source editor"))
         textView.string = document.source
         textView.lineEnding = document.lineEnding
         textView.compositionDidEnd = { [weak coordinator = context.coordinator, weak textView] in
@@ -42,16 +44,14 @@ struct MarkdownEditorView: NSViewRepresentable {
                 guard let textView else { return }
                 coordinator?.applyReload(to: textView)
                 textView.applyTextTheme()
+                textView.syntax?.refresh()
                 coordinator?.scheduleActivation(of: textView)
             }
         }
         scrollView.documentView = textView
         navigation.editor = textView
-        theme.apply(to: scrollView)
-        textView.theme = theme
-        textView.applyTextTheme()
         context.coordinator.undoManager = undoManager
-        scrollView.isHidden = !isActive
+        configure(textView, in: scrollView)
         textView.didAttachToWindow = { [weak coordinator = context.coordinator, weak textView] in
             guard let textView else { return }
             coordinator?.scheduleActivation(of: textView)
@@ -66,16 +66,41 @@ struct MarkdownEditorView: NSViewRepresentable {
         coordinator.document = $document
         coordinator.undoManager = undoManager
         coordinator.applyReload(to: textView)
-        theme.apply(to: scrollView)
-        textView.theme = theme
-        textView.applyTextTheme()
+        configure(textView, in: scrollView)
+        coordinator.updateActivation(isActive, request: entryRequest, textView: textView)
+    }
 
-        if !isActive, scrollView.window?.firstResponder === textView {
+    private func configure(_ textView: SourceTextView, in scrollView: NSScrollView) {
+        let hidden = format == .markdown && !isActive
+        let editable = format == .markdown || isActive
+        if hidden, scrollView.window?.firstResponder === textView {
             textView.breakUndoCoalescing()
             scrollView.window?.makeFirstResponder(nil)
         }
-        scrollView.isHidden = !isActive
-        coordinator.updateActivation(isActive, request: entryRequest, textView: textView)
+        if textView.isEditable != editable {
+            if !editable { textView.breakUndoCoalescing() }
+            textView.isEditable = editable
+        }
+        scrollView.isHidden = hidden
+        let readingSource = format != .markdown && !isActive
+        if readingSource {
+            textView.sourceSnapshot = document.source
+            navigation.reader = textView
+        } else if navigation.reader === textView {
+            navigation.reader = nil
+        }
+        textView.displaysSource = readingSource
+        textView.setReadAction(readingSource ? onEdit : nil)
+        let label = switch format {
+        case .markdown: String(localized: "Markdown source editor")
+        case .plainText: editable ? String(localized: "Text editor") : String(localized: "Text document")
+        case .code: editable ? String(localized: "Source code editor") : String(localized: "Source code")
+        }
+        textView.setAccessibilityLabel(label)
+        theme.apply(to: scrollView)
+        textView.theme = theme
+        textView.format = format
+        textView.applyTextTheme()
     }
 
     static func dismantleNSView(_ scrollView: NSScrollView, coordinator: Coordinator) {
@@ -83,7 +108,8 @@ struct MarkdownEditorView: NSViewRepresentable {
         coordinator.undoManager?.removeAllActions()
         coordinator.cancelActivation()
         coordinator.undoManager = nil
-        (scrollView.documentView as? NSTextView)?.delegate = nil
+        coordinator.textView?.syntax?.detach()
+        coordinator.textView?.delegate = nil
     }
 
     final class Coordinator: NSObject, NSTextViewDelegate {
@@ -201,6 +227,7 @@ struct MarkdownEditorView: NSViewRepresentable {
             textView.lineEnding = value.lineEnding
             if !textView.string.utf8.elementsEqual(value.source.utf8) {
                 textView.string = value.source
+                textView.syntax?.refresh()
             }
         }
 
@@ -222,12 +249,24 @@ struct MarkdownEditorView: NSViewRepresentable {
         }
     }
 
-    final class SourceTextView: DocumentTextView {
+    final class SourceTextView: ReaderInteractionTextView {
         var lineEnding = "\n"
         var compositionDidEnd: (() -> Void)?
         var didAttachToWindow: (() -> Void)?
         var theme: AppTheme = .linenLight
+        var format: DocumentFormat = .markdown
+        private(set) var syntax: SourceSyntaxHighlighting?
         private var appliedTextTheme: AppTheme?
+        private var appliedFormat: DocumentFormat?
+        private var readGesture: NSGestureRecognizer?
+
+        func setReadAction(_ action: ((EditorEntryPoint) -> Void)?) {
+            if action != nil, readGesture == nil { readGesture = enableForceClick() }
+            if let readGesture, readGesture.isEnabled != (action != nil) {
+                readGesture.isEnabled = action != nil
+            }
+            onEdit = action
+        }
 
         override func viewDidMoveToWindow() {
             super.viewDidMoveToWindow()
@@ -236,10 +275,22 @@ struct MarkdownEditorView: NSViewRepresentable {
 
         func applyTextTheme() {
             // Leave marked text under input-method ownership until composition finishes.
-            guard !hasMarkedText(), appliedTextTheme != theme else { return }
-            textColor = theme.secondary
-            typingAttributes[.foregroundColor] = theme.secondary
+            guard !hasMarkedText(), appliedTextTheme != theme || appliedFormat != format else { return }
+            let foreground = switch format {
+            case .markdown: theme.secondary
+            case .plainText: theme.primary
+            case .code: theme.codeBlockText
+            }
+            textColor = foreground
+            typingAttributes[.foregroundColor] = foreground
+            if syntax?.language != format.language {
+                syntax?.detach()
+                syntax = format.language.flatMap { SourceSyntaxHighlighting(textView: self, language: $0, theme: theme) }
+            } else {
+                syntax?.applyTheme(theme)
+            }
             appliedTextTheme = theme
+            appliedFormat = format
         }
 
         override func insertNewline(_ sender: Any?) {

@@ -1,7 +1,7 @@
 import AppKit
 import SwiftUI
 
-struct MarkdownSourceView: NSViewRepresentable {
+struct SourceTextView: NSViewRepresentable {
     let source: String
     let theme: AppTheme
     let navigation: DocumentNavigation

@@ -18,6 +18,7 @@ struct NanoMDApp: App {
         DocumentGroup(newDocument: NanoMDDocument()) { file in
             DocumentView(document: file.$document, isNewDocument: file.fileURL == nil,
                          filename: file.fileURL?.lastPathComponent ?? "Untitled",
+                         format: DocumentFormat(fileURL: file.fileURL, contentType: file.document.contentType),
                          appearancePreference: $themePreference,
                          systemColorScheme: systemAppearance.colorScheme, readerFont: readerFontSettings.value)
         }

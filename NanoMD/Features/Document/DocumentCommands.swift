@@ -4,9 +4,21 @@ import SwiftUI
 struct DocumentCommands: Commands {
     @FocusedValue(\.documentModeAction) private var documentModeAction
     @FocusedValue(\.documentFindAction) private var documentFindAction
+    @FocusedValue(\.documentIsInReadMode) private var documentIsInReadMode
     @Binding var appearancePreference: String
 
     var body: some Commands {
+        if documentIsInReadMode == true {
+            // A visible read-only text view can still consume the window's native undo history.
+            CommandGroup(replacing: .undoRedo) {
+                Button("Undo") {}
+                    .keyboardShortcut("z", modifiers: .command)
+                    .disabled(true)
+                Button("Redo") {}
+                    .keyboardShortcut("z", modifiers: [.command, .shift])
+                    .disabled(true)
+            }
+        }
         CommandGroup(after: .textEditing) {
             Menu("Find") {
                 Button("Find…") { documentFindAction?.perform(.showFindInterface) }
@@ -56,6 +68,8 @@ struct DocumentFindAction {
 }
 
 extension FocusedValues {
+    @Entry var documentIsInReadMode: Bool?
+
     var documentFindAction: DocumentFindAction? {
         get { self[DocumentFindActionKey.self] }
         set { self[DocumentFindActionKey.self] = newValue }
