@@ -95,6 +95,7 @@ struct DocumentView: View {
         .frame(minWidth: 360, minHeight: 240)
         .preferredColorScheme(appearance.colorScheme)
         .tint(Color(nsColor: theme.accent))
+        .focusedSceneValue(\.documentIsInReadMode, mode == .read)
         .focusedSceneValue(\.documentModeAction, modeAction)
         .focusedSceneValue(\.documentFindAction, DocumentFindAction { action in
             navigation.performFindAction(action, inEditor: mode == .edit)

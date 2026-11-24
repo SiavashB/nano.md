@@ -31,7 +31,7 @@ nonisolated final class HTMLHighlighter: MarkupHighlighter {
             // Give JavaScript the bounded slice so an unfinished string cannot consume the closing tag.
             let script = JavaScriptHighlighter(source)
             script.remaining = remaining[..<end]
-            while !script.remaining.isEmpty {
+            while !Task.isCancelled, !script.remaining.isEmpty {
                 let kind = script.advance(depth: 0)
                 consume(to: script.remaining.startIndex, as: kind)
             }

@@ -22,6 +22,7 @@ nonisolated final class TSXHighlighter: TypeScriptHighlighter {
     private enum Section { case code, openingTag, closingTag, children }
     private var section = Section.code
     private var enclosing: [Section] = []
+    private var typeArgumentDepth = 0
 
     override func advance(depth: Int) -> Kind? {
         guard depth == 0, let first = remaining.first else { return super.advance(depth: depth) }
@@ -42,10 +43,24 @@ nonisolated final class TSXHighlighter: TypeScriptHighlighter {
             return nil
         case .openingTag, .closingTag:
             if take("/>") || (section == .closingTag && take(">")) {
+                typeArgumentDepth = 0
                 section = enclosing.popLast() ?? .code
                 // A completed JSX element acts as an operand for the next JavaScript slash.
                 if section == .code { finishEmbeddedExpression(with: source[start..<remaining.startIndex]) }
                 return .symbol
+            }
+            if section == .openingTag, take("<") {
+                typeArgumentDepth += 1
+                return .symbol
+            }
+            if typeArgumentDepth > 0 {
+                // Function types can contain an arrow before the closing type argument bracket.
+                if take("=>") { return .symbol }
+                if take(">") {
+                    typeArgumentDepth -= 1
+                    return .symbol
+                }
+                return super.advance(depth: depth)
             }
             if take(">") { section = .children; return .symbol }
             if first == "{" { return enterExpression() }
